@@ -2,25 +2,28 @@
 """
 Plot what the ITE's fan demand actually does, from the bench logs.
 
-Two panels, one SVG:
+One SVG, three panels:
 
   Top - the pooled curve. Every paired sample from every run that has both captures, plotted against the
-        temperature of the BOARD (pch_thermal) rather than the cores. The board is the right axis: the 196
+        temperature of the BOARD (pch_thermal) rather than the cores. The board is the right axis: the 247
         samples where the cores sat at 65 C or hotter while the board stayed under 55 C sit at the floor,
-        not on the ramp, and they are drawn as open circles so they cannot be argued away. The faint dotted
-        lines are the dwell levels the ITE actually holds - 198, 257, 320, 380 counts, spaced about 61
-        counts apart, which is 1/8 of the swing.
+        not on the ramp, and they are drawn as open circles so they cannot be argued away. The faint
+        dotted lines are the dwell levels the ITE actually holds - 198, 257, 320, 380 counts, spaced about
+        61 counts apart, which is 1/8 of the swing.
 
-  Bottom - one run in time. The warm run: the board dragged up by hand heat and then a four-core load, then
-        left alone. It shows the floor, the climb through the knee near 55 C of board, the plateau at
-        74-76 % while the board sat at 68 C, and the release about 30 s after the board fell back through
-        the same knee.
+  Bottom left - the warm run in time. Board dragged up by hand heat and then a four-core load, then left
+        alone: the floor, the climb through the knee near 55 C of board, the plateau at 74-76 %, and the
+        release about 30 s after the board fell back through the same knee.
+
+  Bottom right - the hold run in time. A four-core ramp to get past the knee and then 1200 s at a lighter
+        load, so the board sits at 68.5-69 C for sixteen flat minutes. The duty sits on 378 counts for all
+        of it: the ITE does not integrate the time the board spends hot.
 
 Counts are the Uno's raw ADC reading at the tap of two 10k resistors, so 512 counts is 100 % duty and the
 wire's average volts are counts x 5.00 / 1024 / 0.5. The duty axis is therefore counts / 512, which is
 exact whatever the top of the ITE's swing turns out to be; the volts axis is what a meter would read.
 
-Run:  python3 bench/plot-curve.py
+Run:  python3 bench/plot-curve.py            (add --png for a raster copy to look at)
 Writes: docs/bench/06-ite-fan-response.svg
 """
 import os
@@ -31,6 +34,7 @@ import sys
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 DATA = "bench/data"
 OUT = "docs/bench/06-ite-fan-response.svg"
@@ -46,6 +50,19 @@ RUNS = [
     ("stress, fans max", "stress2.log", "stress2-temps.log", -15),
     ("board warmed by hand", "warm.log", "warm-temps.log", -20),
     ("board held hot 20 min", "hold.log", "hold-temps.log", -20),
+]
+
+# the two runs drawn as time traces, and what to say beside each trace
+TRACES = [
+    ("board warmed by hand",
+     "The warm run: floor, knee, plateau, release",
+     ("warm", "load", "cool"),
+     (830, 58.0, "the release\n381 -> 242 counts\nwithin 30 s")),
+    ("board held hot 20 min",
+     "The hold run: 16 flat minutes at 68.5-69 C, no climb",
+     ("ramp", "hold", "cool"),
+     (420, 38.0, "16 flat windows, board 68.5-69 C\n378 counts throughout\n"
+                 "trend +0.6 counts per minute")),
 ]
 
 RUN_COLORS = {
@@ -101,12 +118,53 @@ def volts_to_duty(v):
     return v * 100.0 / (COUNTS_FULL * VCC / 1024.0 / RATIO)
 
 
+def trace(ax, samples, marks, title, phases_to_show, note, color):
+    """One run in time: the ITE's duty, with the board and the cores on the right axis."""
+    t = range(len(samples))
+    d = [duty(s[0]) for s in samples]
+    ax.plot(t, d, color=color, linewidth=1.3, zorder=4, label="ITE duty, counts / 512")
+    ax.fill_between(t, d, 30, color=color, alpha=0.13)
+    ax.axhspan(duty(196), duty(262), color="#3aa6a0", alpha=0.13)
+
+    for phase, m in marks:
+        if phase not in phases_to_show:
+            continue
+        ax.axvline(m, color="#999999", linestyle=":", linewidth=1.0)
+        ax.text(m + 6, 90.0, phase, fontsize=8.5, color="#555555")
+
+    axb = ax.twinx()
+    axb.plot(t, [s[1] for s in samples], color="#2b2b2b", linewidth=0.9, label="package C")
+    axb.plot(t, [s[2] for s in samples], color="#4c72b0", linewidth=1.3, label="board C")
+    axb.set_ylabel("temperature, C", fontsize=9)
+    axb.set_ylim(30, 95)
+
+    if note:
+        ax.annotate(note[2], xy=(note[0], note[1]), fontsize=8.2, color="#333333")
+
+    ax.set_xlabel("seconds from the start of the run", fontsize=9)
+    ax.set_ylabel("ITE requested duty, %", fontsize=9)
+    ax.set_xlim(0, len(samples))
+    ax.set_ylim(30, 92)
+    ax.grid(True, color="#dddddd", linewidth=0.7)
+    ax.set_axisbelow(True)
+    ax.set_title(title, fontsize=10.2, loc="left")
+
+    h1, l1 = ax.get_legend_handles_labels()
+    h2, l2 = axb.get_legend_handles_labels()
+    ax.legend(h1 + h2, l1 + l2, loc="lower center", fontsize=7.4, ncol=3, framealpha=0.92)
+
+
 def main():
     runs = [pair(r) for r in RUNS]
+    by_name = {name: (samples, marks) for name, samples, marks in runs}
     pooled = [(name, samples) for name, samples, _ in runs]
 
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(11.0, 8.6))
+    fig = plt.figure(figsize=(11.0, 9.8))
     fig.patch.set_facecolor("white")
+    gs = GridSpec(2, 2, figure=fig, height_ratios=[1.32, 1.0], hspace=0.22, wspace=0.16)
+    ax1 = fig.add_subplot(gs[0, :])
+    ax2 = fig.add_subplot(gs[1, 0])
+    ax3 = fig.add_subplot(gs[1, 1])
 
     # -------------------------------------------------------------- top panel: the pooled curve
     for w in DWELLS:
@@ -157,45 +215,12 @@ def main():
     sec = ax1.secondary_yaxis("right", functions=(duty_to_volts, volts_to_duty))
     sec.set_ylabel("average volts on the PWM wire")
 
-    # ------------------------------------------------------- bottom panel: the warm run, in time
-    name, warm, marks = next(r for r in runs if r[0] == "board warmed by hand")
-    t = range(len(warm))
-    d = [duty(s[0]) for s in warm]
-    ax2.plot(t, d, color="#c44e52", linewidth=1.6, zorder=4, label="ITE duty, counts / 512")
-    ax2.fill_between(t, d, 30, color="#c44e52", alpha=0.13)
-    ax2.axhspan(duty(196), duty(262), color="#3aa6a0", alpha=0.13)
-    ax2.text(8, 54.5, "the floor band, 196-262 counts", fontsize=9, color="#1f6f6a")
+    # ------------------------------------------------- bottom panels: the two runs, in time
+    for name, title, phases, note in TRACES:
+        ax = ax2 if name == TRACES[0][0] else ax3
+        samples, marks = by_name[name]
+        trace(ax, samples, marks, title, phases, note, RUN_COLORS[name])
 
-    ax2b = ax2.twinx()
-    ax2b.plot(t, [s[1] for s in warm], color="#2b2b2b", linewidth=1.1, label="package C (the cores)")
-    ax2b.plot(t, [s[2] for s in warm], color="#4c72b0", linewidth=1.6, label="board C (pch)")
-    ax2b.set_ylabel("temperature, C")
-    ax2b.set_ylim(30, 95)
-    ax2b.legend(loc="upper right", fontsize=8.2, framealpha=0.92)
-
-    label = {"warm": "start warming the board", "load": "four-core load", "cool": "leave it alone",
-             "end": ""}
-    for phase, m in marks:
-        if phase in ("baseline", "end") or not label.get(phase):
-            continue
-        ax2.axvline(m, color="#999999", linestyle=":", linewidth=1.0)
-        ax2.text(m + 6, 88.5, label[phase], fontsize=8.5, color="#555555")
-
-    ax2.annotate("the release: 381 -> 242 counts within 30 s\nof the board falling back through 55 C",
-                 xy=(810, duty(300)), xytext=(830, 58), fontsize=8.5, color="#333333",
-                 arrowprops=dict(arrowstyle="->", color="#777777", linewidth=0.9))
-
-    ax2.set_xlabel("seconds from the start of the run")
-    ax2.set_ylabel("ITE requested duty, %")
-    ax2.set_xlim(0, len(warm))
-    ax2.set_ylim(30, 92)
-    ax2.grid(True, color="#dddddd", linewidth=0.7)
-    ax2.set_axisbelow(True)
-    ax2.legend(loc="center left", fontsize=8.2, framealpha=0.92)
-    ax2.set_title("One run in time: the floor, the climb through the knee, the plateau, the release",
-                  fontsize=11.5, loc="left")
-
-    fig.tight_layout()
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     fig.savefig(OUT, format="svg")
     if "--png" in sys.argv[1:]:

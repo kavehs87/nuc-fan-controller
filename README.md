@@ -53,9 +53,10 @@ raw logs are in `BUILD.md` and `bench/`; these are the measurements that changed
 against the temperature of the *board* (`pch_thermal`), every sample as a dot, the heavy line being the
 median in 3 °C bins, the dotted lines the dwell levels the ITE actually holds. The open circles are the
 247 samples where the cores sat at 65 °C or hotter while the board stayed under 55 °C — they land on the
-floor, not on the ramp, which is what makes the board the axis and the cores not. Bottom: the fourth run
-in time, board warmed by hand with the bench fans off and the NUC's own blower at minimum, then a
-four‑core load, then left alone. `bench/plot-curve.py` draws it from `bench/data/`.
+floor, not on the ramp, which is what makes the board the axis and the cores not. Bottom left: the fourth
+run in time, board warmed by hand with the bench fans off and the NUC's own blower at minimum, then a
+four‑core load, then left alone. Bottom right: the fifth run in time, held at 68.5–69 °C for sixteen flat
+minutes — the duty sits on 378 counts for all of it. `bench/plot-curve.py` draws it from `bench/data/`.
 
 ![the ITE's fan demand against the board, and one run in time](docs/bench/06-ite-fan-response.svg)
 
