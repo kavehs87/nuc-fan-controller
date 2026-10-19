@@ -3,7 +3,8 @@
 A 124 × 85 mm two-layer board that sits between a 6th-gen NUC's processor-fan header and a
 12 V fan in a custom enclosure. It does four things:
 
-1. bucks **19 V → 12 V** for the fan (LM2596T-ADJ, 3 A);
+1. brings **12 V** to the fan from an **off-board XL4016E1 step-down module** that plugs into
+   J6 (19 V in on pin 3, its two returns on pins 1–2, 12 V out on pin 4);
 2. makes **5 V then 3.3 V** from that 12 V for a 3.3 V / 8 MHz Arduino Pro Mini;
 3. reads the **PWM duty the ITE is asking for** and drives the fan at that duty through a
    12 V low-side switch;
@@ -27,7 +28,7 @@ The old Mode A board (fixed-RPM tach simulator only) is archived in
 | `exports/nuc-fan-controller_board.pdf` | top plot: F.Cu, silk, mask, outline |
 | `exports/nuc-fan-controller_board_bottom.pdf` | bottom plot: B.Cu, silk, mask, outline |
 | `exports/nuc-fan-controller_board.svg` | top view fitted to the board outline |
-| `exports/nuc-fan-controller_bom.csv` | 38 rows — the four mounting holes are board-only, so they are correctly not in it |
+| `exports/nuc-fan-controller_bom.csv` | 32 rows — the four mounting holes are board-only, so they are correctly not in it. The buck module is a purchased part, so it is not in it either |
 | `exports/fab/` | 8 Gerbers + `nuc-fan-controller.drl` + `_pos.csv` + `job.gbrjob`, ready to zip |
 | `firmware/nuc-tach-modeB/nuc-tach-modeB.ino` | the sketch |
 | `firmware/nuc-tach-modeA/` | the previous fixed-RPM sketch, kept for reference |
@@ -36,7 +37,8 @@ The old Mode A board (fixed-RPM tach simulator only) is archived in
 | `bench/plot-curve.py` | draws `docs/bench/06-ite-fan-response.svg`, the two-panel graph of the ITE's demand, from the same logs |
 | `bench/data/` | the raw logs behind every number in this file: 1 Hz traces of the divider reading, and of the NUC's temperatures — which pair is which run is the table below |
 | `docs/bench/` | the bench photos and the fan-response graph the README shows |
-| `logs/erc.json`, `logs/drc.json`, `logs/netlist.net` | last ERC / DRC / netlist runs |
+| `logs/erc.txt`, `logs/drc.txt` | the last ERC and DRC runs, as KiCad's JSON reports (`.txt` so they sit in the repo; the `.json` copies the commands write are scratch and gitignored, along with `logs/netlist.net` and `logs/wires.inc`) |
+| `logs/layout.py`, `logs/genwires.py`, `logs/applywires.py`, `logs/export.sh` | the design's own tools: the layout and its geometry checks, the wire generator, the splice that puts its output into the schematic, and the script that rebuilds every file in `exports/` |
 
 **Which log is which run.** The Uno's logs print one line per second and carry no timestamps; the NUC's
 logs are epoch-stamped with `PHASE` markers, so a pair is aligned by the offset the capture scripts were
@@ -64,7 +66,7 @@ error — every other pad on the board matches the schematic exactly.
 
 The schematic is drawn with **wires, not net labels**: every pin reaches its neighbour
 through a drawn wire, and the rails are `power:+12V / +5V / +3V3 / GND` symbols sitting on
-the pins. Every signal net carries a name tag (`19V`, `SW`, `FB`, `5V`, `FAN_SW`, `BASE`,
+the pins. Every signal net carries a name tag (`19V`, `5V`, `FAN_SW`, `BASE`,
 `FAN_GATE`, `GATE`, `TACH_BASE`, `NUC_TACH`, `NUC_PWM`, `PWM_IN`, `TACH_OUT`, `FAN_PWM`) so
 the print, the netlist, the board and the Gerber netlist all use the same readable names.
 Delete a tag and KiCad renames that net to `Net-(…)` everywhere downstream.
@@ -74,14 +76,14 @@ Delete a tag and KiCad renames that net to `Net-(…)` everywhere downstream.
 ## The circuit, in five blocks
 
 ```
-A. 19 V in and the buck                     B. 12 V → 5 V → 3.3 V
-   J1 19V IN ─ C1 220 µ/35V ─ U1 LM2596T       +12V ─ U2 AMS1117-5.0 ─ 5V ─ U3 AMS1117-3.3 ─ +3V3
-   C2 100n    (VIN 1, GND 3, ON/OFF 5)          C5 10µ + C6 100n on 5V   C7 10µ + C8 100n on 3V3
-   SW (U1.2) ─ D1 1N5822 ─ GND
-   SW ─ L1 100 µH 6 A toroid ─ +12V             C9 100p sits on NUC_TACH, TP1 is its test point
-   +12V ─ C3 470 µ/25V ─ C4 100n ─ GND
-   FB (U1.4) ─ RV1 10 k trim ─ R1 1k ─ GND
-   FB ─ back to U1.4
+A. 19 V in, the module, 12 V out            B. 12 V → 5 V → 3.3 V
+   J1 19V IN ─ 19V ─ J6 pin 3                 +12V ─ U2 AMS1117-5.0 ─ 5V ─ U3 AMS1117-3.3 ─ +3V3
+   J1 pin 2 ─ GND ─ J6 pin 2                   C5 10µ + C6 100n on 5V   C7 10µ + C8 100n on 3V3
+   J6 pin 1 ─ GND                              C9 100p sits on NUC_TACH, TP1 is its test point
+   J6 pin 4 ─ +12V ─ C3 470 µ/25V ─ C4 100n ─ GND
+   J6 is the module's socket: 19 V in on 3, its two returns on 1 and 2,
+   12 V out on 4. The XL4016E1 itself is not on this board — it is bolted to
+   the enclosure and connected to J6 with a four-wire harness.
 
 C. NUC interface (signals only)             D. 12 V fan speed drive
    J2  NUC fan header                        FAN_PWM (from D11) ─ R6 1k ─ BASE ─ R7 10k ─ GND
@@ -115,8 +117,9 @@ floating, which otherwise leaves Q3's gate at the mercy of a 12 V pull-up throug
 
 **D2 is not optional.** A fan is a motor winding. Every time Q3 turns off, that winding
 kicks `FAN_SW` above the 12 V rail; D2 (1N5819, 40 V, 3 A) clamps it back into the rail it
-came from. Without it the edge rings into the 12 V rail and the buck is nowhere near fast
-enough (150 kHz) to clean it up.
+came from. Without it the edge rings into the 12 V rail, and no buck — this one switches at
+about 180 kHz and regulates through an output capacitor, not through the fan's commutation —
+is fast enough to clean that up.
 
 **C9 is 100 pF, not 100 nF.** At 40 Hz with a 1–10 kΩ pull-up, 100 nF gives a 0.1–1 ms time
 constant against a 12.5 ms half-period — harmless — but 100 nF on a tach line invites
@@ -131,15 +134,8 @@ All through-hole except the two SOT-223 regulators, all already in the cabinet.
 
 | Ref | Value | Footprint | Cabinet |
 |---|---|---|---|
-| U1 | LM2596T-ADJ | `Package_TO_SOT_THT:TO-220-5_P3.4x3.7mm_StaggerOdd_Lead3.8mm_Vertical` | R1 B4 (1) |
-| L1 | 100 µH 6 A, 15 mm toroid | `Inductor_THT:L_Toroid_Horizontal_D16.8mm_P14.70mm_Vishay_TJ3` | L1 D2 (2) |
-| D1 | 1N5822 (40 V 3 A, catch diode) | `Diode_THT:D_DO-201AD_P15.24mm_Horizontal` | R1 C3 (9) |
-| C1 | 220 µF 35 V | `Capacitor_THT:CP_Radial_D10.0mm_P5.00mm` | L1 A1 |
-| C2 | 100 nF | `Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm` | L1 C9 |
 | C3 | 470 µF 25 V | `Capacitor_THT:CP_Radial_D10.0mm_P5.00mm` | L1 A1 |
 | C4 | 100 nF | `Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm` | L1 C9 |
-| R1 | 1 kΩ | `Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal` | R1 A2 |
-| RV1 | 10 kΩ multi-turn trim (3296W) | `Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical` | R1 D1 |
 | U2 | AMS1117-5.0 | `Package_TO_SOT_SMD:SOT-223-3_TabPin2` | L1 B1 (8) |
 | U3 | AMS1117-3.3 | `Package_TO_SOT_SMD:SOT-223-3_TabPin2` | L1 B1 (19) |
 | C5, C7 | 10 µF | `Capacitor_THT:CP_Radial_D6.3mm_P2.50mm` | L1 A1 |
@@ -158,16 +154,50 @@ All through-hole except the two SOT-223 regulators, all already in the cabinet.
 | J2 | NUC fan header | `Connector:FanPinHeader_1x04_P2.54mm_Vertical` | — |
 | J3, J4 | FAN 1 / FAN 2 | `Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical` | — |
 | J5 | Pro Mini | `Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical` | — |
+| J6 | BUCK MODULE — 1, 2 GND · 3 19 V · 4 12 V | `Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical` | — |
 | TP1 | TACH test point | `TestPoint:TestPoint_Pad_D1.5mm` | — |
 | MH1–4 | M3 mounting holes | `MountingHole:MountingHole_3.2mm_M3` | — |
 | — | Arduino Pro Mini **3.3 V / 8 MHz** | 5-pin header into J5 | L1 C5 (1) |
+| — | **XL4016E1 step-down module**, 19 V in → 12 V out | off-board, bolted to the enclosure, four wires into J6 | L1 A10 (1) |
 
-**Why LM2596T rather than the XL4016E1** (which is not on this board by request): the
-LM2596 is 150 kHz, runs at 19 V in with comfortable margin to its 40 V limit, is a 3 A part
-in TO-220 with a 6 A toroid and a 40 V/3 A catch diode behind it, and its feedback is a
-simple 1.2 V divider you can trim with a screwdriver. The XL4016's internal diode and its
-higher frequency buy nothing at 12 V / 1 A. LM2576HVT (R1 B4) is the spare if a lower
-12 V current is ever wanted.
+**Why the buck is a module now.** This board used to build its converter out of parts — LM2596T-ADJ,
+a 100 µH 6 A toroid, a 1N5822 catch diode, and a 10 kΩ trimmer in the feedback divider with R1 1 kΩ
+under it. That design is in git at `10bc262` and every part of it is still in the cabinet (LM2596T and
+LM2576HVT in R1 B4, 100 µH toroids in L1 D2, 1N5822 in R1 C3, 3296W trimmers in R1 D1). What changed is
+that the cabinet also holds a finished step-down module, and at 12 V / 1 A a finished module is the
+better answer: the **XL4016E1 module in L1 A10** carries the XL4016E1 controller and a 20S100 Schottky
+catch diode, each on its own heatsink, with its input and output electrolytics and two multi-turn trimmers
+— CV for the output voltage, CC for a constant-current limit — so RV1, R1, C1, C2, U1, D1 and L1 all left
+the board and one 4-pin header took their place.
+
+The numbers that make it safe come from the module's own catalogue record, cross-checked against the bare
+XL4016E1 data sheet (LCSC **C55881**, TO-220-5):
+
+* **5–40 V in (≤32 V for continuous use), 1.2–36 V out, 8 A continuous and 12 A with extra cooling, about
+  180 kHz, 95–96 % efficient, ~50 mV output ripple.** 19 V in and 12 V out sit in the middle of all of it,
+  and the output must be below the input — which is this design, and the reason a buck-boost is not needed.
+* **Hugely derated at this load.** Two 0.5 A fans are 1 A out of an 8 A part, so its dual heatsinks sit
+  barely warm and its short-circuit, overload and over-temperature protections never have to do anything.
+  Its record also lists input reverse-polarity protection, which is a courtesy this board does not have:
+  J1 pin 1 is +19 V and C3 is a 25 V part.
+* **It stays in continuous conduction at this load**, which is what makes a big buck unpleasant at a small
+  current: inductor ripple is `Vout × (1 − Vout/Vin) / (L·f)` ≈ 12 × 0.368 / (150 µH × 180 kHz) ≈ **0.16 A**
+  peak-to-peak, so at 0.5 A average the inductor current never reaches zero. No light-load pulse-skipping,
+  and no audible ringing out of the inductor.
+* **Its ripple does not reach the analogue side.** 50 mV at 180 kHz on the 12 V rail goes through two
+  AMS1117 LDOs before it can touch 5 V or 3.3 V, and the `PWM_IN` divider's time constant is milliseconds
+  against a 5.6 µs switching period — attenuation of about 5 000×, so those 50 mV arrive at A0 as 10 µV.
+  The divider's own ripple budget, from the ITE's 23 kHz signal, is 2.2 counts (see *Known limits*); the
+  buck is nowhere near it.
+
+The module is about **61 × 41 × 27 mm** with its heatsinks, which is the whole reason it is off the board:
+that is a third of the board's area and 27 mm of height, and its heatsinks want air moved across them
+rather than a lid sitting on top. The other candidate in the cabinet was the **LTC3780 buck-boost module**
+(L1 A5: 5–32 V in, 1–30 V out, 10 A, 80 W, 78 × 47 mm, replaceable fuse); it is the bigger board and it
+buys nothing here, because this supply's input is always above its output. The DC modules that are *not*
+candidates are worth naming so the search does not have to be repeated: the "Switching Power Supply Module
+6th Gen 12 V 450 mA" (L1 B7) takes 85–265 V AC, and the IP2721 PD trigger (L1 A5) and the 100 W USB-PD
+output module (L1 E5) need a USB-C source that negotiates 12 V.
 
 **Why 120 Ω for R9** rather than the usual 10–47 Ω gate resistor: there is no 100 Ω or 47 Ω
 value in the cabinet in the size needed. It is not the resistor that limits turn-on, though —
@@ -195,20 +225,19 @@ so keep the SOT-223.
 
 | Rail | What hangs off it | Worst case |
 |---|---|---|
-| 19 V in | the buck only | 1.2 A at 12 V / 1 A out, 85 % efficiency |
-| SW (switch node) | D1, L1 | 1 A average, ~1.5 A peak triangular |
-| +12 V | C3/C4, RV1's tap, U2, R8, D2, J3, J4 | 1.0 A (two 0.5 A fans) |
+| 19 V in | J1 → J6 → the module's input | 1.2 A at 12 V / 1 A out, 85 % efficiency |
+| +12 V | J6 pin 4, C3/C4, U2, R8, D2, J3, J4 | 1.0 A (two 0.5 A fans) |
 | 5 V | U3's input, C5/C6 | ~30 mA |
 | +3V3 | Pro Mini, C7/C8, the divider's load side | ~25 mA |
 | FAN_SW | Q3's drain, J3/J4 pin 2, D2, C12 | 1.0 A pulsed |
 
-The buck's 3 A and the toroid's 6 A are both far above the 1 A the two fan connectors can
-draw, and the IRFZ44N at 1 A dissipates I²·Rds(on) = 1² × 0.045 ≈ **0.045 W** — no heatsink,
-and its 55 V Vds is three times the rail. The `Power` net class — 19V, SW, +12V, FAN_SW, +3V3
-and GND — is 1.5 mm wide, which at 1 A on 35 µm copper is about 15 °C above ambient; the GND
-pours (both layers, 326 stitching vias) carry the return current as a plane rather than as a
-trace. The class patterns had to be re-pointed at the renamed nets: they still held the
-pre-rename `Net-(C1-Pad1)` strings, which left 19V, SW and FAN_SW routed at 0.2 mm.
+The module's 8 A is eight times the 1 A the two fan connectors can draw, and the IRFZ44N at 1 A
+dissipates I²·Rds(on) = 1² × 0.045 ≈ **0.045 W** — no heatsink, and its 55 V Vds is four times the
+rail. The `Power` net class — 19V, +12V, FAN_SW, +3V3 and GND — is 1.5 mm wide, which at 1 A on 35 µm
+copper is about 15 °C above ambient; the GND pours (both layers, 326 stitching vias) carry the return
+current as a plane rather than as a trace. The class patterns are held at the renamed nets: they once
+carried the pre-rename `Net-(C1-Pad1)` strings, which left 19V and FAN_SW routed at 0.2 mm, and the
+`SW` pattern went with the switch node when the converter left the board.
 
 The two LDOs drop 7 V and 1.7 V at ~25 mA: 0.18 W and 0.04 W, both trivial for SOT-223.
 Do not hang anything bigger off 5 V — U2 is a 1 A part and its junction rises fast in a
@@ -268,38 +297,53 @@ The tach line sinks 1–5 mA into the ITE's pull-up and the PWM divider draws 5 
 - 124.0 × 85.0 mm, 2 layers, four M3 mounting holes at the corners.
 - **GND poured on both layers** (0.5 mm clearance, thermal relief) with 326 stitching vias,
   so every GND pad lands on a plane on the layer it sits on.
-- Net classes: `Power` at **1.5 mm** track / 0.25 mm clearance / 0.7 mm via for `19V`, `SW`,
-  `+12V`, `5V`, `FAN_SW`, `+3V3`, `GND`; everything else (the signals) at the 0.2 mm default.
+- Net classes: `Power` at **1.5 mm** track / 0.25 mm clearance / 0.7 mm via for `19V`, `+12V`,
+  `FAN_SW`, `+3V3` and `GND`; everything else (the signals) at the 0.2 mm default.
 - Routed by Freerouting (Specctra DSN out, SES back in): 112 track segments, 0 unrouted,
   0 violations at the router's own rules, then re-verified against KiCad's rules.
-- Flow is left to right: input and buck at the left, the 12 V rail across the middle to the
-  LDOs and the Pro Mini header, the NUC interface along the top, the fan drive and the two
-  fan connectors at the bottom-right.
+- Flow is left to right: the 19 V entry (J1) and the module header (J6) at the left, the 12 V rail
+  across the middle to the LDOs and the Pro Mini header, the NUC interface along the top, the fan
+  drive and the two fan connectors at the bottom-right.
 - `exports/fab/` plots as-is for a 2-layer prototype order.
 
-One layout compromise worth knowing about: the SW node (U1 → D1 → L1) is a little longer than
-a converter data sheet would like, because the toroid's 16.8 mm body needs the room it has.
-At 150 kHz with the input caps at the connector and a GND plane directly under it, that costs
-a few millivolts of ripple on the 12 V rail and nothing else. If it ever matters, the fix is
-a smaller toroid, not a different layout.
+The layout note that replaced the old switch-node one: **there is no switching node on this board
+any more.** J1 and J6 sit together at the left edge — 19 V arrives at J1, runs 12 mm to J6 pin 3,
+and the module's 12 V comes back on J6 pin 4 and runs down and across to C3 (470 µF) at the middle
+of the rail, 48 mm away at 1.5 mm. The module's own output electrolytic does the bulk filtering at
+the module; C3 and C4 are the board's local decoupling where the rail lands. Two things follow for
+the build: the module's 12 V return goes back through J6's pins 1–2, which are 2.54 mm apart from
+its 19 V and 12 V pins, so the module's return current enters the GND plane at the same point the
+sense divider's ground does rather than somewhere down the rail; and the left third of the board is
+now empty, which is where the enclosure's wiring and the module's harness have room.
 
 ---
 
-## Trim the buck before anything else is connected
+## Set the module to 12.0 V before it is connected to anything
 
-1. Fit U1, L1, D1, C1–C4, R1, RV1. Fit **nothing** on the 5 V / 3.3 V side yet.
-2. Put a meter across C3 (12 V rail), power J1 from the 19 V tap, current-limited.
-3. Turn RV1 until the rail reads **12.0 V**. The wiper ends up around **8.8–9.0 kΩ**: the
-   divider is `Vout = Vref × (1 + Rtop/Rbottom)` with Rbottom = R1 = 1 kΩ, and the LM2596's
-   Vref is specified 1.158–1.238 V (1.198 typical), so 12.0 V lands anywhere in that band.
-4. RV1's wiper (pin 2) is strapped to its pin 1 (the FB end) so the pot acts as a two-terminal
-   rheostat. If that strap ever breaks, the full 10 kΩ is left in the divider and the rail
-   rises only to ≈13.2 V — a fan can live with that long enough to notice.
-5. Then fit U2/U3 and check 5 V and 3.3 V. Then fit Q1/Q2/Q3.
+1. Fit J1, J6, C3 and C4. Fit **nothing** on the 5 V / 3.3 V side yet.
+2. Set the module up on the bench: 19 V into its IN terminals, a meter on its OUT terminals, the
+   supply current-limited. Turn its voltage trimmer until it reads **12.0 V** on the meter. These
+   modules ship preset anywhere in their 1.2–36 V range, so a module that has never been set is a
+   module that may hand the AMS1117 chain anything.
+3. Make sure its **current limit is released**. These boards carry a second trimmer (CC) that makes
+   the module a constant-current supply, and a fan winding draws inrush. Load the module with the
+   fans actually starting and watch the meter: if the 12 V rail sags while a fan is coming up, the
+   limit is engaged — turn that trimmer the other way until the rail holds above ~11 V through the
+   start. A current-limited module feeding a stalled fan is a fan that never reaches the duty the
+   ITE asked for, and the sketch will happily keep claiming it did.
+4. Then fit U2/U3 and check 5 V and 3.3 V. Then fit Q1/Q2/Q3.
+5. Wire the module to the board with four short wires, twisted in pairs: module IN+ and IN− onto
+   **J6 pins 3 and 2**, module OUT+ and OUT− onto **J6 pins 4 and 1**. The board's silkscreen beside
+   J6 reads `1,2 GND 3 19V 4 12V`, and J1 pin 1 is the +19 V that feeds J6 pin 3.
 
-Check the 19 V tap's polarity on the connector before plugging in: J1 pin 1 is +19 V, and the
-input electrolytic is 35 V, which is not enough headroom to survive a reverse connection for
-long.
+Check the 19 V tap's polarity before plugging in. The module's own record claims input reverse‑polarity
+protection, but nothing on this board has any: the 19 V runs from J1 to J6 as a bare track and C3 is a
+25 V part, so the lead that lands on J1 pin 1 has to be the + of the tap.
+
+**Mounting.** The module is about 61 × 41 × 27 mm with heatsinks on both faces. Bolt it to the
+enclosure wall where the fan's air passes it. Its 8 A rating is a heatsink rating, and at 1 A it is
+comfortable even in a closed box, but a heatsink under a lid is a heatsink that runs 40 °C warmer
+than it has to, and the module is the one part in this design that is allowed to get warm.
 
 ---
 
@@ -362,7 +406,8 @@ Each step answers a question the next one depends on. Do them before the board g
 enclosure.
 
 1. **Identify the four NUC wires with a meter** (section above). Write down which is which.
-2. **Trim the buck to 12.0 V** with nothing else fitted. Then confirm 5 V and 3.3 V.
+2. **Set the module to 12.0 V with a meter** before it is wired to anything, and check its current
+   limit is released (section above). Then confirm 5 V and 3.3 V.
 3. **Find the fan's stall duty.** Synthesize the ITE's demand instead of buying a PWM box: a
    10 kΩ multi-turn pot across +3V3 and GND, wiper to A0, is a 0–100 % duty knob the sketch
    reads through the same divider it will read in service. Watch `duty_fan` on the serial line
@@ -373,9 +418,10 @@ enclosure.
 4. **Measure the fan at two duties.** Point a phone camera at the hub in 240 fps slow-motion
    (or an optical tachometer) at 40 % and at 100 % duty, count blade passes per second × 60 /
    blade count. Those two numbers become `FAN_RPM_MIN` (at `FAN_DUTY_MIN`) and `FAN_RPM_FULL`.
-5. **Power the board from the bench supply** (12 V into the buck's output side is *not* the
-   test — power J1 from the 19 V tap, current-limited) and confirm the LED blinks at 1 Hz and
-   the serial line prints.
+5. **Power the board from the bench supply** — 19 V into J1 with the module wired onto J6, or
+   12 V straight onto J6 pins 4 and 1 when the module is not on the bench (its output side is no
+   longer a switching node, so feeding it directly is a legitimate way to test the control half).
+   Current-limit the supply either way. Confirm the LED blinks at 1 Hz and the serial line prints.
 6. **Read TP1 with a frequency counter** with the sketch running: it should sit at
    `rpm / 30` Hz to the last digit. It is a hardware timer, so a mismatch means a wiring
    error, not drift.
@@ -477,6 +523,13 @@ Both readings belong in `bench/data/` as a note beside the log they were taken w
   it is applying, so it is only honest if the fan really spins at that RPM. If the fan is
   gummed up or the wrong fan is fitted, the board will report a speed that does not exist —
   which is exactly what the ITE cannot tell apart.
+- **The 12 V is somebody else's converter.** The buck is a finished module (XL4016E1, cabinet L1 A10) and
+  the numbers in this document are the ones its catalogue record carries — 5–40 V in, 1.2–36 V out, 8 A
+  continuous, ~180 kHz, ~50 mV ripple — not measurements taken here. There is no data sheet for the module
+  board itself, only for the XL4016E1 IC on it (LCSC C55881). What has never been measured on this rail is
+  the module's real output ripple, its no-load draw, and whether its CC trimmer is released — and that last
+  one is the failure that can quietly break the fan control, so the meter test in *Set the module to 12.0 V*
+  is not optional.
 - **The ITE's PWM is measured, not assumed: 23 kHz square, 45 % duty mid-sweep.** A scope on this
   NUC's fan header reads 23 kHz, inside Intel's 25 kHz ±10 % for a 4-wire fan. The divider and
   C10/C11 are comfortably right at that frequency: 4.08 kΩ Thévenant at the node against 1.1 µF

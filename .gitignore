@@ -10,6 +10,7 @@ logs/placed.txt
 logs/drc*.json
 logs/erc*.json
 logs/netlist.net
+*_drc_violations.json
 logs/route_out.json
 logs/stitch-*.json
 logs/wires.inc

@@ -11,17 +11,13 @@ from pins import place, body_box
 
 # ref, lib, footprint, value, X, Y, angle, mirrorY
 COMPS = [
-    # ---- block A: 19 V in, buck to 12 V -------------------------------------
+    # ---- block A: 19 V in, the buck module, 12 V out -------------------------
+    # The buck is no longer parts on this board: it is a finished XL4016E1 step-down
+    # module bolted to the enclosure, and J6 is the four-wire harness that plugs into it.
     ("J1", "Connector_Generic:Conn_01x02", "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical", "19V IN", 35.00, 44.45, 180, False),
-    ("C1", "Device:C_Polarized", "Capacitor_THT:CP_Radial_D10.0mm_P5.00mm", "220uF 35V", 48.26, 48.26, 0, False),
-    ("C2", "Device:C", "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm", "100n", 55.88, 48.26, 0, False),
-    ("U1", "Regulator_Switching:LM2596T-ADJ", "Package_TO_SOT_THT:TO-220-5_P3.4x3.7mm_StaggerOdd_Lead3.8mm_Vertical", "LM2596T", 75.00, 46.99, 0, False),
-    ("D1", "Diode:1N5822", "Diode_THT:D_DO-201AD_P15.24mm_Horizontal", "1N5822", 91.44, 53.34, 270, False),
-    ("L1", "Device:L_Ferrite", "Inductor_THT:L_Toroid_Horizontal_D16.8mm_P14.70mm_Vishay_TJ3", "100uH 6A", 100.33, 49.53, 90, False),
+    ("J6", "Connector_Generic:Conn_01x04", "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical", "BUCK MODULE", 60.96, 41.91, 0, False),
     ("C3", "Device:C_Polarized", "Capacitor_THT:CP_Radial_D10.0mm_P5.00mm", "470uF 25V", 114.30, 53.34, 0, False),
     ("C4", "Device:C", "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm", "100n", 121.92, 53.34, 0, False),
-    ("R1", "Device:R", "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal", "1k", 127.05, 48.26, 0, False),
-    ("RV1", "Device:R_Potentiometer_Trim", "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical", "10k", 137.16, 44.45, 90, False),
 
     # ---- block B: 12 V to 5 V to 3.3 V --------------------------------------
     ("U2", "Regulator_Linear:AMS1117-5.0", "Package_TO_SOT_SMD:SOT-223-3_TabPin2", "AMS1117-5.0", 170.00, 44.45, 0, False),
@@ -62,23 +58,23 @@ COMPS = [
 
 # nets: ordered (ref, pin) joined by drawn wire; a bare (x, y) is an explicit point
 NETS = {
-    "19V":      [("J1", "1"), ("C1", "1"), ("C2", "1"), ("U1", "1")],
+    # the 19 V wire is broken at the two points a symbol hangs off it: a pin or a stub
+    # only connects to a wire END, so the vertices at the flag and the name tag matter.
+    "19V":      [("J1", "1"), (43.18, 44.45), (48.26, 44.45), ("J6", "3")],
     # every net the schematic leaves to KiCad's auto-naming gets a name tag on a
     # short stub, so the board, the netlist and the print all use the same names.
-    "19V_TAG":   [(48.26, 44.45), (48.26, 41.91)],
-    "SW_TAG":    [("L1", "1"), (96.52, 52.07)],
+    "19V_TAG":   [(48.26, 44.45), (48.26, 46.99)],
     "FAN_SW_TAG": [(138.43, 127.0), (138.43, 124.46)],
     "5V_TAG":    [("C6", "1"), (193.04, 41.91)],
-    "FB_TAG":    [(121.92, 44.45), (121.92, 41.91)],
     "BASE_TAG":  [("R6", "2"), (49.53, 139.70)],
     "FAN_GATE_TAG": [("R9", "1"), (87.63, 134.62)],
     "GATE_TAG":  [("R9", "2"), (95.25, 134.62)],
     "TACH_BASE_TAG": [("Q1", "2"), (90.17, 111.76)],
-    "19V_FLAG": [("J1", "1"), (40.64, 46.99)],
-    "SW":       [("U1", "2"), ("D1", "1"), ("L1", "1")],
-    "12V":      [("L1", "2"), ("C3", "1"), ("C4", "1"), (132.08, 49.53), (132.08, 54.61)],
-    "FB":       [("U1", "4"), (121.92, 44.45), ("R1", "1"), ("RV1", "1")],
-    "WIPER":    [("RV1", "2"), (133.35, 40.64), ("RV1", "1")],
+    # the module's four wires: 19 V in on J6.3, its two returns on J6.1/6.2, 12 V out on J6.4
+    "MODULE_IN_GND":  [("J1", "2"), (50.80, 41.91), ("J6", "2")],
+    "MODULE_OUT_GND": [("J6", "1"), (63.50, 39.37)],
+    "MODULE_OUT":     [("J6", "4"), (63.50, 46.99)],
+    "12V":      [("C3", "1"), ("C4", "1"), (132.08, 49.53), (132.08, 54.61)],
     "5V":       [("U2", "2"), ("C5", "1"), ("C6", "1"), ("U3", "3")],
     "3V3":      [("U3", "2"), ("C7", "1"), ("C8", "1"), (238.76, 44.45)],
     # R3 and R4 are in series and the node between them is the divider's midpoint:
@@ -97,22 +93,24 @@ NETS = {
     "GATE":     [("R9", "2"), ("R10", "1"), ("Q3", "1")],
     "FAN_SW":   [("Q3", "2"), ("D2", "2"), (138.43, 127.0), ("J3", "2"), ("J4", "2"), ("C12", "1")],
     "D2_CATH":  [("D2", "1"), (129.54, 134.62), (134.62, 134.62)],
-    "GND_FLAG": [(48.26, 52.07), (43.18, 52.07)],
 }
 
 # power symbols placed straight onto a pin or a wire end (no wire needed)
 POWER = [
-    ("power:GND",  [("J1", "2"), ("C1", "2"), ("C2", "2"), ("U1", "3"), ("U1", "5"), ("D1", "2"),
-                    ("C3", "2"), ("C4", "2"), ("R1", "2"), ("U2", "1"), ("C5", "2"), ("C6", "2"),
+    ("power:GND",  [("J1", "2"), (63.50, 39.37),
+                    ("C3", "2"), ("C4", "2"), ("U2", "1"), ("C5", "2"), ("C6", "2"),
                     ("U3", "1"), ("C7", "2"), ("C8", "2"), ("J2", "1"), ("C9", "2"), ("Q1", "3"),
                     ("R5", "2"), ("C10", "2"), ("C11", "2"), ("R7", "2"), ("Q2", "3"),
                     ("R10", "2"), ("Q3", "3"), ("C12", "2"), ("J5", "1")]),
-    ("power:+12V", [("U2", "3"), ("R8", "1"), ("RV1", "3"), (132.08, 54.61), (129.54, 134.62),
+    ("power:+12V", [("U2", "3"), ("R8", "1"), (63.50, 46.99), (132.08, 54.61), (129.54, 134.62),
                     ("J3", "1"), ("J4", "1")]),
     ("power:+3V3", [(238.76, 44.45), ("J5", "5")]),
     # flags only where nothing else drives the net: the LDO outputs are already
     # power outputs, so a flag on 5 V or 3 V3 is an ERC "two power drivers" error.
-    ("power:PWR_FLAG", [(43.18, 52.07), (40.64, 46.99), (134.62, 134.62)]),
+    # In the schematic the 19 V flag is rotated 180 (body below the wire) and the GND
+    # flag 0 (body above its own), so neither body lands on the other wire 2.54 mm away.
+    # Both sit on a vertex of their net's chain, because a pin only connects to a wire end.
+    ("power:PWR_FLAG", [(50.80, 41.91), (43.18, 44.45), (134.62, 134.62)]),
 ]
 
 NOCONECT = [("J2", "4")]
@@ -127,11 +125,9 @@ LABELS = [
     ("FAN_PWM", ("R6", "1"), 180),
     ("FAN_PWM", ("J5", "3"), 0),
     ("PWM_IN", ("J5", "4"), 0),
-    ("19V", (48.26, 41.91), 90),
-    ("SW", (96.52, 52.07), 270),
+    ("19V", (48.26, 46.99), 270),
     ("FAN_SW", (138.43, 124.46), 90),
     ("5V", (193.04, 41.91), 90),
-    ("FB", (121.92, 41.91), 90),
     ("BASE", (49.53, 139.70), 270),
     ("FAN_GATE", (87.63, 134.62), 270),
     ("GATE", (95.25, 134.62), 270),

@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.kicad.org/drc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-10-19T11:30:52",
+    "date": "2026-10-19T23:31:20",
     "ignored_checks": [
         {
             "description": "Footprint has no courtyard defined",
@@ -26,11 +26,28 @@
     ],
     "included_severities": [
         "error",
-        "warning"
+        "warning",
+        "exclusion"
     ],
     "kicad_version": "10.0.6",
-    "schematic_parity": [],
-    "source": "nuc-tach-sim.kicad_pcb",
+    "schematic_parity": [
+        {
+            "description": "Pad missing net given by schematic (unconnected-(J2-Pin_4-Pad4))",
+            "items": [
+                {
+                    "description": "PTH pad 4 [<no net>] of J2",
+                    "pos": {
+                        "x": 93.62,
+                        "y": 20.0
+                    },
+                    "uuid": "6819c8bc-e2e7-44c9-9cbd-2710e6729c06"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        }
+    ],
+    "source": "nuc-fan-controller.kicad_pcb",
     "unconnected_items": [],
     "violations": []
 }

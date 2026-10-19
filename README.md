@@ -5,8 +5,9 @@ answers the NUC's tach input so the BIOS believes the fan it is asking for.
 
 It does four things:
 
-1. **bucks 19 V → 12 V** for the fans — LM2596T‑ADJ, 100 µH / 6 A toroid, 1N5822 catch diode,
-   trimmed with a 10 kΩ multi‑turn pot to 12.0 V;
+1. **brings 12 V to the fans from a ready‑made module** — an XL4016E1 step‑down (8 A, ~180 kHz) bolted
+   to the enclosure wall and wired to this board through **J6**: 19 V in on pin 3, its two returns on
+   pins 1–2, 12 V out on pin 4. The board's own 12 V parts are only C3 470 µF/25 V and C4 100 n;
 2. **12 V → 5 V → 3.3 V** for a 3.3 V / 8 MHz Arduino Pro Mini (AMS1117‑5.0 then AMS1117‑3.3,
    into the Pro Mini's **VCC**; RAW unused);
 3. **follows the duty the NUC's ITE asks for** — the ITE's PWM wire is divided to 2.96 V, read
@@ -15,9 +16,16 @@ It does four things:
    the pull‑up lives in the NUC. `RPM = 30 × f_tach` (the ITE IT8607E counts 2 pulses per turn).
 
 Board: 124 × 85 mm, 2 layers, GND poured both sides with 326 stitching vias, `Power` net class
-1.5 mm on 19V / SW / +12V / FAN_SW / +3V3 / GND. **ERC 0 violations. DRC 0 violations,
+1.5 mm on 19V / +12V / FAN_SW / +3V3 / GND. **ERC 0 violations. DRC 0 violations,
 0 unconnected items**, one schematic‑parity warning: `J2` pin 4 carries a deliberate no‑connect
 (it is the NUC header's own fan supply, which this board never touches).
+
+**A reversal worth stating.** The first version of this board built its 19 V → 12 V converter out of
+discrete parts — LM2596T‑ADJ, a 100 µH / 6 A toroid, a 1N5822 catch diode and a 10 kΩ trimmer — because
+the XL4016E1 module in the cabinet had been ruled out. That ruling is now lifted: the converter is that
+module, and U1, L1, D1, C1, C2, R1 and RV1 came off the board in exchange for one 4‑pin header. The
+discrete design is in git at `10bc262` and every part of it is still in the cabinet, so the swap goes
+both ways. *BUILD.md* carries the arithmetic that makes the module the better choice at 12 V / 1 A.
 
 ## Open it without KiCad
 
@@ -28,7 +36,7 @@ Board: 124 × 85 mm, 2 layers, GND poured both sides with 326 stitching vias, `P
 | `nuc-fan-controller.kicad_sch` / `.kicad_pcb` / `.kicad_pro` | KiCad 10 design |
 | `exports/nuc-fan-controller_schematic.pdf` / `.svg` | schematic, wires not net labels, name tags on every signal net |
 | `exports/nuc-fan-controller_board.pdf`, `…_board_bottom.pdf`, `…_board.svg` | board plots |
-| `exports/nuc-fan-controller_bom.csv` | 38 fitted parts |
+| `exports/nuc-fan-controller_bom.csv` | 32 fitted parts — the buck module is a purchased part wired to J6, so it is correctly not in it |
 | `exports/fab/` | 8 Gerbers + `.drl` + `_pos.csv` + `job.gbrjob` — ready to zip and order |
 | `firmware/nuc-tach-modeB/nuc-tach-modeB.ino` | the sketch; calibration constants at the top |
 | `firmware/probe-uno/probe-uno.ino` | breadboard probe sketch for an Uno (5 V / 16 MHz): tach wave on D9 with the measured `ITE_READ_GAIN` applied, 31.25 kHz fan drive on D11 — for scope-checking the BC547 stages before the board exists |
@@ -40,7 +48,7 @@ Board: 124 × 85 mm, 2 layers, GND poured both sides with 326 stitching vias, `P
 | `bench/analyze-hold.py` | the analyser for the "does it integrate time?" test: flat-window trend, same-temperature early against late, and a two-variable fit |
 | `bench/plot-curve.py`, `bench/plot-hold.py` | draw `docs/bench/06-ite-fan-response.svg` and `docs/bench/07-ite-hold-test.svg`, the two graphs below, from the same logs |
 | `bench/data/` | the raw logs: 1 Hz traces of the divider reading, and of the NUC's temperatures |
-| `BUILD.md` | the build sheet: header identification with a meter, buck trim, calibration, bench order |
+| `BUILD.md` | the build sheet: header identification with a meter, setting the module to 12.0 V, calibration, bench order |
 | `archive/modeA-2026-10-19/` | the fixed‑RPM tach simulator this board replaced |
 
 ## On the bench
@@ -203,7 +211,8 @@ reading), and whether the top is flat or droops under load at the top dwell. The
 ## Build order, short version
 
 1. Identify the four NUC fan‑header wires with a meter — Intel publishes no pinout.
-2. Fit the buck only, trim to 12.0 V, then confirm 5 V and 3.3 V.
+2. Fit J1, J6, C3, C4. Set the module to 12.0 V with a meter before it is wired in, confirm its
+   current limit is released, then confirm 5 V and 3.3 V.
 3. Find the fan's stall duty and measure its RPM at two duties; those four numbers are the
    constants at the top of the sketch.
 4. Read TP1 with a frequency counter — it must equal `rpm / 30` Hz exactly, it is a hardware timer.
@@ -217,7 +226,12 @@ Mini*, Processor → **ATmega328 (3.3V, 8MHz)**.
 ## Reproducing the design work
 
 ```
-python3 logs/genwires.py                 # regenerates the schematic's wires/junctions from logs/layout.py
+cd logs
+python3 layout.py                       # geometry checks: crossings, wires through bodies, overlaps
+python3 genwires.py                     # regenerates the whole wire set -> wires.inc
+python3 applywires.py                   # splices that set back into the .kicad_sch
+cd ..
+sh logs/export.sh                       # rebuilds exports/: PDF, SVG, BOM, Gerbers, drill, placement
 kicad-cli sch erc nuc-fan-controller.kicad_sch --output logs/erc.json --format json --severity-all
 kicad-cli pcb drc nuc-fan-controller.kicad_pcb --output logs/drc.json --format json \
     --severity-all --schematic-parity --refill-zones --save-board
@@ -228,7 +242,11 @@ docker run --rm -v "$PWD/logs/routing:/work" eclipse-temurin:25-jre \
 
 The layout in `logs/layout.py` is the source of the schematic's geometry; `logs/genwires.py`
 checks cross‑net crossings, wires through symbol bodies, pins on two nets and shorted parts
-before it emits anything.
+before it emits anything. One rule it enforces the hard way: **a symbol pin or a name tag only
+connects to a wire *end***, so a net whose wire carries a flag or a tag mid‑span is written as the
+chain of segments it really is — `19V` is `J1.1 → (43.18, 44.45) → (48.26, 44.45) → J6.3`, the first
+vertex being where the 19 V `PWR_FLAG` hangs off it and the second where the name tag does. Written
+as one straight wire, the flag and the tag are orphaned and ERC reports them.
 
 ## Status
 

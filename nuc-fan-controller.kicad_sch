@@ -3731,418 +3731,6 @@
 	)
 	(symbol
 		(lib_id "Device:C_Polarized")
-		(at 48.26 48.26 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "fcc8d8b1-6d93-4484-be28-f54b5dbd7896")
-		(property "Reference" "C1"
-			(at 44.45 48.26 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "220uF 35V"
-			(at 41.9 58.42 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Capacitor_THT:CP_Radial_D10.0mm_P5.00mm"
-			(at 49.225 44.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 48.26 48.26 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Polarized capacitor"
-			(at 48.26 48.26 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "31a60624-1a79-46e8-8298-b0829ae5c9ea")
-		)
-		(pin "2"
-			(uuid "96671b92-5594-4623-b170-d5d12840394b")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "C1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:C")
-		(at 55.88 48.26 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "4d56e32e-d8a6-49a0-8b52-65e2325bc802")
-		(property "Reference" "C2"
-			(at 52.07 48.26 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "100n"
-			(at 52.07 49.53 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm"
-			(at 56.845 44.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 55.88 48.26 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Unpolarized capacitor"
-			(at 55.88 48.26 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "a1d47666-c46c-4ae5-b15c-2e9961b370a5")
-		)
-		(pin "2"
-			(uuid "3866d87a-0038-4cc8-a2c8-02fa71040d55")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "C2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Regulator_Switching:LM2596T-ADJ")
-		(at 74.93 46.99 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "23432359-9b8d-4724-b5da-c29300bf976d")
-		(property "Reference" "U1"
-			(at 74.93 40.64 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "LM2596T"
-			(at 74.93 39.37 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Package_TO_SOT_THT:TO-220-5_P3.4x3.7mm_StaggerOdd_Lead3.8mm_Vertical"
-			(at 76.2 40.64 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-					(italic yes)
-				)
-				(justify left)
-			)
-		)
-		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/lm2596.pdf"
-			(at 74.93 46.99 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Adjustable 3A 150kHz Step-Down Voltage Regulator, TO-220"
-			(at 74.93 46.99 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "453acadc-d577-4848-8db0-9fd8f6671e94")
-		)
-		(pin "2"
-			(uuid "9e89099e-f4f9-4e9d-9fac-54eb05bf1e79")
-		)
-		(pin "3"
-			(uuid "60c6d95d-5092-4f64-a785-35f5d849b031")
-		)
-		(pin "4"
-			(uuid "03eb194d-278a-41f4-9643-54b3336f7fee")
-		)
-		(pin "5"
-			(uuid "f65fd557-afbe-4586-ad40-a06b0613724b")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "U1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Diode:1N5822")
-		(at 91.44 53.34 270)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "7f13dce0-2932-467c-8ede-d5c5b18b85d9")
-		(property "Reference" "D1"
-			(at 95.25 53.34 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "1N5822"
-			(at 88.9 40.64 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Diode_THT:D_DO-201AD_P15.24mm_Horizontal"
-			(at 95.885 53.34 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "http://www.vishay.com/docs/88526/1n5820.pdf"
-			(at 91.44 53.34 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "40V 3A Schottky Barrier Rectifier Diode, DO-201AD"
-			(at 91.44 53.34 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "766f62cf-720c-499e-bebe-5c4f82327756")
-		)
-		(pin "2"
-			(uuid "6d133dc7-06b7-4eff-b6cd-2677fb1471ff")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "D1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:L_Ferrite")
-		(at 100.33 49.53 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "137f25ca-723f-42c6-a3e0-e398d28cb806")
-		(property "Reference" "L1"
-			(at 100.33 45.72 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "100uH 6A"
-			(at 104.14 40.64 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Inductor_THT:L_Toroid_Horizontal_D16.8mm_P14.70mm_Vishay_TJ3"
-			(at 100.33 49.53 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 100.33 49.53 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Inductor with ferrite core"
-			(at 100.33 49.53 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "72a39948-3034-4ddb-89ee-e413337b744a")
-		)
-		(pin "2"
-			(uuid "8e0a2ab6-813f-410e-9866-4e91eccca05c")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "L1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:C_Polarized")
 		(at 114.3 53.34 0)
 		(unit 1)
 		(body_style 1)
@@ -4298,167 +3886,6 @@
 			(project "nuc-fan-controller"
 				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
 					(reference "C4")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 127 48.26 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "37d9d981-3bd4-4e0c-a8ad-500cee45a8cd")
-		(property "Reference" "R1"
-			(at 130.81 48.26 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "1k"
-			(at 130.81 49.53 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
-			(at 125.222 48.26 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 127 48.26 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 127 48.26 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "0bfd1331-e4e7-443b-b3d4-a502a3a4fa05")
-		)
-		(pin "2"
-			(uuid "f81d39e2-d2c2-4f39-805d-e97bdbb9b9dd")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "R1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R_Potentiometer_Trim")
-		(at 137.16 44.45 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "57fbb01a-bc88-4cc8-85c2-6c8ce25cfdc3")
-		(property "Reference" "RV1"
-			(at 137.16 36.83 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "10k trim"
-			(at 130.81 38.1 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical"
-			(at 137.16 44.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 137.16 44.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Trim-potentiometer"
-			(at 137.16 44.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "954b5fef-1fd4-4121-99bb-6326872dceb2")
-		)
-		(pin "2"
-			(uuid "3403bb0f-689f-43b5-8393-d67b25f0d9b8")
-		)
-		(pin "3"
-			(uuid "7e3c6b6d-846b-433d-a474-938fc1d79edc")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "RV1")
 					(unit 1)
 				)
 			)
@@ -6739,468 +6166,6 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 40.64 41.91 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "c4c4ca9b-05e4-45ce-bf1c-7b4537862850")
-		(property "Reference" "#PWR01"
-			(at 162.56 39.37 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 162.56 44.45 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 40.64 41.91 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 40.64 41.91 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 40.64 41.91 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "e2592a74-8ccc-454e-833e-0d3f7bde9540")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "#PWR01")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 48.26 52.07 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "e692725c-3917-4d52-8e01-0002a2018beb")
-		(property "Reference" "#PWR02"
-			(at 81.28 49.53 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 81.28 54.61 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 48.26 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 48.26 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 48.26 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "2e55b644-8639-4123-bd65-3598442db94a")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "#PWR02")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 55.88 52.07 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "806cf3c2-a5cf-44b8-aabc-7da3a06b5fae")
-		(property "Reference" "#PWR03"
-			(at 140.97 49.53 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 140.97 54.61 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 55.88 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 55.88 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 55.88 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "ef23e3a9-8bfa-4d95-a942-78f105db6585")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "#PWR03")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 74.93 54.61 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "ff6cc845-0e77-433f-8ff7-ff17e4cf58b3")
-		(property "Reference" "#PWR04"
-			(at 132.08 52.07 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 132.08 57.15 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 74.93 54.61 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 74.93 54.61 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 74.93 54.61 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "9bf34f77-c49f-4b3e-9cb5-5116bba226ac")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "#PWR04")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 62.23 49.53 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "79861c67-12d0-4d16-afaf-2b992f3ef33f")
-		(property "Reference" "#PWR05"
-			(at 129.54 132.08 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 129.54 137.16 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 62.23 49.53 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 62.23 49.53 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 62.23 49.53 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "2bdecaa1-9fd0-4774-bfa0-ae8b09e82338")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "#PWR05")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 91.44 57.15 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "5d79e9d7-eee4-4c2d-8012-968546818dfd")
-		(property "Reference" "#PWR06"
-			(at 147.32 121.92 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 147.32 127.0 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 91.44 57.15 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 91.44 57.15 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 91.44 57.15 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "d2006f5e-a210-4ec9-9139-4eb8bc0491c4")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "#PWR06")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
 		(at 114.3 57.15 0)
 		(unit 1)
 		(body_style 1)
@@ -7348,83 +6313,6 @@
 			(project "nuc-fan-controller"
 				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
 					(reference "#PWR08")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 127 52.07 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "01d46fae-1255-47ed-a029-9942175d922a")
-		(property "Reference" "#PWR09"
-			(at 224.79 90.17 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 224.79 95.25 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 127 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 127 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 127 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "dd56542a-fe49-4231-b26d-495d495add23")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "#PWR09")
 					(unit 1)
 				)
 			)
@@ -8972,83 +7860,6 @@
 	)
 	(symbol
 		(lib_id "power:+12V")
-		(at 140.97 44.45 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "25998616-65b9-4008-921f-fa8ceefc2c46")
-		(property "Reference" "#PWR30"
-			(at 140.97 40.64 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "+12V"
-			(at 140.97 48.006 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 140.97 44.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 140.97 44.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+12V\""
-			(at 140.97 44.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "ae618360-d852-4ebc-b731-2dbd67f17973")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "#PWR30")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+12V")
 		(at 132.08 54.61 0)
 		(unit 1)
 		(body_style 1)
@@ -9511,160 +8322,6 @@
 	)
 	(symbol
 		(lib_id "power:PWR_FLAG")
-		(at 43.18 52.07 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "78c9e0fe-a9af-4c1b-bcd5-8c4040a15063")
-		(property "Reference" "#FLG01"
-			(at 43.18 49.53 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "PWR_FLAG"
-			(at 43.18 54.61 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 43.18 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 43.18 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Special symbol for telling ERC where power comes from"
-			(at 43.18 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "6f350689-690e-43de-8c6d-574af639218c")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "#FLG01")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:PWR_FLAG")
-		(at 40.64 46.99 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "51195e5b-e209-49c7-9601-dd14239cc3ae")
-		(property "Reference" "#FLG02"
-			(at 40.64 44.45 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "PWR_FLAG"
-			(at 40.64 49.53 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 40.64 46.99 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 40.64 46.99 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Special symbol for telling ERC where power comes from"
-			(at 40.64 46.99 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "c9760088-f66b-41e2-8385-77208672c8e2")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "#FLG02")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:PWR_FLAG")
 		(at 134.62 134.62 0)
 		(unit 1)
 		(body_style 1)
@@ -9824,26 +8481,6 @@
 		(at 44.449999999999996 99.06)
 		(uuid "19ec9489-8542-464d-b9f3-7de9c19ae570")
 	)
-	(global_label "19V"
-		(at 48.26 41.91 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "4bc0d1de-e155-4e71-9458-dff36a439c0a")
-	)
-	(global_label "SW"
-		(at 96.52 52.07 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "0e58ba89-5cc2-488e-bcd7-da79f00bfda2")
-	)
 	(global_label "FAN_SW"
 		(at 138.43 124.46 90)
 		(effects
@@ -9863,16 +8500,6 @@
 			(justify left)
 		)
 		(uuid "1fb6bdd3-8317-48eb-9588-b74056bc54a1")
-	)
-	(global_label "FB"
-		(at 121.92 41.91 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "c9671188-0c33-4b42-98ea-53e5716e105d")
 	)
 	(global_label "BASE"
 		(at 49.53 139.7 270)
@@ -9914,7 +8541,6 @@
 		)
 		(uuid "1696f3c8-2ab4-4329-859f-19eac5687c9d")
 	)
-
 	(global_label "PWM_DIV"
 		(at 59.69 90.17 270)
 		(effects
@@ -9924,15 +8550,26 @@
 			(justify right)
 		)
 		(uuid "c0b04c00-00b1-4adf-a4b0-cc4fcbd8d39b")
-	)	(wire
+	)
+	(wire
 		(pts
-			(xy 40.6400 44.4500) (xy 48.2600 44.4500)
+			(xy 40.6400 44.4500) (xy 43.1800 44.4500)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "637d3492-0f7f-4c22-bda0-69ff19aebe3f")
+		(uuid "52a85561-8059-472b-be44-4505add7f395")
+	)
+	(wire
+		(pts
+			(xy 43.1800 44.4500) (xy 48.2600 44.4500)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3f7dd598-76b5-4179-a77f-6ea5901b0395")
 	)
 	(wire
 		(pts
@@ -9942,37 +8579,17 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "ff57db9a-0ff0-4ab1-a593-dd05272fb49c")
+		(uuid "8789854c-a060-42c2-b656-1f50c5bf7c3b")
 	)
 	(wire
 		(pts
-			(xy 55.8800 44.4500) (xy 62.2300 44.4500)
+			(xy 48.2600 44.4500) (xy 48.2600 46.9900)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "ff4ab267-84e0-4635-abce-1024bf03f7b4")
-	)
-	(wire
-		(pts
-			(xy 48.2600 44.4500) (xy 48.2600 41.9100)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c7e76bcd-b2ad-4dd8-ad5e-53ffacb6a874")
-	)
-	(wire
-		(pts
-			(xy 96.5200 49.5300) (xy 96.5200 52.0700)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "fda33c23-4f5b-43d8-8abf-306f563dd90a")
+		(uuid "7776ad2c-539a-4860-91da-5a19e4361dca")
 	)
 	(wire
 		(pts
@@ -9982,7 +8599,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "80737d84-422e-4ad6-8e01-bfe13e4fd3be")
+		(uuid "1bd1e9fd-07f1-43c6-aea6-ac0923c4d6b8")
 	)
 	(wire
 		(pts
@@ -9992,17 +8609,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "edcaa9c0-0a18-4228-a810-8ae1199ab55c")
-	)
-	(wire
-		(pts
-			(xy 121.9200 44.4500) (xy 121.9200 41.9100)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e6ebaf65-0dcf-4220-b7eb-40301ef364b0")
+		(uuid "ea821217-c743-4905-8fba-12c379277189")
 	)
 	(wire
 		(pts
@@ -10012,7 +8619,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "0bb41894-aed1-4ad3-b011-6a171f0abc7d")
+		(uuid "67f8abae-6dfa-4872-a1af-2c69984af259")
 	)
 	(wire
 		(pts
@@ -10022,7 +8629,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "97b9a3b7-45ee-4800-b41f-70f906664189")
+		(uuid "7f3f1bed-0c40-4dcb-9d7b-6e0bf9094955")
 	)
 	(wire
 		(pts
@@ -10032,7 +8639,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "dc767418-d726-439a-bf41-560a0d23403f")
+		(uuid "fcdffafe-dcf4-4818-a111-c858d3e3daa1")
 	)
 	(wire
 		(pts
@@ -10042,47 +8649,47 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "20f0016d-83b2-4489-b62c-ed90f933c0db")
+		(uuid "912b4536-cb02-44ad-9672-49cd37245e8f")
 	)
 	(wire
 		(pts
-			(xy 40.6400 44.4500) (xy 40.6400 46.9900)
+			(xy 40.6400 41.9100) (xy 50.8000 41.9100)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "95540ecf-4e09-4c74-9b7f-7ef667d3d73e")
+		(uuid "6d293e96-b2e1-4a53-9a20-e2e374eb9d5a")
 	)
 	(wire
 		(pts
-			(xy 87.6300 49.5300) (xy 91.4400 49.5300)
+			(xy 50.8000 41.9100) (xy 55.8800 41.9100)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "1c11e210-ab75-4c39-94d1-49c3ee10543b")
+		(uuid "38354608-8e00-4148-93b7-236276c772e7")
 	)
 	(wire
 		(pts
-			(xy 91.4400 49.5300) (xy 96.5200 49.5300)
+			(xy 55.8800 39.3700) (xy 63.5000 39.3700)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "71f8d8b2-ef97-4c37-9bcc-aabe9ab68532")
+		(uuid "b1efd46a-7acd-462b-acfe-d25d6c24b847")
 	)
 	(wire
 		(pts
-			(xy 104.1400 49.5300) (xy 114.3000 49.5300)
+			(xy 55.8800 46.9900) (xy 63.5000 46.9900)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "3c62030b-ed35-4b7d-a0f5-c61d80f2090c")
+		(uuid "7a846774-2026-420b-bda5-dcf1796a3f81")
 	)
 	(wire
 		(pts
@@ -10092,7 +8699,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "1ab2c55c-088c-4b5c-9f89-c8cd5a4ff13b")
+		(uuid "f914c608-f0da-41c1-878b-03d99d8ec808")
 	)
 	(wire
 		(pts
@@ -10102,7 +8709,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "f4658971-f82b-4e8a-8d8c-7a686c1dbd30")
+		(uuid "f629009c-34e2-401c-ae32-39afec59a2c7")
 	)
 	(wire
 		(pts
@@ -10112,57 +8719,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "64d046a2-8785-4324-b938-c847c7a1761c")
-	)
-	(wire
-		(pts
-			(xy 87.6300 44.4500) (xy 121.9200 44.4500)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a0a8502b-b58b-47ec-9281-877084e2aaf9")
-	)
-	(wire
-		(pts
-			(xy 121.9200 44.4500) (xy 127.0000 44.4500)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0919adbb-982b-4ff8-90ef-08d45269817b")
-	)
-	(wire
-		(pts
-			(xy 127.0000 44.4500) (xy 133.3500 44.4500)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "7f213d69-9aab-4e70-9a21-21f8997108fe")
-	)
-	(wire
-		(pts
-			(xy 137.1600 40.6400) (xy 133.3500 40.6400)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "29e92475-8ad2-4b06-8937-7599e3954e99")
-	)
-	(wire
-		(pts
-			(xy 133.3500 40.6400) (xy 133.3500 44.4500)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d631ea31-40b6-4004-9d1c-435d95c67bec")
+		(uuid "897dd351-f119-4cc0-b370-4bfe9d22c817")
 	)
 	(wire
 		(pts
@@ -10172,7 +8729,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "a127a0ed-d92c-44c7-b109-c01ee4614981")
+		(uuid "f6662d08-65c3-4ee3-a674-13a7987e5e08")
 	)
 	(wire
 		(pts
@@ -10182,7 +8739,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "11d96e20-b327-4255-8494-d7161f63bf85")
+		(uuid "6746da12-64b9-43e5-9d07-fe6c9c0edcdd")
 	)
 	(wire
 		(pts
@@ -10192,7 +8749,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "cc72f91a-720b-44a4-a26b-1247dbaeb098")
+		(uuid "1d8e3e40-857f-47de-868b-e64e50e42f9c")
 	)
 	(wire
 		(pts
@@ -10202,7 +8759,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "8e8feacc-f8a6-4341-bf65-83aa8bf6bdcc")
+		(uuid "fd939ec5-01d0-4352-b4df-17609ecf62ac")
 	)
 	(wire
 		(pts
@@ -10212,7 +8769,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "979c35e6-cb2a-4a4c-af23-ae16fd471b30")
+		(uuid "778c3d16-4941-476a-936a-efbe286bc968")
 	)
 	(wire
 		(pts
@@ -10222,7 +8779,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "80b127f6-5f2a-4a3c-8e0d-4924556dac80")
+		(uuid "c0e42ef6-bbba-4066-94cf-aa2ce60dca72")
 	)
 	(wire
 		(pts
@@ -10232,7 +8789,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "99fb4806-6682-472d-8f0c-1cf17931daed")
+		(uuid "fad2e572-7fd3-4e9f-a9a9-2b6070628195")
 	)
 	(wire
 		(pts
@@ -10242,7 +8799,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "67ce0da6-69c1-4d3c-98d3-b8f65a6cd860")
+		(uuid "93bea88e-b8dc-4853-855b-bdae36629840")
 	)
 	(wire
 		(pts
@@ -10252,7 +8809,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "359cc84d-2bb8-49be-8ca8-03bc429a6d54")
+		(uuid "c08760ac-fc3d-445e-aedf-d9080ab0e7f3")
 	)
 	(wire
 		(pts
@@ -10262,7 +8819,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "564c5b9e-4abb-420e-9949-60dbdeba05d4")
+		(uuid "e375c6db-285c-4a08-8d06-aef8a80e32e4")
 	)
 	(wire
 		(pts
@@ -10272,7 +8829,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "2fcb8081-82be-4735-8bc3-02fc122b3e05")
+		(uuid "54a4b69a-dc33-4e0c-bda2-859ed478df19")
 	)
 	(wire
 		(pts
@@ -10282,7 +8839,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "dcc6e098-f357-4ce2-ac61-439f7a9dbbcd")
+		(uuid "a3dbce2a-d7fc-456c-a3dc-67a086710e2a")
 	)
 	(wire
 		(pts
@@ -10292,7 +8849,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "e767a2fe-5637-469b-9f2e-287c109806a1")
+		(uuid "646a8064-4851-4304-a6f2-fcc8a2934eae")
 	)
 	(wire
 		(pts
@@ -10302,7 +8859,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "50319977-33a6-49d7-aaed-73161d538f98")
+		(uuid "9f5226fc-07b5-4b77-b152-138733d84dd1")
 	)
 	(wire
 		(pts
@@ -10312,7 +8869,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "482bdb0a-5d7f-4023-a2d2-ea350c7c1176")
+		(uuid "3c7301eb-e5a3-4da0-bbb2-d1713ab28554")
 	)
 	(wire
 		(pts
@@ -10322,7 +8879,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "430aa439-123b-4c90-83dc-16696c97f578")
+		(uuid "9844bcd2-96d0-421b-b789-92f269ef633b")
 	)
 	(wire
 		(pts
@@ -10332,7 +8889,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "9ca9dd08-50ea-4066-8e89-70679b40c965")
+		(uuid "516def32-070a-48fe-b34c-b4a860b75778")
 	)
 	(wire
 		(pts
@@ -10342,7 +8899,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "3df26c54-acb4-4e52-9931-3e1fef2a62cd")
+		(uuid "87c59b8b-73e8-4e07-9bbf-d2245db02b0b")
 	)
 	(wire
 		(pts
@@ -10352,7 +8909,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "be668225-894b-4666-a153-b08d5f846993")
+		(uuid "9010802d-2b22-4d94-ac86-0825f2fa6a25")
 	)
 	(wire
 		(pts
@@ -10362,7 +8919,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "921386f2-ee72-4aa3-9486-1172c18d7207")
+		(uuid "ba2ae4e7-7734-49a9-ba5d-f62f31243c67")
 	)
 	(wire
 		(pts
@@ -10372,7 +8929,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "1faec38c-4a79-4026-afc6-8441dec29114")
+		(uuid "b044c1d3-04ee-48ae-aae6-2a1401daf272")
 	)
 	(wire
 		(pts
@@ -10382,7 +8939,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "64cb99c0-89cb-4433-a473-cda7664bbd6c")
+		(uuid "890273b8-6d6c-476c-bae2-bf1683cd68a3")
 	)
 	(wire
 		(pts
@@ -10392,7 +8949,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "73aa8b42-ddac-4a56-a170-c9ec75f1c1b0")
+		(uuid "80b72e8c-4c34-4641-8509-183b84679eb6")
 	)
 	(wire
 		(pts
@@ -10402,7 +8959,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "16808351-76f7-4fa4-a2eb-a540d68ca6a2")
+		(uuid "8538adbf-a326-4526-bd7e-e32366b4c30d")
 	)
 	(wire
 		(pts
@@ -10412,7 +8969,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "27c8821d-b9b3-4aa3-8d7c-304092072024")
+		(uuid "bb99b21a-d6f9-4877-bc58-28b16356c982")
 	)
 	(wire
 		(pts
@@ -10422,7 +8979,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "a830d31b-3d00-40ed-99c5-83c8e22ebf3e")
+		(uuid "2c840e4d-0465-445b-b443-1157a15ef135")
 	)
 	(wire
 		(pts
@@ -10432,7 +8989,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "a067c700-f4b8-4956-91ee-a795f1c5db77")
+		(uuid "c471d2b2-2b2b-497a-a20f-5604cb5e97dc")
 	)
 	(wire
 		(pts
@@ -10442,7 +8999,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "9c31f98a-b5df-41aa-b785-e46b05b102fc")
+		(uuid "7cbbcad6-a254-41f3-b12e-1cc3b7ba099b")
 	)
 	(wire
 		(pts
@@ -10452,7 +9009,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "63177190-42de-4b27-87ff-57914acf46ef")
+		(uuid "939ae987-a120-4a6b-b969-093f0e5839c1")
 	)
 	(wire
 		(pts
@@ -10462,7 +9019,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "83e59d2f-527c-4f36-95f1-44ddecc0d691")
+		(uuid "90fcc715-d8e2-42d5-9a3a-1b048799354d")
 	)
 	(wire
 		(pts
@@ -10472,7 +9029,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "a7bc6755-4523-4c69-bebb-7a6d453aa6ec")
+		(uuid "426ede15-495a-4c7e-8d2e-b59b6712182b")
 	)
 	(wire
 		(pts
@@ -10482,7 +9039,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "571a1a60-ea2a-4949-99a8-23aca87d2171")
+		(uuid "f4ca02aa-8195-40bd-b3a8-f0da3d44d3d0")
 	)
 	(wire
 		(pts
@@ -10492,7 +9049,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "00cf50ad-fb8b-4398-896f-9fae12e50c51")
+		(uuid "34990947-5299-433b-ab85-465d137f16f8")
 	)
 	(wire
 		(pts
@@ -10502,7 +9059,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "c0151b8c-7d18-4248-a477-c616709c5ca8")
+		(uuid "77c84e6b-d3e2-4d23-b913-5e760c0f902a")
 	)
 	(wire
 		(pts
@@ -10512,55 +9069,709 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "4a88386a-977a-44d9-bf33-14443739df3e")
-	)
-	(wire
-		(pts
-			(xy 48.2600 52.0700) (xy 43.1800 52.0700)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "7c8945de-b73e-4b45-a1a1-04d794d79358")
+		(uuid "76d92e63-9016-446b-8c32-709b169a897f")
 	)
 	(junction
 		(at 48.2600 44.4500)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "2165acfe-25fb-4749-b29c-817037c693ab")
+		(uuid "1333afde-93dd-42e7-bea6-38ef8ed5e548")
 	)
 	(junction
 		(at 53.3400 104.1400)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "3a05ada2-aabd-40f8-9331-742c1904da20")
+		(uuid "ca51a0c5-ee1a-405c-8210-24628e4e04c9")
 	)
 	(junction
 		(at 59.6900 87.6300)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "7752e2a0-37ef-4617-9371-37c6bcc5f27a")
-	)
-	(junction
-		(at 121.9200 44.4500)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "c8c20f2c-8c96-403b-8c2b-59aa254e8d06")
+		(uuid "894b30d6-3d05-4689-bd53-bb86843f44ba")
 	)
 	(junction
 		(at 138.4300 127.0000)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "60187574-f94a-4624-9bcd-3dc127543348")
+		(uuid "f8ccc572-f847-4320-8335-c1cc9a7522a3")
 	)
 	(junction
 		(at 193.0400 44.4500)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "fb83795c-0791-4714-a16d-c8fab799463d")
+		(uuid "39180188-bf4a-4147-82aa-b29149ba2134")
 	)
-	(sheet_instances
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x04")
+		(at 60.96 41.91 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "06d898db-2eb0-40aa-896c-88f3b181e6da")
+		(property "Reference" "J6"
+			(at 60.96 46.99 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "BUCK MODULE"
+			(at 60.96 34.29 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+			(at 60.96 41.91 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 60.96 41.91 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 60.96 41.91 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "8f219a49-904c-439c-8c78-d29e7ffda6fd")
+		)
+		(pin "2"
+			(uuid "38e35ee6-6c02-45c7-8585-590ff6536916")
+		)
+		(pin "3"
+			(uuid "27d6e439-0536-4a82-8750-8e3c60fe1b06")
+		)
+		(pin "4"
+			(uuid "cd462754-282d-4315-a020-d2d90b11db53")
+		)
+		(instances
+			(project "nuc-fan-controller"
+				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
+					(reference "J6")
+					(unit 1)
+				)
+			)
+		)
+	)
+
+
+
+
+
+
+
+
+
+	(symbol
+		(lib_id "power:GND")
+		(at 63.5 39.37 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "ce2d6bc5-9c47-4b07-aff7-0c2888416af8")
+		(property "Reference" "#PWR37"
+			(at 63.5 33.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 63.5 35.56 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 63.5 39.37 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 63.5 39.37 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 63.5 39.37 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "8b1346ac-5efc-4cb7-8da2-93f4590a7bb6")
+		)
+		(instances
+			(project "nuc-fan-controller"
+				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
+					(reference "#PWR37")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+12V")
+		(at 63.5 46.99 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "a42d63ce-7630-4533-b4ac-5d2ab07683d0")
+		(property "Reference" "#PWR38"
+			(at 63.5 43.18 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+12V"
+			(at 63.5 50.546 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 63.5 46.99 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 63.5 46.99 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+12V\""
+			(at 63.5 46.99 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "48ddc95b-cea8-4218-bad2-365dac456d8d")
+		)
+		(instances
+			(project "nuc-fan-controller"
+				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
+					(reference "#PWR38")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(global_label "19V"
+		(at 48.26 46.99 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "9c3db43b-3c68-4368-bec2-b3b445394268")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 40.64 41.91 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "a1dd2e04-b989-48fe-8264-b494aa337874")
+		(property "Reference" "#PWR01"
+			(at 40.64 48.26 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 40.64 45.72 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 40.64 41.91 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 40.64 41.91 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 40.64 41.91 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "8b38fc3b-44a1-42d6-8656-0392bd3f2f8e")
+		)
+		(instances
+			(project "nuc-fan-controller"
+				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
+					(reference "#PWR01")
+					(unit 1)
+				)
+			)
+		)
+	)
+
+	(text "the buck is a module, not parts on this board: an XL4016E1 step-down, bolted to the enclosure wall"
+		(exclude_from_sim no)
+		(at 35.56 71.12 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4a0c01ef-ec67-4864-b02b-bb3abcfa1885")
+	)
+	(text "J6: 1 and 2 GND, 3 = 19 V in, 4 = 12 V out - trim the module to 12.0 V with a meter before fitting"
+		(exclude_from_sim no)
+		(at 35.56 73.66 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c0994afa-69b1-4961-a282-9cbea5ecf93a")
+	)
+	  (symbol (lib_id "power:PWR_FLAG") (at 50.8 41.91 0) (unit 1)
+    (body_style 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (in_pos_files yes) (dnp no)
+    (uuid "99273525-5dd9-49e4-b9bc-2ef0b2eabe55")
+    (property "Reference" "#FLG01"
+      (at 50.8 43.815 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+    )
+    (property "Value" "PWR_FLAG"
+      (at 50.8 45.72 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+    )
+    (property "Footprint" ""
+      (at 50.8 41.91 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+    )
+    (property "Datasheet" ""
+      (at 50.8 41.91 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+    )
+    (property "Description" "Special symbol for telling ERC where power comes from"
+      (at 50.8 41.91 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+    )
+    (pin "1" (uuid "fdb42f5d-1848-4843-bf44-394c669de910"))
+    (instances
+      (project "nuc-fan-controller"
+        (path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
+          (reference "#FLG01")
+          (unit 1)
+        )
+      )
+    )
+  )
+    (symbol (lib_id "power:PWR_FLAG") (at 43.18 44.45 180) (unit 1)
+    (body_style 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (in_pos_files yes) (dnp no)
+    (uuid "82eb5635-cae6-4c0f-8564-a350fc9ddfde")
+    (property "Reference" "#FLG02"
+      (at 43.18 42.545 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+    )
+    (property "Value" "PWR_FLAG"
+      (at 43.18 40.64 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+    )
+    (property "Footprint" ""
+      (at 43.18 44.45 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+    )
+    (property "Datasheet" ""
+      (at 43.18 44.45 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+    )
+    (property "Description" "Special symbol for telling ERC where power comes from"
+      (at 43.18 44.45 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+    )
+    (pin "1" (uuid "fd59027b-31af-4025-aab2-f15104252874"))
+    (instances
+      (project "nuc-fan-controller"
+        (path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
+          (reference "#FLG02")
+          (unit 1)
+        )
+      )
+    )
+  )
+  (sheet_instances
 		(path "/"
 			(page "1")
 		)

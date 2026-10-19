@@ -19,7 +19,8 @@
 </style></head><body>
 <header>
  <h1>nuc-fan-controller — Mode B</h1>
- <p>19 V → 12 V buck for two 2‑pin 12 V fans; 12 V → 5 V → 3.3 V for a 3.3 V / 8 MHz Arduino Pro
+ <p>12 V for two 2‑pin 12 V fans, from an XL4016E1 step‑down module bolted to the enclosure and wired
+  to this board through J6; 12 V → 5 V → 3.3 V for a 3.3 V / 8 MHz Arduino Pro
  Mini; follows the PWM duty the NUC asks for; and simulates the tach signal the ITE expects.
  ERC 0 violations. DRC 0 violations, 0 unconnected items. Everything below opens without KiCad.</p>
 </header>
@@ -47,8 +48,8 @@
 <section>
  <h2>Board, 124 × 85 mm, two layers</h2>
  <p class="hint">GND poured on both layers with 326 stitching vias. Power nets 1.5 mm, signals 0.2 mm.
- Flow left to right: input and buck, then the 12 V rail to the LDOs and the Pro Mini header; the NUC
- interface along the top; the fan drive and the two fan connectors bottom right.</p>
+ Flow left to right: the 19 V entry (J1) and the module header (J6), then the 12 V rail to the LDOs and
+  the Pro Mini header; the NUC interface along the top; the fan drive and the two fan connectors bottom right.</p>
  <div class="grid">
   <div><strong>Top (F.Cu, silk, mask)</strong><img src="nuc-fan-controller_board.svg" alt="board top"></div>
   <div><strong>Bottom (B.Cu, silk, mask)</strong><img src="nuc-fan-controller_board_bottom.svg" alt="board bottom"></div>
@@ -56,10 +57,8 @@
 </section>
 
 <section>
- <h2>Bill of materials — 38 fitted parts, all from the cabinet</h2>
+ <h2>Bill of materials — 32 fitted parts, all from the cabinet</h2>
  <table><thead><tr><th>Refs</th><th>Value</th><th>Footprint</th></tr></thead><tbody>
-<tr><td>C1</td><td>220uF 35V</td><td class=fp>Capacitor_THT:CP_Radial_D10.0mm_P5.00mm</td></tr>
-<tr><td>C2</td><td>100n</td><td class=fp>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</td></tr>
 <tr><td>C3</td><td>470uF 25V</td><td class=fp>Capacitor_THT:CP_Radial_D10.0mm_P5.00mm</td></tr>
 <tr><td>C4</td><td>100n</td><td class=fp>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</td></tr>
 <tr><td>C5</td><td>10uF</td><td class=fp>Capacitor_THT:CP_Radial_D6.3mm_P2.50mm</td></tr>
@@ -70,18 +69,16 @@
 <tr><td>C10</td><td>1uF</td><td class=fp>Capacitor_THT:CP_Radial_D8.0mm_P3.50mm</td></tr>
 <tr><td>C11</td><td>100n</td><td class=fp>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</td></tr>
 <tr><td>C12</td><td>100n</td><td class=fp>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</td></tr>
-<tr><td>D1</td><td>1N5822</td><td class=fp>Diode_THT:D_DO-201AD_P15.24mm_Horizontal</td></tr>
 <tr><td>D2</td><td>1N5819</td><td class=fp>Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal</td></tr>
 <tr><td>J1</td><td>19V IN</td><td class=fp>Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical</td></tr>
 <tr><td>J2</td><td>NUC fan header</td><td class=fp>Connector:FanPinHeader_1x04_P2.54mm_Vertical</td></tr>
 <tr><td>J3</td><td>FAN 1</td><td class=fp>Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical</td></tr>
 <tr><td>J4</td><td>FAN 2</td><td class=fp>Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical</td></tr>
 <tr><td>J5</td><td>Pro Mini</td><td class=fp>Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical</td></tr>
-<tr><td>L1</td><td>100uH 6A</td><td class=fp>Inductor_THT:L_Toroid_Horizontal_D16.8mm_P14.70mm_Vishay_TJ3</td></tr>
+<tr><td>J6</td><td>BUCK MODULE — 1, 2 GND · 3 19V · 4 12V</td><td class=fp>Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical</td></tr>
 <tr><td>Q1</td><td>BC547B</td><td class=fp>Package_TO_SOT_THT:TO-92_Inline_Wide</td></tr>
 <tr><td>Q2</td><td>BC547B</td><td class=fp>Package_TO_SOT_THT:TO-92_Inline_Wide</td></tr>
 <tr><td>Q3</td><td>IRFZ44N</td><td class=fp>Package_TO_SOT_THT:TO-220-3_Vertical</td></tr>
-<tr><td>R1</td><td>1k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
 <tr><td>R2</td><td>1k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
 <tr><td>R3</td><td>4.7k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
 <tr><td>R4</td><td>2.2k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
@@ -91,21 +88,23 @@
 <tr><td>R8</td><td>1k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
 <tr><td>R9</td><td>120R</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
 <tr><td>R10</td><td>10k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
-<tr><td>RV1</td><td>10k trim</td><td class=fp>Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical</td></tr>
 <tr><td>TP1</td><td>TACH</td><td class=fp>TestPoint:TestPoint_Pad_D1.5mm</td></tr>
-<tr><td>U1</td><td>LM2596T</td><td class=fp>Package_TO_SOT_THT:TO-220-5_P3.4x3.7mm_StaggerOdd_Lead3.8mm_Vertical</td></tr>
 <tr><td>U2</td><td>AMS1117-5.0</td><td class=fp>Package_TO_SOT_SMD:SOT-223-3_TabPin2</td></tr>
 <tr><td>U3</td><td>AMS1117-3.3</td><td class=fp>Package_TO_SOT_SMD:SOT-223-3_TabPin2</td></tr>
  </tbody></table>
  <p class="hint">Plus four <span class="fp">MountingHole:MountingHole_3.2mm_M3</span> holes, which are
- board‑only and therefore correctly absent from the table above.</p>
+ board‑only and therefore correctly absent from the table above. And the converter itself: an
+ <strong>XL4016E1 step‑down module</strong> (cabinet L1 A10 — 5–40 V in, 1.2–36 V out, 8 A, ~180 kHz,
+ 61 × 41 × 27 mm with its two heatsinks), bolted to the enclosure wall and joined to J6 by four wires.
+ It is a purchased part, so it is not in the table either.</p>
 </section>
 
 <section>
  <h2>Build order, in short</h2>
  <ol>
   <li>Identify the four NUC fan‑header wires with a meter. Mark them before cutting anything.</li>
-  <li>Fit the buck only (U1, L1, D1, C1–C4, R1, RV1) and trim the rail to 12.0 V.</li>
+  <li>Fit J1, J6, C3 and C4. Set the module to <strong>12.0 V with a meter</strong> before it is wired
+      in, and confirm its current limit is released by watching the rail through a fan starting.</li>
   <li>Fit U2/U3, confirm 5 V and 3.3 V. Then fit Q1/Q2/Q3.</li>
   <li>Find the fan's stall duty and measure its RPM at two duties. Those four numbers are the
       calibration constants at the top of the sketch.</li>
