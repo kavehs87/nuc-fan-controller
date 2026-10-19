@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>NUC fan controller — parts collection sheet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { --ink:#1b1b1b; --mut:#5b6470; --line:#d7dbe0; --hit:#f5f7f9; --ok:#0b6b3a; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:28px 22px 60px; background:#fff; color:var(--ink);
+         font:15px/1.5 -apple-system,"Helvetica Neue",Arial,sans-serif; }
+  header { max-width:1080px; margin:0 auto 22px; }
+  h1 { font-size:24px; margin:0 0 6px; }
+  h2 { font-size:18px; margin:30px 0 10px; }
+  .sub { color:var(--mut); max-width:80ch; }
+  main { max-width:1080px; margin:0 auto; }
+  table { width:100%; border-collapse:collapse; margin:10px 0 4px; }
+  th, td { text-align:left; padding:8px 9px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:var(--mut);
+       border-bottom:1px solid #b9c0c8; background:var(--hit); }
+  td.n { white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .refs { font-weight:600; }
+  .drawer { font-weight:600; white-space:nowrap; }
+  .id { color:var(--mut); font-size:13px; }
+  .take { font-weight:700; color:var(--ok); white-space:nowrap; }
+  tr.done td { color:#9aa3ad; text-decoration:line-through; }
+  tr.done td.chk { text-decoration:none; color:var(--ok); }
+  input[type=checkbox] { width:18px; height:18px; }
+  .grp { margin-top:22px; border:1px solid var(--line); border-radius:8px; padding:2px 14px 12px; }
+  .grp h3 { font-size:15px; margin:12px 0 2px; }
+  .grp p.note { color:var(--mut); font-size:14px; margin:2px 0 6px; }
+  ol.steps { max-width:88ch; }
+  ol.steps li { margin:8px 0; }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px; }
+  .bar { display:flex; gap:14px; align-items:center; margin:14px 0 0; flex-wrap:wrap; }
+  .bar button { font:inherit; padding:6px 12px; border:1px solid var(--line); border-radius:6px;
+                background:#fff; cursor:pointer; }
+  #count { color:var(--mut); font-size:14px; }
+  @media print { .bar { display:none; } body { padding:0; } tr.done td { color:inherit; text-decoration:none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Parts collection sheet — NUC fan controller</h1>
+  <div class="sub">
+    Every BOM line and the exact cabinet drawer it comes from. Walk the drawers in the order of the
+    second table; tick each row as it goes in the tray. The last table is what the photos and caliper
+    readings have to answer, because those answers set the footprints and therefore the board size.
+    Quantities include spares. The 19&nbsp;V→12&nbsp;V stage is the XL4016E1 module, so the board carries
+    no power inductor, no rectifier for that stage, and no buck IC.
+  </div>
+  <div class="bar">
+    <button id="print">Print</button>
+    <button id="clear">Clear ticks</button>
+    <span id="count"></span>
+  </div>
+</header>
+<main>
+
+<h2>1. By reference</h2>
+<table>
+  <thead><tr><th></th><th>Ref</th><th>Value</th><th>On the board</th><th>Cabinet</th><th>Inventory entry</th><th class="n">Stock</th><th class="n">Take</th></tr></thead>
+  <tbody>
+    <tr><td class="chk"><input type="checkbox" data-k="q3"></td><td class="refs">Q3</td><td>IRFZ44N</td><td>low‑side fan switch</td><td class="drawer">R1 B4</td><td>IRFZ44N N‑Channel Power MOSFET (TO‑220) <span class="id">id 208</span></td><td class="n">12</td><td class="n take">2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="q12"></td><td class="refs">Q1, Q2</td><td>BC547B</td><td>fake tach generator, fan‑gate driver</td><td class="drawer">R1 D3</td><td>BC547 NPN Transistor (TO‑92) <span class="id">id 248</span></td><td class="n">20</td><td class="n take">4</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d2"></td><td class="refs">D2</td><td>1N5819</td><td>fan freewheel (cathode to +12 V)</td><td class="drawer">L1 E1</td><td>1N5819 <span class="id">id 48</span></td><td class="n">30</td><td class="n take">3</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="u2"></td><td class="refs">U2</td><td>AMS1117‑5.0</td><td>12 V → 5 V</td><td class="drawer">L1 B1</td><td>AMS1117‑5.0 <span class="id">id 28</span></td><td class="n">8</td><td class="n take">2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="u3"></td><td class="refs">U3</td><td>AMS1117‑3.3</td><td>5 V → 3.3 V</td><td class="drawer">L1 B1</td><td>AMS1117‑3.3 (TO‑252) <span class="id">id 27</span></td><td class="n">19</td><td class="n take">2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="c3"></td><td class="refs">C3</td><td>470 µF 25 V</td><td>bulk on the module's 12 V</td><td class="drawer">L1 C1</td><td>470uF 25v 8x20mm Radial <span class="id">id 111</span></td><td class="n">6</td><td class="n take">2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="c57"></td><td class="refs">C5, C7</td><td>10 µF</td><td>regulator output caps</td><td class="drawer">L1 D3</td><td>10uF 16v Radial 4x7.5mm <span class="id">id 147</span></td><td class="n">4</td><td class="n take">3</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="c10"></td><td class="refs">C10</td><td>1 µF</td><td>PWM_IN filter</td><td class="drawer">L1 E7</td><td>1uF 50V Radial Electrolytic Cap 8x4mm <span class="id">id 256</span></td><td class="n">8</td><td class="n take">2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="c100n"></td><td class="refs">C4, C6, C8, C11, C12</td><td>100 n</td><td>bypass on 12 V, 5 V, 3.3 V, PWM_IN, FAN_SW</td><td class="drawer">L1 C9</td><td>Ceramic Cap 100nF (104) <span class="id">id 294</span></td><td class="n">30</td><td class="n take">7</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="c9"></td><td class="refs">C9</td><td>100 p</td><td>tach output filter</td><td class="drawer">L1 C9</td><td>Ceramic Cap 100pF (101) <span class="id">id 293</span></td><td class="n">8</td><td class="n take">2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="r1k"></td><td class="refs">R2, R6, R8</td><td>1 k</td><td>tach pull‑up, Q2 base, fan‑rail pull</td><td class="drawer">R1 A2</td><td>1k Ohm Through‑Hole Resistor <span class="id">id 221</span></td><td class="n">20</td><td class="n take">5</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="r4k7"></td><td class="refs">R3</td><td>4.7 k</td><td>PWM divider top arm</td><td class="drawer">R1 B2</td><td>4.7k Ohm Through‑Hole Resistor <span class="id">id 223</span></td><td class="n">20</td><td class="n take">2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="r2k2"></td><td class="refs">R4</td><td>2.2 k</td><td>PWM divider mid tap</td><td class="drawer">R1 A2</td><td>2.2k Ohm Through‑Hole Resistor <span class="id">id 222</span></td><td class="n">20</td><td class="n take">2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="r10k"></td><td class="refs">R5, R7, R10</td><td>10 k</td><td>PWM pull‑down, base pull‑down, gate pull‑down</td><td class="drawer">R1 B2</td><td>10k Ohm Through‑Hole Resistor <span class="id">id 224</span></td><td class="n">20</td><td class="n take">5</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="r120"></td><td class="refs">R9</td><td>120 Ω</td><td>Q3 gate series</td><td class="drawer">R1 B1</td><td>120 Ohm Through‑Hole Resistor <span class="id">id 213</span></td><td class="n">20</td><td class="n take">2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="hdr2"></td><td class="refs">J1, J3, J4, J7</td><td>1×02 header</td><td>19 V in, three fans</td><td class="drawer">L1 E9</td><td>2‑Pin Male Header 2.54mm <span class="id">id 310</span></td><td class="n">7</td><td class="n take">5</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="hdr5"></td><td class="refs">J2, J5, J6</td><td>1×04 · 1×05 · 1×04</td><td>NUC fan header, Pro Mini, buck module</td><td class="drawer">L1 E9</td><td>5‑Pin Male Header 2.54mm <span class="id">id 309</span></td><td class="n">7</td><td class="n take">3 strips</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="tp1"></td><td class="refs">TP1</td><td>TACH</td><td>probe point — no part, a bare 1.5 mm pad</td><td class="drawer">—</td><td>nothing to collect</td><td class="n">—</td><td class="n take">—</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="mod"></td><td class="refs">—</td><td>XL4016E1 module</td><td>the whole 19 V → 12 V stage, off the board</td><td class="drawer">L1 A10</td><td>XL4016E1 Step‑Down Module <span class="id">id 319</span></td><td class="n">1</td><td class="n take">1</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="mini"></td><td class="refs">—</td><td>Arduino Pro Mini 3.3 V/8 MHz</td><td>the controller</td><td class="drawer">L1 C5</td><td>Arduino Pro Mini <span class="id">id 125</span></td><td class="n">1</td><td class="n take">1</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="iso"></td><td class="refs">—</td><td>TO‑220 isolation pad</td><td>only if Q3's tab touches metal</td><td class="drawer">L1 E7</td><td>TO‑220 Heatsink Isolation Pads <span class="id">id 202</span></td><td class="n">10</td><td class="n take">1</td></tr>
+  </tbody>
+</table>
+
+<h2>2. Walk the cabinet in this order</h2>
+<table>
+  <thead><tr><th></th><th class="n">#</th><th>Drawer</th><th>Take</th></tr></thead>
+  <tbody>
+    <tr><td class="chk"><input type="checkbox" data-k="d1"></td><td class="n">1</td><td class="drawer">L1 B1</td><td>AMS1117‑5.0 ×2, AMS1117‑3.3 ×2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d2x"></td><td class="n">2</td><td class="drawer">L1 C1</td><td>470 µF 25 V 8×20 radial ×2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d3"></td><td class="n">3</td><td class="drawer">L1 C9</td><td>100 n (104) ×7, 100 p (101) ×2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d4"></td><td class="n">4</td><td class="drawer">L1 D3</td><td>10 µF 16 V 4×7.5 ×3</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d5"></td><td class="n">5</td><td class="drawer">L1 E1</td><td>1N5819 ×3</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d6"></td><td class="n">6</td><td class="drawer">L1 E7</td><td>1 µF 50 V 8×4 ×2, TO‑220 isolation pad ×1</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d7"></td><td class="n">7</td><td class="drawer">L1 E9</td><td>2‑pin headers ×5, 5‑pin headers ×3</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d8"></td><td class="n">8</td><td class="drawer">L1 A10</td><td>XL4016E1 step‑down module ×1</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d9"></td><td class="n">9</td><td class="drawer">L1 C5</td><td>Arduino Pro Mini ×1</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d10"></td><td class="n">10</td><td class="drawer">R1 A2</td><td>1 k ×5, 2.2 k ×2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d11"></td><td class="n">11</td><td class="drawer">R1 B1</td><td>120 Ω ×2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d12"></td><td class="n">12</td><td class="drawer">R1 B2</td><td>4.7 k ×2, 10 k ×5</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d13"></td><td class="n">13</td><td class="drawer">R1 B4</td><td>IRFZ44N ×2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d14"></td><td class="n">14</td><td class="drawer">R1 D3</td><td>BC547 ×4</td></tr>
+  </tbody>
+</table>
+<p class="sub">Only if the 3.5″ HDD 12 V tap gets built: <b>L1 A8</b> glass fuse 3–4 A ×1 and
+<b>L1 B6</b> glass fuse socket ×1 for the tapped 19 V lead.</p>
+
+<h2>3. What the photos and calipers have to answer</h2>
+<div class="grp">
+  <h3>3.1 The nine resistors — the biggest lever on board area</h3>
+  <p class="note">The design assumes DIN0204: 3.6 mm body, 1.6 mm Ø, <b>5.08 mm</b> pad pitch. If the cabinet's
+  are 0207 (≈5.5 × 2.5 mm, leads spread to ≈10 mm) every resistor takes twice the room. Report body length,
+  body Ø, and the spacing the leads land at when the part sits flat.</p>
+  <h3>3.2 The disc caps</h3>
+  <p class="note">Assumed Ø3.8 / P2.50 for the 100 n and Ø3.0 / P2.50 for the 100 p. A 104 disc is usually
+  Ø5–6 mm. Report body Ø, thickness, and lead spread where the leads exit the body.</p>
+  <h3>3.3 Headers — the cabinet has no 4‑pin strip</h3>
+  <p class="note">Three ways to make J2 and J6: snap 5‑pin strips down to 4; salvage the NUC's own fan plug and
+  solder its wires into a 4‑pin header; or solder fan wires straight into the pads. The JST‑XH 4P housings in
+  L1 E9 are 2.5 mm pitch and will not sit on 2.54 mm pins. Report whether the strips are breakaway.</p>
+  <h3>3.4 D2's span decides the two fan rails</h3>
+  <p class="note">The footprint spreads its pads 10.16 mm apart. A DO‑41 body is ≈5.3 × 2.7 mm with ≈2.7 mm
+  natural lead spacing, so the leads can be bent out to 5.08 mm and sit flat. Report body length and Ø.</p>
+  <h3>3.5 The buck module decides J6</h3>
+  <p class="note">Some XL4016 modules have screw terminals (5.08 mm pitch, no pins at all), some have plain pins.
+  Report module L × W, what the input and output terminals are and their spacing, where the two trim pots sit,
+  whether it has mounting holes, and how tall its tallest part is.</p>
+  <h3>3.6 The regulators</h3>
+  <p class="note">Confirm both AMS1117s are SOT‑223 (TO‑252). If the 5 V one is TO‑220 instead, L1 B1 also holds
+  L7805CV (TO‑220, 9 pcs) and BA033ST (TO‑220 3.3 V, 4 pcs) — a deliberate all‑THT option, at the cost of two
+  TO‑220 footprints on a board that is trying to be small.</p>
+  <h3>3.7 The transistors</h3>
+  <p class="note">TO‑92 leads come flat (one row) or staggered (middle lead offset); the design uses
+  <code>TO-92_Inline_Wide</code>. Report which the BC547s are and confirm the marking reads BC547<b>B</b>.
+  Pin order facing the flat face: 1 = E, 2 = B, 3 = C.</p>
+  <h3>3.8 The Pro Mini</h3>
+  <p class="note">Confirm 3.3 V / 8 MHz (crystal marked 8.000). The board's 3.3 V rail and the firmware expect it.</p>
+</div>
+
+<h2>4. Not in the cabinet</h2>
+<p class="sub">M3 mounting hardware for the board corners (four holes, if they stay) plus four nuts, and hookup
+wire. The 19 V lead, its fuse, and the NUC's 5 V tap are bench items, not board items.</p>
+
+</main>
+<script>
+(function(){
+  var KEY='nucfan-collection';
+  var saved={}; try{ saved=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){}
+  var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox]'));
+  function refresh(){
+    var n=0;
+    boxes.forEach(function(b){
+      var row=b.closest('tr'); if(saved[b.dataset.k]) { b.checked=true; row.classList.add('done'); n++; }
+      else row.classList.remove('done');
+    });
+    document.getElementById('count').textContent = n+' of '+boxes.length+' collected';
+  }
+  boxes.forEach(function(b){
+    b.addEventListener('change',function(){
+      if(b.checked) saved[b.dataset.k]=1; else delete saved[b.dataset.k];
+      try{ localStorage.setItem(KEY,JSON.stringify(saved)); }catch(e){}
+      refresh();
+    });
+  });
+  document.getElementById('print').addEventListener('click',function(){ window.print(); });
+  document.getElementById('clear').addEventListener('click',function(){
+    saved={}; try{ localStorage.removeItem(KEY); }catch(e){}
+    boxes.forEach(function(b){ b.checked=false; }); refresh();
+  });
+  refresh();
+})();
+</script>
+</body>
+</html>

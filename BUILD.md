@@ -135,40 +135,42 @@ leaves the edges alone.
 
 ## BOM, and where the parts came from
 
-All through-hole except the two SOT-223 regulators, all already in the cabinet.
+All through-hole except the two SOT-223 regulators, all already in the cabinet. `docs/parts-collection.html`
+is the same list cut as a walk-the-cabinet checklist, with quantities including spares and the measurements
+each part has to give up before its footprint can be fixed.
 
 | Ref | Value | Footprint | Cabinet |
 |---|---|---|---|
-| C3 | 470 µF 25 V | `Capacitor_THT:CP_Radial_D10.0mm_P5.00mm` | L1 A1 |
-| C4 | 100 nF | `Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm` | L1 C9 |
+| C3 | 470 µF 25 V | `Capacitor_THT:CP_Radial_D10.0mm_P5.00mm` — **the cabinet's can is 8×20 mm, so this footprint waits on its lead pitch** | L1 C1 (6) |
+| C4 | 100 nF | `Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm` | L1 C9 (30) |
 | U2 | AMS1117-5.0 | `Package_TO_SOT_SMD:SOT-223-3_TabPin2` | L1 B1 (8) |
 | U3 | AMS1117-3.3 | `Package_TO_SOT_SMD:SOT-223-3_TabPin2` | L1 B1 (19) |
-| C5, C7 | 10 µF | `Capacitor_THT:CP_Radial_D6.3mm_P2.50mm` | L1 A1 |
-| C6, C8, C11, C12 | 100 nF | `Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm` | L1 C9 |
+| C5, C7 | 10 µF | `Capacitor_THT:CP_Radial_D6.3mm_P2.50mm` | L1 D3 (4), spare pool L1 C1 (19) |
+| C6, C8, C11, C12 | 100 nF | `Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm` | L1 C9 (30) |
 | C9 | 100 pF | `Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm` | L1 C9 (8) |
-| C10 | 1 µF | `Capacitor_THT:CP_Radial_D8.0mm_P3.50mm` | L1 A1 |
-| R3 | 4.7 kΩ | `Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal` | R1 A2 |
+| C10 | 1 µF | `Capacitor_THT:CP_Radial_D8.0mm_P3.50mm` | L1 E7 (8) |
+| R3 | 4.7 kΩ | `Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal` | R1 B2 |
 | R4 | 2.2 kΩ | same | R1 A2 |
 | R5, R7, R10 | 10 kΩ | same | R1 B2 |
 | R2, R6, R8 | 1 kΩ | same | R1 A2 |
-| R9 | 120 Ω | same | R1 A2 |
+| R9 | 120 Ω | same | R1 B1 |
 | Q1, Q2 | BC547B | `Package_TO_SOT_THT:TO-92_Inline_Wide` | R1 D3 (20) — **meter them first, see "Which way round a BC547 goes"** |
-| Q3 | IRFZ44N | `Package_TO_SOT_THT:TO-220-3_Vertical` | R1 A4 (12) |
-| D2 | 1N5819 | `Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal` | R1 C3 (30) |
-| J1 | 19 V IN | `Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical` | — |
-| J2 | NUC fan header | `Connector:FanPinHeader_1x04_P2.54mm_Vertical` | — |
-| J7, J3, J4 | FAN 1 / FAN 2 / FAN 3 | `Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical` | — |
-| J5 | Pro Mini | `Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical` | — |
-| J6 | BUCK MODULE — 1, 2 GND · 3 19 V · 4 12 V | `Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical` | — |
-| TP1 | TACH test point | `TestPoint:TestPoint_Pad_D1.5mm` | — |
-| MH1–4 | M3 mounting holes | `MountingHole:MountingHole_3.2mm_M3` | — |
+| Q3 | IRFZ44N | `Package_TO_SOT_THT:TO-220-3_Vertical` | R1 B4 (12) |
+| D2 | 1N5819 | `Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal` | L1 E1 (30) |
+| J1 | 19 V IN | `Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical` | L1 E9 (7) |
+| J2 | NUC fan header | `Connector:FanPinHeader_1x04_P2.54mm_Vertical` | L1 E9 — snap a 5-pin strip to 4 |
+| J7, J3, J4 | FAN 1 / FAN 2 / FAN 3 | `Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical` | L1 E9 (7) |
+| J5 | Pro Mini | `Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical` | L1 E9 (7) |
+| J6 | BUCK MODULE — 1, 2 GND · 3 19 V · 4 12 V | `Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical` | L1 E9 — snap a 5-pin strip to 4 |
+| TP1 | TACH test point | `TestPoint:TestPoint_Pad_D1.5mm` | no part: a bare pad |
+| MH1–4 | M3 mounting holes | `MountingHole:MountingHole_3.2mm_M3` | no part: a drilled hole |
 | — | Arduino Pro Mini **3.3 V / 8 MHz** | 5-pin header into J5 | L1 C5 (1) |
 | — | **XL4016E1 step-down module**, 19 V in → 12 V out | off-board, bolted to the enclosure, four wires into J6 | L1 A10 (1) |
 
 **Why the buck is a module now.** This board used to build its converter out of parts — LM2596T-ADJ,
 a 100 µH 6 A toroid, a 1N5822 catch diode, and a 10 kΩ trimmer in the feedback divider with R1 1 kΩ
 under it. That design is in git at `10bc262` and every part of it is still in the cabinet (LM2596T and
-LM2576HVT in R1 B4, 100 µH toroids in L1 D2, 1N5822 in R1 C3, 3296W trimmers in R1 D1). What changed is
+LM2576HVT in L1 E7, 100 µH toroids in L1 A7, 1N5822 in L1 E1, 10 kΩ multi-turn trimmers in R1 A3). What changed is
 that the cabinet also holds a finished step-down module, and at 12 V / 0.3 A a finished module is the
 better answer: the **XL4016E1 module in L1 A10** carries the XL4016E1 controller and a 20S100 Schottky
 catch diode, each on its own heatsink, with its input and output electrolytics and two multi-turn trimmers

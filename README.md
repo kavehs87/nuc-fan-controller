@@ -49,6 +49,7 @@ both ways. *BUILD.md* carries the arithmetic that makes the module the better ch
 | `bench/plot-curve.py`, `bench/plot-hold.py` | draw `docs/bench/06-ite-fan-response.svg` and `docs/bench/07-ite-hold-test.svg`, the two graphs below, from the same logs |
 | `bench/data/` | the raw logs: 1 Hz traces of the divider reading, and of the NUC's temperatures |
 | `BUILD.md` | the build sheet: header identification with a meter, setting the module to 12.0 V, calibration, bench order |
+| `docs/parts-collection.html` | the collection sheet: every BOM line with the exact cabinet drawer it comes from, in drawer‑walk order, plus the eight measurements that decide the footprints (also `docs/parts-collection.md`) |
 | `archive/modeA-2026-10-19/` | the fixed‑RPM tach simulator this board replaced |
 
 ## On the bench
