@@ -4,6 +4,7 @@ logs/*.kicad_pcb
 logs/*.kicad_sch
 logs/inspect/
 logs/__pycache__/
+__pycache__/
 logs/scratch.kicad_sch
 logs/placed.txt
 logs/drc*.json

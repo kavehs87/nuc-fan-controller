@@ -50,6 +50,7 @@ starts logging). `analyze-heat.py` takes that offset as an argument.
 | `cold.log` | `coldtemp.log` | claim frozen, bench fans at maximum, package 32–36 °C for twelve minutes |
 | `stress2.log` | `stress2-temps.log` | claim frozen, fans at maximum, `stress-ng --cpu 4` for 300 s: package 34 → 73 °C, board only to 55.5 °C |
 | `warm.log` | `warm-temps.log` | claim frozen, bench fans off, NUC blower at minimum, board warmed by hand, then `stress-ng --cpu 4` for 240 s: board to 68.5 °C, package pinned at 88 °C |
+| `hold.log` | `hold-temps.log` | claim frozen, fans off, a 300 s four-core ramp then **1200 s at a two-core load** so the board sits at 68.5–69 °C for sixteen flat minutes — the time-at-temperature test. Its `baseline` loop was left out of the capture script, so the log starts mid-ramp at 41 °C |
 | `nucmon-idle.log` | — | the NUC's own sensors at idle, for the record |
 
 **ERC: 0 violations.** **DRC: 0 violations, 0 unconnected items** after
@@ -494,7 +495,8 @@ Both readings belong in `bench/data/` as a note beside the log they were taken w
   on the confirmed 0.500 divider the ITE's four dwell levels — 198, 257, 320 and 380 counts — average
   **1.94 V, 2.51 V, 3.13 V and 3.71 V** on the PWM wire, with 0.97 V, 1.26 V, 1.56 V and 1.86 V at the tap.
 - **The ITE's PWM demand answers the board's temperature, not the cores, and not the tach.** Measured
-  four times on this NUC6i3SYB, and the third measurement corrected the second.
+  five times on this NUC6i3SYB: the third measurement corrected the second, and the fourth killed the
+  integrator theory.
 
   *The tach.* A 40 s ladder of claims (800 / 2000 / 4500 RPM, fan drive pinned at 90 %) moved the ITE's
   requested duty from 233.6 to 231.0 counts — a 5.6× swing in claimed RPM for 2.5 counts out of 233
@@ -522,20 +524,27 @@ Both readings belong in `bench/data/` as a note beside the log they were taken w
   board dropping back through 55 °C. The board and the cores were collinear in this run, so it does not
   separate them; it extends the curve at the top and measures the response time.
 
-  Pool the four runs and bin by the board, and the picture is monotone where binning by the cores is not:
+  *Temperature, fourth run — the hold.* Same sketch, same frozen claim, same airflow. A 300 s four-core
+  ramp to get the board past the knee, then **1200 s at a two-core load**, then 300 s left alone. The board
+  settled at 68.5–69.0 °C and stayed there for sixteen flat minutes with the package at 84–86 °C, and the
+  demand sat at **378 counts** — the same rung the third run found at the same board temperature,
+  repeatable to 2 counts. See the integrator test below; the point here is that the top of the curve
+  reproduces.
+
+  Pool the five runs and bin by the board, and the picture is monotone where binning by the cores is not:
 
   | board (`pch_thermal`) | n | median counts | duty at 512 | PWM wire average | package in those samples |
   |---|---|---|---|---|---|
-  | 33–51 °C | 1 946 | 239 | 46.7 % | 2.33 V | 41 °C |
-  | 51–54 °C | 228 | 248 | 48.3 % | 2.42 V | 53 °C |
-  | 54–57 °C | 182 | 254 | 49.6 % | 2.48 V | 60 °C |
-  | 57–60 °C | 95 | 259 | 50.6 % | 2.53 V | 76 °C |
-  | 60–66 °C | 149 | 319 | 62.3 % | 3.12 V | 80 °C |
-  | 66–69 °C | 174 | 380 | 74.2 % | 3.71 V | 88 °C |
+  | 33–51 °C | 2 131 | 239 | 46.7 % | 2.33 V | 42 °C |
+  | 51–54 °C | 306 | 247 | 48.2 % | 2.41 V | 53 °C |
+  | 54–57 °C | 251 | 254 | 49.6 % | 2.48 V | 58 °C |
+  | 57–60 °C | 169 | 259 | 50.6 % | 2.53 V | 75 °C |
+  | 60–66 °C | 365 | 319 | 62.3 % | 3.12 V | 80 °C |
+  | 66–72 °C | 1 352 | 377 | 73.6 % | 3.68 V | 85 °C |
 
-  The discriminating subset is 196 samples with the cores at 68.5 °C and the board at 50.9 °C: median 241
-  counts, 47 %, none above 260 — the number the ITE asks for when everything is cold. The mirror subset,
-  103 samples with the cores under 55 °C and the board at 52 °C or more, sits at 243 counts: the board has
+  The discriminating subset is 247 samples with the cores at 68.7 °C and the board at 51.0 °C: median 243
+  counts, 47 %, none above 261 — the number the ITE asks for when everything is cold. The mirror subset,
+  134 samples with the cores under 55 °C and the board at 52 °C or more, sits at 243 counts: the board has
   to pass about 55 °C before the ITE moves. `bench/analyze-heat.py` reproduces these tables from
   `bench/data/`, and `bench/plot-curve.py` draws them as `docs/bench/06-ite-fan-response.svg`.
 
@@ -553,6 +562,25 @@ Both readings belong in `bench/data/` as a note beside the log they were taken w
   ITE's own ambient sensor — the BIOS screen's "motherboard ambient", 40 °C against a CPU at 58 °C — and
   not only over the heatsink. A fan that leaves the board warm will be told, by the ITE itself, to speed
   up; one that cools the board will be told to slow down.
+- **The ITE's demand is not an integrator: time at temperature buys nothing.** The theory that the ITE
+  keeps raising its duty as long as the temperature refuses to fall — a step-up timer, maybe accelerating
+  past a threshold — is what the hold run was built for, and it is dead on this machine. Three reads
+  (`bench/analyze-hold.py`, figure `docs/bench/07-ite-hold-test.svg`):
+
+  * Across the 16 windows of the hold in which the board held within 0.8 °C of its 68.5–69 °C plateau, the
+    demand trended **+0.6 counts per minute**, while the board's own +0.07 °C per minute drift already
+    explains +1.5 counts per minute at the ladder's 20.3 counts per °C. Nothing is left for time to explain.
+  * The same board temperature reached quickly against reached and held: 63–66 °C gives 342 counts on the
+    ramp and **319** in the hold; 66–69 °C gives 378 and **368**. Later is *lower*.
+  * Fitting the 1 513 samples above 55 °C on board temperature and seconds since the knee was crossed:
+    temperature alone R² 0.669, plus time R² 0.670 with a coefficient of **−0.00 counts per minute**.
+
+  What the ITE does instead is settle. Early in the hold the reading swung 318–380 counts, dipping to the
+  rung below; by the end the dips had shrunk to 346–381 and the mode was 379 throughout. And the ramp
+  overshoots: 342 counts at 63–66 °C on the way up against 319 at the same temperature in the hold, which
+  says the ITE answers how fast the board is moving as well as where it is — the same asymmetry the third
+  temperature run measured as 75 s to climb and 30 s to release. For the build: `DEMAND_TAU_S` does not
+  have to outwait a controller that ramps on a timer, because this one does not ramp on a timer.
 - **The ITE's demand has a floor, and it is nowhere near zero.** With the bench fans at maximum the
   package sat at 32–36 °C for twelve minutes — 21 °C below the plateau the first temperature run had been
   stuck at — and the requested duty did not follow it down: 196–260 counts, median 239, and not one
@@ -561,9 +589,10 @@ Both readings belong in `bench/data/` as a note beside the log they were taken w
   against a broken sense wire rather than something the ITE ever reaches, and a fan that is always turning
   is a fan whose tach claim is always plausible.
 - **The demand is stepped, not analog, and the ITE cycles between the steps.** The dwell levels across all
-  four runs are 198, 257, 320 and 380 counts — spaced 59–63 — with everything else either a ramp between
-  them or the ITE's own drift, and the hottest samples reaching 434 against the 441 the spacing predicts
-  for the next rung. Read as 512 counts = 100 % they are 38.8 %, 50.2 %, 62.5 % and 74.2 %: 3/8, 4/8, 5/8
+  five runs are 198, 257, 320 and 380 counts — spaced 59–63 — held for 667, 1 120, 321 and 826 samples of
+  4 577, with everything else either a ramp between them or the ITE's own drift, and the hottest samples
+  reaching 434 against the 441 the spacing predicts for the next rung. Read as 512 counts = 100 % they are
+  38.8 %, 50.2 %, 62.5 % and 74.2 %: 3/8, 4/8, 5/8
   and 6/8 within 0.7 duty points, which is what a fan controller with a binary duty quantum looks like.
   Read as 605 they are 32.7 %, 42.5 %, 52.9 % and 62.8 %, a 10.1 point step that matches no binary quantum —
   one more reason to run the ratio test above. It moves fast, too: 535 of 716 seconds changed by more than

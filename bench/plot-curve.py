@@ -45,6 +45,7 @@ RUNS = [
     ("cold, fans at max", "cold.log", "coldtemp.log", 0),
     ("stress, fans max", "stress2.log", "stress2-temps.log", -15),
     ("board warmed by hand", "warm.log", "warm-temps.log", -20),
+    ("board held hot 20 min", "hold.log", "hold-temps.log", -20),
 ]
 
 RUN_COLORS = {
@@ -52,6 +53,7 @@ RUN_COLORS = {
     "cold, fans at max": "#3aa6a0",
     "stress, fans max": "#8172b3",
     "board warmed by hand": "#c44e52",
+    "board held hot 20 min": "#b8860b",
 }
 
 DWELLS = (198, 257, 320, 380)     # levels the ITE holds for many seconds, from the pooled histogram
@@ -135,9 +137,10 @@ def main():
 
     ax1.axvline(55, color="#c44e52", linestyle="--", linewidth=1.2)
     ax1.text(54.4, 36.5, "knee: the board at about 55 C", color="#c44e52", fontsize=9.5, ha="right")
-    ax1.text(30.6, 61.5, "floor 46-48 %\n240 counts, 2.34 V on the wire\nflat from 32 C to 54 C of board",
+    ax1.text(30.6, 59.5, "floor 46-48 % - 240 counts, 2.33 V on the wire,\n"
+                         "flat from 32 C to 54 C of board (2131 samples)",
              fontsize=9.5, color="#333333")
-    ax1.text(61.5, 31.2, "board at 68 C:\n380 counts, 74 %, 3.71 V\nmax seen 434 counts (85 %)",
+    ax1.text(61.5, 31.2, "board held at 68-69 C:\n377 counts, 73.6 %, 3.68 V\nmax seen 434 counts (85 %)",
              fontsize=9.5, color="#333333")
 
     ax1.set_xlabel("board temperature - pch_thermal, C")
@@ -147,14 +150,15 @@ def main():
     ax1.grid(True, color="#dddddd", linewidth=0.7)
     ax1.set_axisbelow(True)
     ax1.legend(loc="upper left", fontsize=8.2, framealpha=0.92)
-    ax1.set_title("The ITE's fan demand against the board - 2777 paired samples from four runs",
+    ax1.set_title(f"The ITE's fan demand against the board - "
+                  f"{sum(len(s) for _, s in pooled)} paired samples from {len(pooled)} runs",
                   fontsize=11.5, loc="left")
 
     sec = ax1.secondary_yaxis("right", functions=(duty_to_volts, volts_to_duty))
     sec.set_ylabel("average volts on the PWM wire")
 
     # ------------------------------------------------------- bottom panel: the warm run, in time
-    name, warm, marks = runs[-1]
+    name, warm, marks = next(r for r in runs if r[0] == "board warmed by hand")
     t = range(len(warm))
     d = [duty(s[0]) for s in warm]
     ax2.plot(t, d, color="#c44e52", linewidth=1.6, zorder=4, label="ITE duty, counts / 512")

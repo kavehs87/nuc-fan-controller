@@ -37,7 +37,8 @@ Board: 124 × 85 mm, 2 layers, GND poured both sides with 326 stitching vias, `P
 | `firmware/probe-temp/probe-temp.ino` | test sketch: claim frozen at 1500 RPM — measures whether the demand answers temperature, and what the ITE's floor demand is when the machine is cold |
 | `firmware/probe-divider/probe-divider.ino` | test sketch: measures the divider's own ratio with nothing but the Uno, by feeding the chain from the Uno's 5 V pin so the rail voltage cancels |
 | `bench/analyze-ladder.py`, `bench/analyze-temp.py`, `bench/analyze-cold.py`, `bench/analyze-heat.py` | the analysers that produced the numbers below, run against `bench/data/` — `analyze-heat.py` is the one that separates the cores from the board |
-| `bench/plot-curve.py` | draws `docs/bench/06-ite-fan-response.svg`, the two-panel graph below, from the same logs |
+| `bench/analyze-hold.py` | the analyser for the "does it integrate time?" test: flat-window trend, same-temperature early against late, and a two-variable fit |
+| `bench/plot-curve.py`, `bench/plot-hold.py` | draw `docs/bench/06-ite-fan-response.svg` and `docs/bench/07-ite-hold-test.svg`, the two graphs below, from the same logs |
 | `bench/data/` | the raw logs: 1 Hz traces of the divider reading, and of the NUC's temperatures |
 | `BUILD.md` | the build sheet: header identification with a meter, buck trim, calibration, bench order |
 | `archive/modeA-2026-10-19/` | the fixed‑RPM tach simulator this board replaced |
@@ -48,10 +49,10 @@ The board itself is not built yet. Its two control signals have been measured on
 an Uno standing in for the Pro Mini and the ITE's own behaviour logged at 1 Hz. Full numbers and the
 raw logs are in `BUILD.md` and `bench/`; these are the measurements that changed the design.
 
-**The whole result in one picture** — 2 777 paired samples from four runs. Top: the ITE's requested duty
+**The whole result in one picture** — 4 577 paired samples from five runs. Top: the ITE's requested duty
 against the temperature of the *board* (`pch_thermal`), every sample as a dot, the heavy line being the
 median in 3 °C bins, the dotted lines the dwell levels the ITE actually holds. The open circles are the
-196 samples where the cores sat at 65 °C or hotter while the board stayed under 55 °C — they land on the
+247 samples where the cores sat at 65 °C or hotter while the board stayed under 55 °C — they land on the
 floor, not on the ramp, which is what makes the board the axis and the cores not. Bottom: the fourth run
 in time, board warmed by hand with the bench fans off and the NUC's own blower at minimum, then a
 four‑core load, then left alone. `bench/plot-curve.py` draws it from `bench/data/`.
@@ -90,8 +91,8 @@ and the NUC's own hardware monitor, 40.000 Hz later:
 memory 44 °C, motherboard ambient 40 °C. Those are the ITE's own sensors, and they turn out to be
 what its fan policy runs on.
 
-**The demand answers the board's temperature, not the cores, and not the reported speed.** Four tests,
-all logged at 1 Hz, 2 777 paired samples. Stepping the claimed RPM 800 → 2000 → 4500 — a 5.6× swing —
+**The demand answers the board's temperature, not the cores, and not the reported speed.** Five tests,
+all logged at 1 Hz, 4 577 paired samples. Stepping the claimed RPM 800 → 2000 → 4500 — a 5.6× swing —
 moved the ITE's requested duty by 1.1 %, while the same claim swung 195–260 counts on its own: the
 reported speed is not in the loop. Freezing the claim at 1500 RPM and driving the package 55 → 83 → 53 °C
 moved the reading 231 → 327 → 230 counts, correlated at **r = +0.822 with a 4 s lag** — but that run had
@@ -108,24 +109,55 @@ four runs together:
 
 | board (`pch_thermal`) | n | median demand | as duty, 512 counts = 100 % | PWM wire average |
 |---|---|---|---|---|
-| 33–51 °C | 1 946 | 239 counts | 46.7 % | 2.33 V |
-| 51–54 °C | 228 | 248 counts | 48.3 % | 2.42 V |
-| 54–57 °C | 182 | 254 counts | 49.6 % | 2.48 V |
-| 57–60 °C | 95 | 259 counts | 50.6 % | 2.53 V |
-| 60–66 °C | 149 | 319 counts | 62.3 % | 3.12 V |
-| 66–69 °C | 174 | 380 counts | 74.2 % | 3.71 V |
+| 33–51 °C | 2 131 | 239 counts | 46.7 % | 2.33 V |
+| 51–54 °C | 306 | 247 counts | 48.2 % | 2.41 V |
+| 54–57 °C | 251 | 254 counts | 49.6 % | 2.48 V |
+| 57–60 °C | 169 | 259 counts | 50.6 % | 2.53 V |
+| 60–66 °C | 365 | 319 counts | 62.3 % | 3.12 V |
+| 66–72 °C | 1 352 | 377 counts | 73.6 % | 3.68 V |
 
-The decisive 196 samples have the cores at 68.5 °C and the board at 50.9 °C, and the ITE asks for exactly
-what it asks for when everything is cold: 241 counts, 47 %, no sample above 260. `bench/analyze-heat.py`
+The decisive 247 samples have the cores at 68.7 °C and the board at 51.0 °C, and the ITE asks for exactly
+what it asks for when everything is cold: 243 counts, 47 %, no sample above 261. `bench/analyze-heat.py`
 reproduces these tables from the logs.
 
 Two corrections to what this README said before the fourth run. The 297 counts it listed at 57–60 °C was
-not a step the ITE holds — 285–314 counts account for 34 samples out of 2 777, while 315–319 account for
-89: the ITE dwells at 198, 257, 320 and 380 and passes through everything else on its way between them.
+not a step the ITE holds — 285–314 counts account for 55 samples out of 4 577, while the four rungs
+195–206, 253–264, 315–326 and 373–384 account for 667, 1 120, 321 and 826: the ITE dwells on rungs and
+passes through everything else on its way between them.
 And the demand does not chase the board at the same speed in both directions. In the fourth run the board
 crossed 55 °C and the demand took **about 75 s** to reach its plateau, while on the way back it went
 381 → 242 counts **within 30 s** of the board falling back through the same knee. The follower's 15 s tau
 sits well inside both, so it filters the ITE's cycling without fighting its response.
+
+**It is not an integrator: 20 minutes with the board held hot does not make the duty climb.** The theory
+worth killing was that the ITE raises its duty for as long as the temperature refuses to fall — that it
+integrates dwell time, and maybe accelerates past some threshold. The earlier runs could not touch it,
+because in all of them the temperature was moving while the demand was being measured. The fifth run is
+built for the question: a 300 s four‑core ramp to push the board past the knee, then **1200 s at a lighter
+two‑core load** so the board sits still, then 300 s left alone. The board settled at 68.5–69 °C and stayed
+there for sixteen flat minutes with the cores at 84–86 °C, and the demand sat at **378 counts** — the same
+6/8 rung the fourth run found at the same board temperature, repeatable to 2 counts.
+
+![held hot and flat for 20 minutes, and the same temperature reached quickly against reached and held](docs/bench/07-ite-hold-test.svg)
+
+Three independent reads, all saying the same thing (`bench/analyze-hold.py`):
+
+- Across the 16 windows where the board held within 0.8 °C of its plateau, the demand trended
+  **+0.6 counts per minute** — and the board's own +0.07 °C/min drift already explains +1.5 counts per
+  minute at the ladder's 20 counts per °C. Nothing is left over for time to explain.
+- The same board temperature reached quickly against reached and held: at 63–66 °C, 342 counts on the ramp
+  against **319** in the hold; at 66–69 °C, 378 against **368**. Later is *lower*, not higher.
+- Fitting the 1 513 samples above the knee on board temperature **and** seconds since the knee was crossed:
+  temperature alone gives R² 0.669, adding time gives 0.670 with a coefficient of **−0.00 counts per
+  minute**. Time does not earn its place in the model.
+
+What the run found instead is the opposite of a ratchet: held steady, **the ITE stops hunting**. Early in
+the hold the reading swung 318–380 counts, dipping to the rung below; by the end the dips had shrunk to
+346–381 and the mode was 379 throughout. And the ramp's overshoot — 342 counts at 63–66 °C on the way up
+against 319 counts at the same temperature in the hold — says the ITE answers how *fast* the board is
+moving as well as where it is, which is the same asymmetry the fourth run measured as 75 s to climb and
+30 s to release. For the build this is a simplification: `DEMAND_TAU_S` does not have to outwait a
+controller that ramps on a timer, because this one does not.
 
 **The demand has a floor, and it is not near zero.** With the fans at maximum the package sat at 32–36 °C
 for twelve minutes — 21 °C below the plateau the first temperature run had been stuck at — and the duty
@@ -141,9 +173,9 @@ the board and the ITE's own ambient sensor (the BIOS screen's "motherboard ambie
 at 58 °C), not only over the heatsink. The ITE will sit at its floor quite happily while the cores are at
 73 °C.
 
-**The demand is stepped, and the fourth run extends the ladder.** The dwell levels across all four runs are
-198, 257, 320 and 380 counts, spaced 59–63, and the hottest samples reach 434 — close to the fifth rung the
-spacing predicts, 441. A straight line through the four is counts = 15 + 61·k for k = 3, 4, 5, 6, so the step
+**The demand is stepped, and the ladder holds across five runs.** The dwell levels are 198, 257, 320 and
+380 counts, spaced 59–63, held for 667, 1 120, 321 and 826 samples of 4 577, and the hottest samples reach
+434 — close to the fifth rung the spacing predicts, 441. A straight line through the four is counts = 15 + 61·k for k = 3, 4, 5, 6, so the step
 is 11.9 duty points and 0.595 V on the wire: a binary duty quantum of 1/8, with the ITE sitting on 3/8 when
 the board is cold and reaching 6/8 or 7/8 when it is hot. Read as 605 counts the step is 10.1 points and
 matches nothing, which is one more reason the 10 kΩ / 10 kΩ divider is the right one. The cycling is fast —
@@ -201,7 +233,8 @@ before it emits anything.
 
 Design verified on paper and in the CAD; **the board is not built yet.** The control side has been
 measured on a breadboard — the ITE's PWM frequency and amplitude, how it reads the tach, what drives
-its demand, and where that demand bottoms out — see *On the bench*. `BUILD.md` is the bench sequence.
+its demand, where that demand bottoms out and where it tops out, and that it does not integrate the time
+the board spends hot — see *On the bench*. `BUILD.md` is the bench sequence.
 The fan-side constants (`FAN_RPM_MIN`, `FAN_RPM_FULL`, `ADC_AT_100PCT`) are still placeholders until a
 real fan is fitted and measured; `ITE_READ_GAIN` has a measured value for the Uno driving this NUC and
 needs the same measurement on the finished board.
