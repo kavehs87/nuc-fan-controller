@@ -31,6 +31,10 @@ The old Mode A board (fixed-RPM tach simulator only) is archived in
 | `exports/fab/` | 8 Gerbers + `nuc-fan-controller.drl` + `_pos.csv` + `job.gbrjob`, ready to zip |
 | `firmware/nuc-tach-modeB/nuc-tach-modeB.ino` | the sketch |
 | `firmware/nuc-tach-modeA/` | the previous fixed-RPM sketch, kept for reference |
+| `firmware/probe-uno/`, `probe-gain/`, `probe-loop/`, `probe-temp/`, `probe-divider/` | the breadboard sketches the measurements below were made with |
+| `bench/analyze-ladder.py`, `bench/analyze-temp.py`, `bench/analyze-cold.py` | the analysers, run against `bench/data/` |
+| `bench/data/` | the raw logs behind every number in this file: 1 Hz traces of the divider reading, and of the NUC's temperatures |
+| `docs/bench/` | the bench photos the README shows |
 | `logs/erc.json`, `logs/drc.json`, `logs/netlist.net` | last ERC / DRC / netlist runs |
 
 **ERC: 0 violations.** **DRC: 0 violations, 0 unconnected items** after
@@ -310,12 +314,19 @@ The constants at the top of the file are the calibration surface:
 | `FAN_DUTY_MIN` | 20 % | duty below which this fan stalls |
 | `TACH_RPM_FLOOR` | 700 | stay above the ITE's stall detect (~1–2 s without pulses = fan error) |
 | `TACH_RPM_CEIL` | 10500 | the ITE stops counting above ~11 000 RPM |
-| `ADC_AT_100PCT` | 918 | 2.96 V / 3.3 V × 1023 — the two-point calibration's top point |
+| `ADC_AT_100PCT` | 918 | 2.96 V ÷ 3.3 V × 1023 — the two-point calibration's top point, for the divider the schematic carries |
 | `ITE_READ_GAIN` | 1.0 | what the BIOS reads ÷ what the timer emits. Measured Uno → this NUC: **1188 shown for a 40.000 Hz claim** (0.9900). Measure it on the finished board |
+| `DEMAND_TAU_S` | 15 s | the pole the ITE's demand is read through. Measured, not taste: see *The ITE's demand has a floor, and it hunts* |
+| `DEMAND_DEADBAND` | 1.5 duty points | below this the fan is left alone, so the ITE's own cycling does not pump it |
 
-The sketch smooths the demand over ~300 ms and slews the reported RPM by 400 RPM per 100 ms
-update (4000 RPM/s). Both are deliberate: the ITE integrates the tach over about a second, and
-a step in the reported rate reads to it as a fan that surged.
+The demand filter is slow on purpose. Measured at a constant 33 °C package, this ITE dwells at two
+duty levels 58 counts apart — 11 duty points — and ramps between them in 1–3 s, moving by more than 3
+counts in 535 of 716 seconds. A 300 ms pole hands that whole dance to the fan, which then pumps at
+about 0.3 Hz for no thermal reason. tau 15 s with a 1.5 point deadband drops the pump and keeps the
+response: the lag at 0.1 °C/s is 0.6 points, inside the deadband, so the fan sits at most 1.5 duty
+points behind the ITE's own set point. The reported RPM is slewed by 400 RPM per 100 ms update
+(4000 RPM/s), because the ITE integrates the tach over about a second and a step in the reported rate
+reads to it as a fan that surged.
 
 It prints one line per update at 9600 baud — `duty_in`, `duty_fan`, `rpm`, `hz`, `adc` — which
 is what the calibration below reads.
@@ -373,6 +384,30 @@ Calibration is then two numbers. At idle and at full load, read the fan's real R
 sketch's `rpm`; if the sketch reports too much or too little, move `FAN_RPM_MIN` /
 `FAN_RPM_FULL`, not the tach floor or ceiling.
 
+### Two measurements the numbered list does not cover
+
+**The divider's own ratio, with the Uno alone** (`firmware/probe-divider`). Every duty number printed
+so far carries an unresolved "which pair is in the breadboard": 605 counts is 4.7 kΩ + 2.2 kΩ over
+10 kΩ, 512 is 10 kΩ over 10 kΩ, and the gap is 18 % — the difference between the fan following 42 %
+and following 50 %. Feed the top of the chain from the Uno's 5 V pin and read the tap: excitation and
+ADC full scale come from the same rail, so the rail's voltage cancels and `counts ÷ 1024` *is* the
+ratio. Three connections in any order (GND, 5 V direct, 5 V through the chain) and the sketch prints
+the ratio and names the nearest pair. The ITE's dwell levels already point at 10 kΩ / 10 kΩ — see the
+lattice below — but this settles it in a minute with the meter still in the drawer.
+
+**The top of the PWM swing, from two dwell levels and a meter.** The flat top (5.0 V or 5.5 V) decides
+whether 100 % lands at 918 or 1009 counts on the board, and it cannot be got from a single average
+reading because the duty at that moment is unknown. It can be got from a *difference*. The ITE dwells at
+two levels one 1/8-step apart (198 and 257 counts), so with the meter on the PWM wire,
+
+    top = 8 × (V_high − V_low)
+
+A 5.0 V top predicts 1.88 V at the low level and 2.50 V at the high one, a difference of 0.625 V; a
+5.5 V top predicts 2.06 V and 2.75 V, a difference of 0.688 V. Either reading pins the top to within
+about 0.08 V, which is ten times tighter than the 0.5 V question is asking. And if the difference comes
+out nowhere near 0.6 V, the wire being measured is not the PWM wire — the arithmetic checks the wiring
+at the same time it checks the amplitude.
+
 ---
 
 ## Known limits
@@ -409,6 +444,34 @@ sketch's `rpm`; if the sketch reports too much or too little, move `FAN_RPM_MIN`
   about ±5 duty points, which is the ITE's controller cycling, not the machine.
   So the tach's job is to keep the ITE satisfied — no fan error, a plausible number on the BIOS
   screen — and Mode B's premise (follow the demand) is following what the ITE is actually driving.
+- **The ITE's demand has a floor, and it is nowhere near zero.** With the bench fans at maximum the
+  package sat at 32–36 °C for twelve minutes — 21 °C below the plateau the temperature run had been
+  stuck at — and the requested duty did not follow it down: 196–260 counts, median 239, and not one
+  sample of 717 below 100 counts. Put the two runs together and the demand is flat from 33 °C to
+  about 60 °C and ramps above it:
+
+  | package | n | median counts | duty at 512 = 100 % | duty at 605 = 100 % |
+  |---|---|---|---|---|
+  | 32–36 °C, fans at max | 717 | 239 | 46.7 % | 39.5 % |
+  | 50–55 °C | 12 | 231 | 45.1 % | 38.2 % |
+  | 55–60 °C | 54 | 246 | 47.9 % | 40.6 % |
+  | 70–75 °C | 26 | 260 | 50.8 % | 43.0 % |
+  | 75–80 °C | 98 | 309 | 60.4 % | 51.1 % |
+  | 80–85 °C | 68 | 319 | 62.3 % | 52.7 % |
+
+  There are only two samples between 60 and 70 °C, so the knee is somewhere in that gap and its exact
+  place is not measured. What is measured is the floor: the fan this board drives never stops, so
+  `FAN_DUTY_MIN` is a clamp against a broken sense wire rather than something the ITE ever reaches,
+  and a fan that is always turning is a fan whose tach claim is always plausible.
+- **The demand is stepped, not analog, and the ITE cycles between the steps.** The dwell levels across
+  both runs are 198, 257 and 318 counts — spaced 58–61 — with everything else either a ramp between
+  them or the ITE's own drift. Read as 512 counts = 100 % they are 38.8 %, 50.2 % and 62.1 %: 3/8, 4/8
+  and 5/8 within 0.7 duty points, which is what a fan controller with a binary duty quantum looks
+  like. Read as 605 they are 32.7 %, 42.5 % and 52.6 %, a 9.9 point step that matches no binary
+  quantum — one more reason to run the ratio test above. It moves fast, too: 535 of 716 seconds changed
+  by more than 3 counts, and a dwell switches to the other dwell in 1–3 s. That is why
+  `DEMAND_TAU_S` is 15 s and `DEMAND_DEADBAND` is 1.5 points. Chasing the cycle with a 300 ms pole
+  would pump the fan at 0.3 Hz while the machine's own thermal time constant is minutes.
 - **The ITE's fan block is not reachable from Linux on this NUC.** `it87` refuses with `No such
   device`: the BIOS enumerates only the CIR (ITE8713) and RTC logical devices of the SuperIO, so
   there is no `fan1_input` or `pwm1` to read, and Debian 13 packages no `superiotool`. The ITE's own

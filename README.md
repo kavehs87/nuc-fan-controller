@@ -34,8 +34,9 @@ Board: 124 × 85 mm, 2 layers, GND poured both sides with 326 stitching vias, `P
 | `firmware/probe-uno/probe-uno.ino` | breadboard probe sketch for an Uno (5 V / 16 MHz): tach wave on D9 with the measured `ITE_READ_GAIN` applied, 31.25 kHz fan drive on D11 — for scope-checking the BC547 stages before the board exists |
 | `firmware/probe-gain/probe-gain.ino` | sweep sketch: an exact ladder of tach claims (900–3000 RPM, 20 s each) with the fan following the ITE's demand, printing the divider's own count — measures the ITE's read gain and logs its fan curve |
 | `firmware/probe-loop/probe-loop.ino` | test sketch: fan drive pinned, tach claims stepped 800 / 2000 / 4500 RPM — measures whether the ITE's demand answers the tach at all |
-| `firmware/probe-temp/probe-temp.ino` | test sketch: claim frozen at 1500 RPM — measures whether the demand answers temperature |
-| `bench/analyze-ladder.py`, `bench/analyze-temp.py` | the analysers that produced the numbers below, run against `bench/data/` |
+| `firmware/probe-temp/probe-temp.ino` | test sketch: claim frozen at 1500 RPM — measures whether the demand answers temperature, and what the ITE's floor demand is when the machine is cold |
+| `firmware/probe-divider/probe-divider.ino` | test sketch: measures the divider's own ratio with nothing but the Uno, by feeding the chain from the Uno's 5 V pin so the rail voltage cancels |
+| `bench/analyze-ladder.py`, `bench/analyze-temp.py`, `bench/analyze-cold.py` | the analysers that produced the numbers below, run against `bench/data/` |
 | `bench/data/` | the raw logs: 1 Hz traces of the divider reading, and of the NUC's temperatures |
 | `BUILD.md` | the build sheet: header identification with a meter, buck trim, calibration, bench order |
 | `archive/modeA-2026-10-19/` | the fixed‑RPM tach simulator this board replaced |
@@ -85,6 +86,36 @@ same claim swung 195–260 counts on its own. Freezing the claim at 1500 RPM and
 lag**. So the tach's job is to keep the ITE satisfied — no fan error, a plausible number on the
 screen — and following the demand is following the NUC's own thermal policy.
 
+**The demand has a floor, and it is not near zero.** With the bench fans at maximum the package sat at
+32–36 °C for twelve minutes — 21 °C below the plateau the temperature run had been stuck at — and the
+ITE's requested duty did not follow it down: 196–260 counts, median 239, and not one sample of 717
+below 100 counts. Cold end to hot end, the same reading in the same counts:
+
+| package | median demand | as duty, 512 counts = 100 % |
+|---|---|---|
+| 32–36 °C, fans at max | 239 counts | 46.7 % |
+| 55–60 °C | 246 counts | 47.9 % |
+| 75–80 °C | 309 counts | 60.4 % |
+| 80–85 °C | 319 counts | 62.3 % |
+
+Flat to about 60 °C, then a ramp. So the fan this board drives never stops: `FAN_DUTY_MIN` is a clamp
+against a broken sense wire rather than something the ITE ever reaches, and a fan that is always turning
+is a fan whose tach claim is always plausible.
+
+**The demand is stepped, and the ITE cycles between the steps.** The dwell levels across both runs are
+198, 257 and 318 counts, spaced 58–61. Read as 512 counts = 100 % they are 3/8, 4/8 and 5/8 within 0.7
+duty points, which is what a fan controller with a binary duty quantum looks like; read as 605 counts
+the step is 9.9 points and matches nothing. The cycling is fast — 535 of 716 seconds moved by more than
+3 counts, one dwell switching to the other in 1–3 s — so the follower filters it (tau 15 s, 1.5 duty
+point deadband) instead of pumping the fan at 0.3 Hz while the machine's own thermal time constant is
+minutes.
+
+**Two things the bench still has to settle.** Which resistor pair is actually in the breadboard — 512 or
+605 counts for 100 %, an 18 % gap that decides whether the fan follows 42 % or 50 % — which
+`firmware/probe-divider` answers in a minute with no meter at all; and whether the ITE's PWM top is
+5.0 V or 5.5 V, which a meter answers from the *difference* between two dwell levels:
+`top = 8 × (V_high − V_low)`, predicting 0.625 V or 0.688 V between them.
+
 ![both ends probed at once](docs/bench/06-probing-both-ends.jpg)
 
 ![the scope on the bench, and the buck module trimmed first](docs/bench/08-scope-and-buck.jpg)
@@ -124,11 +155,11 @@ before it emits anything.
 ## Status
 
 Design verified on paper and in the CAD; **the board is not built yet.** The control side has been
-measured on a breadboard — the ITE's PWM frequency and amplitude, how it reads the tach, and what
-actually drives its demand — see *On the bench*. `BUILD.md` is the bench sequence. The fan-side
-constants (`FAN_RPM_MIN`, `FAN_RPM_FULL`, `ADC_AT_100PCT`) are still placeholders until a real fan is
-fitted and measured; `ITE_READ_GAIN` has a measured value for the Uno driving this NUC and needs the
-same measurement on the finished board.
+measured on a breadboard — the ITE's PWM frequency and amplitude, how it reads the tach, what drives
+its demand, and where that demand bottoms out — see *On the bench*. `BUILD.md` is the bench sequence.
+The fan-side constants (`FAN_RPM_MIN`, `FAN_RPM_FULL`, `ADC_AT_100PCT`) are still placeholders until a
+real fan is fitted and measured; `ITE_READ_GAIN` has a measured value for the Uno driving this NUC and
+needs the same measurement on the finished board.
 
 No license is granted — all rights reserved. It is published so the drawings and the reasoning
 behind them are readable.

@@ -130,7 +130,9 @@ const uint8_t  PIN_TACH   = 9;    // OC1A -> R2 -> Q1 base
 const uint8_t  PIN_FAN    = 11;   // OC2A -> R6 -> Q2 base
 const uint8_t  PIN_PWM_IN = A0;   // R3/R4/R5 divider, C10/C11 filtered
 const uint16_t UPDATE_MS  = 100;  // control period; also the serial report period
-const float    RPM_SLEW   = 400.0f;  // RPM per update: 4000 RPM/s, slower than the ITE's own loop
+const float    RPM_SLEW   = 400.0f;  // RPM per update: 4000 RPM/s
+const float    DEMAND_TAU_S    = 15.0f;  // the pole the ITE's demand is read through
+const float    DEMAND_DEADBAND = 1.5f;   // duty points below which the fan is left alone
 
 // -----------------------------------------------------------------------------
 
@@ -215,9 +217,16 @@ void loop() {
 
   float duty = read_duty();
 
-  // One pole of smoothing on the demand, so a flicker on the PWM line does not
-  // twitch the fan. tau = 3 updates = 300 ms, slower than the ITE's own loop.
-  duty_seen += 0.33f * (duty - duty_seen);
+  // The demand is filtered hard, and the measurement is why. At a constant 33 C package this ITE
+  // dwells at two duty levels 58 counts apart - 11 duty points - and ramps between them in 1-3 s:
+  // 535 of 716 seconds moved by more than 3 counts. A 300 ms pole hands that whole dance to the fan,
+  // which then pumps at about 0.3 Hz for no thermal reason. The signal worth following is +3.7 counts
+  // per C, i.e. 37 counts for a 10 C change that takes minutes to happen. tau 15 s with a 1.5 point
+  // deadband drops the pump and keeps the response: the lag at 0.1 C/s is 0.6 points, inside the
+  // deadband, so the fan sits at most 1.5 duty points behind the ITE's own set point.
+  if (duty_seen == 0.0f) duty_seen = duty;                 // seed at boot, do not ramp up from zero
+  else if (fabsf(duty - duty_seen) > DEMAND_DEADBAND)
+    duty_seen += (UPDATE_MS / 1000.0f) / (DEMAND_TAU_S + (UPDATE_MS / 1000.0f)) * (duty - duty_seen);
 
   // Below the fan's stall duty the ITE is asking for less than the fan can give. Command
   // the stall duty and report the RPM that duty really produces: a fan held at its stall
