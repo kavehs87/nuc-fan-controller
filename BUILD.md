@@ -396,6 +396,19 @@ sketch's `rpm`; if the sketch reports too much or too little, move `FAN_RPM_MIN`
   5.5 V, R5 drops from 10 kΩ to 8.2 kΩ and 100 % lands at 930 counts with 10 % headroom. It is
   still the one thing on this board that has to be re-checked if a different NUC generation puts
   12 V on that line (rule 4 above).
+- **The ITE's PWM demand does not answer the tach.** Measured on this NUC6i3SYB with the Uno
+  injecting a 40 s ladder of tach claims (800 / 2000 / 4500 RPM, fan drive pinned at 90 % so
+  temperature stayed out of it): the ITE's requested duty averaged 233.6 counts at the 800 claim,
+  234.0 at 2000 and 231.0 at 4500 — a 5.6× swing in claimed RPM moved it by 2.5 counts out of 233
+  (−1.1 %), while the same claim swung 195–260 on its own with an autocorrelation peak at 6 s. The
+  demand comes from the ITE's own policy, not from the reported speed. So the tach's job is only to
+  keep the ITE satisfied — no fan error, a plausible number on the BIOS screen — and Mode B's
+  premise (follow the demand) is following what the ITE is actually driving.
+- **The ITE's fan block is not reachable from Linux on this NUC.** `it87` refuses with `No such
+  device`: the BIOS enumerates only the CIR (ITE8713) and RTC logical devices of the SuperIO, so
+  there is no `fan1_input` or `pwm1` to read, and Debian 13 packages no `superiotool`. The ITE's own
+  RPM number has to be read on the BIOS screen, which is why the sweep puts its rungs 4.6 RPM apart
+  at the 3000 claim — wider than the ITE's 2 RPM display step.
 - **Two-pin fans have no tach.** There is no way to confirm the fan is turning other than
   looking at it, or adding a separate tach wire and a 10 kΩ pull-up to +12 V and reading it
   off a spare ADC pin (A1 is free on J5 if you want it — there is no pin on the header today).
