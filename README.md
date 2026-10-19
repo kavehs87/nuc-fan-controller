@@ -1,6 +1,6 @@
 # nuc-fan-controller
 
-A board that lets a 12 V two‑pin fan be used in place of a NUC's stock 5 V fan, and that
+A board that lets three 12 V two‑pin fans be used in place of a NUC's stock 5 V fan, and that
 answers the NUC's tach input so the BIOS believes the fan it is asking for.
 
 It does four things:
@@ -15,7 +15,7 @@ It does four things:
 4. **simulates the tach signal** — Timer1 hardware square wave on D9 sinks Q1's open collector;
    the pull‑up lives in the NUC. `RPM = 30 × f_tach` (the ITE IT8607E counts 2 pulses per turn).
 
-Board: 124 × 85 mm, 2 layers, GND poured both sides with 326 stitching vias, `Power` net class
+Board: 124 × 85 mm, 2 layers, GND poured both sides with 322 stitching vias, `Power` net class
 1.5 mm on 19V / +12V / FAN_SW / +3V3 / GND. **ERC 0 violations. DRC 0 violations,
 0 unconnected items**, one schematic‑parity warning: `J2` pin 4 carries a deliberate no‑connect
 (it is the NUC header's own fan supply, which this board never touches).
@@ -36,7 +36,7 @@ both ways. *BUILD.md* carries the arithmetic that makes the module the better ch
 | `nuc-fan-controller.kicad_sch` / `.kicad_pcb` / `.kicad_pro` | KiCad 10 design |
 | `exports/nuc-fan-controller_schematic.pdf` / `.svg` | schematic, wires not net labels, name tags on every signal net |
 | `exports/nuc-fan-controller_board.pdf`, `…_board_bottom.pdf`, `…_board.svg` | board plots |
-| `exports/nuc-fan-controller_bom.csv` | 32 fitted parts — the buck module is a purchased part wired to J6, so it is correctly not in it |
+| `exports/nuc-fan-controller_bom.csv` | 33 fitted parts — the buck module is a purchased part wired to J6, so it is correctly not in it |
 | `exports/fab/` | 8 Gerbers + `.drl` + `_pos.csv` + `job.gbrjob` — ready to zip and order |
 | `firmware/nuc-tach-modeB/nuc-tach-modeB.ino` | the sketch; calibration constants at the top |
 | `firmware/probe-uno/probe-uno.ino` | breadboard probe sketch for an Uno (5 V / 16 MHz): tach wave on D9 with the measured `ITE_READ_GAIN` applied, 31.25 kHz fan drive on D11 — for scope-checking the BC547 stages before the board exists |
@@ -216,20 +216,18 @@ reading), and whether the top is flat or droops under load at the top dwell. The
 3. Find the fan's stall duty and measure its RPM at two duties; those four numbers are the
    constants at the top of the sketch.
 4. Read TP1 with a frequency counter — it must equal `rpm / 30` Hz exactly, it is a hardware timer.
-5. Tach side first (J2.1 + J2.2), then the PWM wire (J2.3), then the fans on J3/J4.
+5. Tach side first (J2.1 + J2.2), then the PWM wire (J2.3), then the fans on J7/J3/J4.
 
-**Two things that break hardware:** a 12 V fan's tach or PWM wire spliced into the NUC header
-(that fan pulls those lines to its own 12 V internally), and a 5 V FTDI on a 3.3 V Pro Mini
-(ATmega328P absolute maximum on any pin is VCC + 0.5 V). Flash with Board → *Arduino Pro or Pro
+**Three things that break hardware:** a 12 V fan's tach or PWM wire spliced into the NUC header
+(that fan pulls those lines to its own 12 V internally), a 5 V FTDI on a 3.3 V Pro Mini
+(ATmega328P absolute maximum on any pin is VCC + 0.5 V), and a BC547 fitted in the onsemi
+**C-B-E** order when this board is drawn and routed for the NXP/Philips **E-B-C** order — meter
+the two of them before they go in, `BUILD.md` says how. Flash with Board → *Arduino Pro or Pro
 Mini*, Processor → **ATmega328 (3.3V, 8MHz)**.
 
 ## Reproducing the design work
 
 ```
-cd logs
-python3 layout.py                       # geometry checks: crossings, wires through bodies, overlaps
-python3 genwires.py                     # regenerates the whole wire set -> wires.inc
-python3 applywires.py                   # splices that set back into the .kicad_sch
 cd ..
 sh logs/export.sh                       # rebuilds exports/: PDF, SVG, BOM, Gerbers, drill, placement
 kicad-cli sch erc nuc-fan-controller.kicad_sch --output logs/erc.json --format json --severity-all
@@ -239,6 +237,14 @@ docker run --rm -v "$PWD/logs/routing:/work" eclipse-temurin:25-jre \
     java -Djava.awt.headless=true -jar /work/freerouting.jar \
     -de /work/nuc-fan-controller.dsn -do /work/nuc-fan-controller.ses -mp 150
 ```
+
+**`layout.py`, `genwires.py` and `applywires.py` are parked, and running them now would undo work.**
+Their `NETS` / `POWER` / `LABELS` tables still describe the schematic as it was before it was edited by
+hand — 52 wires against the 55 the file now carries, and none of the label placements the drawing pass
+moved. They were kept because they are the only record of how the wire set was derived, and they re-point
+at the current geometry as soon as `layout.py` is updated to match it. Until then the schematic and the
+board are the source of truth, and `logs/fixq.py`, `logs/fixboard.py`, `logs/fixboard2.py`,
+`logs/fixboard3.py` are the record of what changed by hand this pass.
 
 The layout in `logs/layout.py` is the source of the schematic's geometry; `logs/genwires.py`
 checks cross‑net crossings, wires through symbol bodies, pins on two nets and shorted parts

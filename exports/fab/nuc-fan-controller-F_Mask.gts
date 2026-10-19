@@ -1,12 +1,12 @@
 %TF.GenerationSoftware,KiCad,Pcbnew,10.0.6*%
-%TF.CreationDate,2026-10-19T23:24:32+03:30*%
+%TF.CreationDate,2026-10-20T01:18:21+03:30*%
 %TF.ProjectId,nuc-fan-controller,6e75632d-6661-46e2-9d63-6f6e74726f6c,rev?*%
 %TF.SameCoordinates,Original*%
 %TF.FileFunction,Soldermask,Top*%
 %TF.FilePolarity,Negative*%
 %FSLAX46Y46*%
 G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
-G04 Created by KiCad (PCBNEW 10.0.6) date 2026-10-19 23:24:32*
+G04 Created by KiCad (PCBNEW 10.0.6) date 2026-10-20 01:18:21*
 %MOMM*%
 %LPD*%
 G01*
@@ -96,6 +96,12 @@ X130000000Y-70540000D03*
 D13*
 %TO.C,MH4*%
 X132000000Y-93000000D03*
+%TD*%
+D15*
+%TO.C,J7*%
+X130000000Y-76000000D03*
+D16*
+X130000000Y-78540000D03*
 %TD*%
 D14*
 %TO.C,R7*%

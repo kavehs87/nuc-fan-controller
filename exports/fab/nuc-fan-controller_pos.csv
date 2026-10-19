@@ -1,4 +1,4 @@
-### Footprint positions - created on 2026-10-19T23:24:33 ###
+### Footprint positions - created on 2026-10-20T01:18:22 ###
 ### Printed by KiCad version 10.0.6
 ## Unit = inches, Angle = deg.
 ## Side : All
@@ -16,10 +16,11 @@ C12       100n            C_Disc_D3.8mm_W2.6mm_P2.50mm                         4
 D2        1N5819          D_DO-41_SOD81_P10.16mm_Horizontal                    3.9370    -3.3071    0.0000  top
 J1        19V_IN          PinHeader_1x02_P2.54mm_Vertical                      0.5512    -1.3386    0.0000  top
 J2        NUC_fan_header  FanPinHeader_1x04_P2.54mm_Vertical                   3.3858    -0.7874    0.0000  top
-J3        FAN_1           PinHeader_1x02_P2.54mm_Vertical                      5.1181    -2.3622    0.0000  top
-J4        FAN_2           PinHeader_1x02_P2.54mm_Vertical                      5.1181    -2.6772    0.0000  top
+J3        FAN_2           PinHeader_1x02_P2.54mm_Vertical                      5.1181    -2.3622    0.0000  top
+J4        FAN_3           PinHeader_1x02_P2.54mm_Vertical                      5.1181    -2.6772    0.0000  top
 J5        Pro_Mini        PinHeader_1x05_P2.54mm_Vertical                      4.8031    -1.7323    0.0000  top
 J6        BUCK_MODULE     PinHeader_1x04_P2.54mm_Vertical                      0.9449    -1.3386    0.0000  top
+J7        FAN_1           PinHeader_1x02_P2.54mm_Vertical                      5.1181    -2.9921    0.0000  top
 Q1        BC547B          TO-92_Inline_Wide                                    4.4094    -0.7874    0.0000  top
 Q2        BC547B          TO-92_Inline_Wide                                    3.6220    -2.9921    0.0000  top
 Q3        IRFZ44N         TO-220-3_Vertical                                    4.6850    -2.9921    0.0000  top

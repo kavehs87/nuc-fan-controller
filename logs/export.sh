@@ -19,8 +19,10 @@ kicad-cli pcb export pdf "$P.kicad_pcb" --check-zones --mode-single \
     --layers "F.Cu,F.Silkscreen,F.Mask,Edge.Cuts" -o "exports/${P}_board.pdf"
 kicad-cli pcb export pdf "$P.kicad_pcb" --check-zones --mode-single --mirror \
     --layers "B.Cu,B.Silkscreen,B.Mask,Edge.Cuts" -o "exports/${P}_board_bottom.pdf"
-kicad-cli pcb export svg "$P.kicad_pcb" --check-zones --mode-single \
+kicad-cli pcb export svg "$P.kicad_pcb" --check-zones --mode-single --fit-page-to-board \
     --layers "F.Cu,F.Silkscreen,F.Mask,Edge.Cuts" -o "exports/${P}_board.svg"
+kicad-cli pcb export svg "$P.kicad_pcb" --check-zones --mode-single --mirror --fit-page-to-board \
+    --layers "B.Cu,B.Silkscreen,B.Mask,Edge.Cuts" -o "exports/${P}_board_bottom.svg"
 
 kicad-cli pcb export gerbers "$P.kicad_pcb" --check-zones -o exports/fab/ \
     --layers "F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,F.Mask,B.Mask,Edge.Cuts,Margin"

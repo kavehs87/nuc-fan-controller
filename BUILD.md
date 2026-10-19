@@ -93,11 +93,11 @@ C. NUC interface (signals only)             D. 12 V fan speed drive
                                                    GATE ─ R10 10k ─ GND
      4  (no connect: the header's fan supply)       Q3 IRFZ44N:  gate GATE, drain FAN_SW, source GND
    NUC_TACH ─ Q1 BC547B collector                   FAN_SW ─ D2 1N5819 ─ +12V   (freewheel)
-   Q1 base ─ TACH_BASE ─ R2 1k ─ D9 (OC1A)          FAN_SW ─ J3 pin 2 ─ J4 pin 2 ─ C12 100n ─ GND
-   Q1 emitter ─ GND                                  +12V ─ J3 pin 1 ─ J4 pin 1
-   NUC_PWM ─ R3 4.7k ─ R4 2.2k ─ PWM_IN ─ C10 1µ
-                        PWM_IN ─ R5 10k ─ GND       J3 / J4 are the two 2-pin 12 V fan connectors
-                        PWM_IN ─ C11 100n ─ GND
+   Q1 base ─ TACH_BASE ─ R2 1k ─ D9 (OC1A)          FAN_SW ─ J7 pin 2 ─ J3 pin 2 ─ J4 pin 2
+   Q1 emitter ─ GND                                 FAN_SW ─ C12 100n ─ GND   (snubber at the fan end)
+   NUC_PWM ─ R3 4.7k ─ R4 2.2k ─ PWM_IN ─ C10 1µ    +12V ─ J7 pin 1 ─ J3 pin 1 ─ J4 pin 1
+                        PWM_IN ─ R5 10k ─ GND
+                        PWM_IN ─ C11 100n ─ GND     J7 / J3 / J4 are the three 2-pin 12 V fan connectors
                         PWM_IN ─ A0
 E. Pro Mini header J5: 1 GND, 2 TACH_OUT (D9), 3 FAN_PWM (D11), 4 PWM_IN (A0), 5 +3V3
 ```
@@ -120,6 +120,11 @@ kicks `FAN_SW` above the 12 V rail; D2 (1N5819, 40 V, 3 A) clamps it back into t
 came from. Without it the edge rings into the 12 V rail, and no buck — this one switches at
 about 180 kHz and regulates through an output capacitor, not through the fan's commutation —
 is fast enough to clean that up.
+
+**C12 100 n sits on FAN_SW at the fan end.** `FAN_SW` is the node the commutating fan windings and D2's
+recovery both live on, so it is the noisiest place on the board. 100 n there is a small snubber: against the
+~120 Ω a 12 V fan presents at full speed it is a 12 µs time constant, which is short enough not to blunt the
+32 µs pulses of the 31.25 kHz drive and long enough to take the edge off the switching spike.
 
 **C9 is 100 pF, not 100 nF.** At 40 Hz with a 1–10 kΩ pull-up, 100 nF gives a 0.1–1 ms time
 constant against a 12.5 ms half-period — harmless — but 100 nF on a tach line invites
@@ -147,12 +152,12 @@ All through-hole except the two SOT-223 regulators, all already in the cabinet.
 | R5, R7, R10 | 10 kΩ | same | R1 B2 |
 | R2, R6, R8 | 1 kΩ | same | R1 A2 |
 | R9 | 120 Ω | same | R1 A2 |
-| Q1, Q2 | BC547B | `Package_TO_SOT_THT:TO-92_Inline_Wide` | R1 D3 (20) |
+| Q1, Q2 | BC547B | `Package_TO_SOT_THT:TO-92_Inline_Wide` | R1 D3 (20) — **meter them first, see "Which way round a BC547 goes"** |
 | Q3 | IRFZ44N | `Package_TO_SOT_THT:TO-220-3_Vertical` | R1 A4 (12) |
 | D2 | 1N5819 | `Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal` | R1 C3 (30) |
 | J1 | 19 V IN | `Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical` | — |
 | J2 | NUC fan header | `Connector:FanPinHeader_1x04_P2.54mm_Vertical` | — |
-| J3, J4 | FAN 1 / FAN 2 | `Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical` | — |
+| J7, J3, J4 | FAN 1 / FAN 2 / FAN 3 | `Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical` | — |
 | J5 | Pro Mini | `Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical` | — |
 | J6 | BUCK MODULE — 1, 2 GND · 3 19 V · 4 12 V | `Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical` | — |
 | TP1 | TACH test point | `TestPoint:TestPoint_Pad_D1.5mm` | — |
@@ -228,21 +233,24 @@ so keep the SOT-223.
 | Rail | What hangs off it | Worst case |
 |---|---|---|
 | 19 V in | J1 → J6 → the module's input | 0.4 A at 12 V / 0.3 A out, ~90 % efficiency |
-| +12 V | J6 pin 4, C3/C4, U2, R8, D2, J3, J4 | **0.3 A, measured** — three 12 V fans at full speed, 300 mA together |
+| +12 V | J6 pin 4, C3/C4, U2, R8, D2, J7, J3, J4 | **0.3 A, measured** — three 12 V fans at full speed, 300 mA together |
 | 5 V | U3's input, C5/C6 | ~30 mA |
 | +3V3 | Pro Mini, C7/C8, the divider's load side | ~25 mA |
-| FAN_SW | Q3's drain, J3/J4 pin 2, D2, C12 | 0.3 A pulsed |
+| FAN_SW | Q3's drain, J7/J3/J4 pin 2, D2, C12 | 0.3 A pulsed |
 
 **The fan load is measured, not assumed: three 12 V fans at full speed draw 300 mA together at 12 V** —
-100 mA each, 3.6 W. The board has two fan connectors, so a third fan shares one of them: 0.2 A through a
-2.54 mm header rated at 3 A. That is 0.3 A out of an 8 A module — under 4 % of its rating, heatsinks
+100 mA each, 3.6 W. The board has one 2-pin connector per fan (J7, J3, J4), so each carries 0.1 A through a
+header rated at 3 A. That is 0.3 A out of an 8 A module — under 4 % of its rating, heatsinks
 cold — and the IRFZ44N dissipates I²·Rds(on) = 0.3² × 0.045 ≈ **0.004 W**, with a 55 V Vds and a 3 A
 catch diode behind a fan bank that never asks for either. The `Power` net class — 19V, +12V, FAN_SW,
 +3V3 and GND — is 1.5 mm wide, which at 0.3 A on 35 µm copper is a couple of degrees above ambient; the
-GND pours (both layers, 326 stitching vias) carry the return current as a plane rather than as a trace.
+GND pours (both layers, 322 stitching vias) carry the return current as a plane rather than as a trace.
 The class patterns are held at the renamed nets: they once carried the pre-rename `Net-(C1-Pad1)` strings,
 which left 19V and FAN_SW routed at 0.2 mm, and the `SW` pattern went with the switch node when the
-converter left the board.
+converter left the board. It happened a second time when the KiCad update renamed `FAN_SW` to
+`Net-(C12-Pad1)` and `PWM_DIV` to `Net-(R3-Pad2)` on the board — a net that drops out of its class keeps the
+copper it already has but takes the 0.25 mm clearance and the future width with it, so the names were put
+back by hand and the board re-checked.
 
 One thing the small load does bring. The module's inductor ripple is ≈0.16 A peak-to-peak, which puts its
 continuous-conduction boundary near **0.08 A**, and fan current scales with speed: at the bottom of the
@@ -307,15 +315,17 @@ The tach line sinks 1–5 mA into the ITE's pull-up and the PWM divider draws 5 
 ## Board
 
 - 124.0 × 85.0 mm, 2 layers, four M3 mounting holes at the corners.
-- **GND poured on both layers** (0.5 mm clearance, thermal relief) with 326 stitching vias,
+- **GND poured on both layers** (0.5 mm clearance, thermal relief) with 322 stitching vias,
   so every GND pad lands on a plane on the layer it sits on.
 - Net classes: `Power` at **1.5 mm** track / 0.25 mm clearance / 0.7 mm via for `19V`, `+12V`,
   `FAN_SW`, `+3V3` and `GND`; everything else (the signals) at the 0.2 mm default.
 - Routed by Freerouting (Specctra DSN out, SES back in): 112 track segments, 0 unrouted,
-  0 violations at the router's own rules, then re-verified against KiCad's rules.
+  0 violations at the router's own rules, then re-verified against KiCad's rules. The board now
+  carries 143 segments: the router's set, plus what the module swap, the third fan connector and
+  the BC547 pad swap needed by hand.
 - Flow is left to right: the 19 V entry (J1) and the module header (J6) at the left, the 12 V rail
   across the middle to the LDOs and the Pro Mini header, the NUC interface along the top, the fan
-  drive and the two fan connectors at the bottom-right.
+  drive and the three fan connectors down the right edge.
 - `exports/fab/` plots as-is for a 2-layer prototype order.
 
 The layout note that replaced the old switch-node one: **there is no switching node on this board
@@ -327,6 +337,33 @@ the build: the module's 12 V return goes back through J6's pins 1–2, which are
 its 19 V and 12 V pins, so the module's return current enters the GND plane at the same point the
 sense divider's ground does rather than somewhere down the rail; and the left third of the board is
 now empty, which is where the enclosure's wiring and the module's harness have room.
+
+---
+
+## Which way round a BC547 goes
+
+`BC547` is not one pinout. **NXP/Philips — the order most of what arrives in an unbranded 20-piece bag
+uses — is 1 emitter · 2 base · 3 collector.** onsemi/Fairchild/MCC publish the same part number as
+1 collector · 2 base · 3 emitter. The base is the middle pin either way, so the whole question is whether
+pin 1 is the emitter or the collector, and nothing on the package says which.
+
+**This board is drawn and routed for E-B-C.** Q1 and Q2 carry the symbol `Q_NPN_EBC` in the schematic —
+KiCad's own `Transistor_BJT:BC547` is the onsemi order, which is why the symbol was replaced rather than
+relabelled. On the board Q1's pad 1 is the emitter in the GND pour and pad 3 carries `NUC_TACH`; Q2's pad 1
+is the emitter in the GND pour and pad 3 carries `FAN_GATE`. Pad 1 is the square pad, and the silkscreen
+between the two transistors reads `Q1 Q2 1=E 2=B 3=C`.
+
+Meter them before fitting. A diode test only proves the middle pin is the base, which is true of both orders.
+What separates them is gain: read hFE in a transistor meter, then swap the outer two pins and read again. A
+BC547B gives **200–450 forward and single digits reversed** (reverse-active gain is 0.5–5), so the orientation
+that reads a real hFE is the orientation this board expects. If the parts read the other way they are C-B-E
+parts: fit BC548s in the right order, or seat them with the flat face away from the printed outline so the
+collector lands in the square pad — electrically fine, but it leaves the pin-1 marker pointing at the collector
+for whoever builds from this print next.
+
+Fitted the wrong way round both transistors run reverse-active: Q1 barely pulls the tach line low on the
+2.6 mA R2 gives a device with a reverse gain of ~2, and Q2's emitter-base junction — rated 6 V — sits behind
+R8 against the 12 V rail.
 
 ---
 
@@ -343,7 +380,8 @@ now empty, which is where the enclosure's wiring and the module's harness have r
    limit is engaged — turn that trimmer the other way until the rail holds above ~11 V through the
    start. A current-limited module feeding a stalled fan is a fan that never reaches the duty the
    ITE asked for, and the sketch will happily keep claiming it did.
-4. Then fit U2/U3 and check 5 V and 3.3 V. Then fit Q1/Q2/Q3.
+4. Then fit U2/U3 and check 5 V and 3.3 V. Then meter Q1/Q2 against "Which way round a BC547 goes" and fit
+   Q1/Q2/Q3.
 5. Wire the module to the board with four short wires, twisted in pairs: module IN+ and IN− onto
    **J6 pins 3 and 2**, module OUT+ and OUT− onto **J6 pins 4 and 1**. The board's silkscreen beside
    J6 reads `1,2 GND 3 19V 4 12V`, and J1 pin 1 is the +19 V that feeds J6 pin 3.
@@ -450,7 +488,7 @@ enclosure.
 9. **Then add the PWM wire** (J2.3) and watch the serial line while you load the machine
    (`yes > /dev/null` on every core). `duty_in` should climb with the fan demand the BIOS is
    asking for. If it stays flat, the PWM wire is not where you thought it was.
-10. **Only then** connect the fan to J3/J4, and only then cut and splice the stock fan cable.
+10. **Only then** connect the fans to J7/J3/J4, and only then cut and splice the stock fan cable.
 
 Step 7 before step 9 before step 10 matters: if something is wrong on the tach line, you want
 it wrong while the board is driving nothing but a signal.

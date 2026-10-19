@@ -2584,7 +2584,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Transistor_BJT:BC547"
+	(symbol "Transistor_BJT:Q_NPN_EBC"
 			(pin_names
 				(offset 0)
 				(hide yes)
@@ -2595,7 +2595,7 @@
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
 			(property "Reference" "Q"
-				(at 5.08 1.905 0)
+				(at 5.08 1.27 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
@@ -2605,8 +2605,8 @@
 					(justify left)
 				)
 			)
-			(property "Value" "BC547"
-				(at 5.08 0 0)
+			(property "Value" "Q_NPN_EBC"
+				(at 5.08 -1.27 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
@@ -2616,20 +2616,18 @@
 					(justify left)
 				)
 			)
-			(property "Footprint" "Package_TO_SOT_THT:TO-92_Inline"
-				(at 5.08 -1.905 0)
+			(property "Footprint" ""
+				(at 5.08 2.54 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
-						(italic yes)
 					)
-					(justify left)
 				)
 			)
-			(property "Datasheet" "https://www.onsemi.com/pub/Collateral/BC550-D.pdf"
+			(property "Datasheet" ""
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -2638,10 +2636,9 @@
 					(font
 						(size 1.27 1.27)
 					)
-					(justify left)
 				)
 			)
-			(property "Description" "0.1A Ic, 45V Vce, Small Signal NPN Transistor, TO-92"
+			(property "Description" "NPN transistor, emitter/base/collector"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -2663,7 +2660,7 @@
 					)
 				)
 			)
-			(property "Sim.Pins" "1=C 2=B 3=E"
+			(property "Sim.Pins" "1=E 2=B 3=C"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -2674,7 +2671,7 @@
 					)
 				)
 			)
-			(property "ki_keywords" "NPN Transistor"
+			(property "ki_keywords" "BJT"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -2685,18 +2682,7 @@
 					)
 				)
 			)
-			(property "ki_fp_filters" "TO?92*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "BC547_0_1"
+			(symbol "Q_NPN_EBC_0_1"
 				(polyline
 					(pts
 						(xy -2.54 0) (xy 0.635 0)
@@ -2733,7 +2719,7 @@
 					)
 				)
 			)
-			(symbol "BC547_1_1"
+			(symbol "Q_NPN_EBC_1_1"
 				(polyline
 					(pts
 						(xy 0.635 0.635) (xy 2.54 2.54)
@@ -2771,9 +2757,9 @@
 					)
 				)
 				(pin passive line
-					(at 2.54 5.08 270)
+					(at 2.54 -5.08 90)
 					(length 2.54)
-					(name "C"
+					(name "E"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2807,9 +2793,9 @@
 					)
 				)
 				(pin passive line
-					(at 2.54 -5.08 90)
+					(at 2.54 5.08 270)
 					(length 2.54)
-					(name "E"
+					(name "C"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -8652,7 +8638,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Transistor_BJT:BC547")
+		(lib_id "Transistor_BJT:Q_NPN_EBC")
 		(at 66.04 137.16 0)
 		(unit 1)
 		(body_style 1)
@@ -8697,7 +8683,7 @@
 				(justify left)
 			)
 		)
-		(property "Datasheet" "https://www.onsemi.com/pub/Collateral/BC550-D.pdf"
+		(property "Datasheet" "https://doc.platan.ru/pdf/datasheets/philips/BC547.pdf"
 			(at 66.04 137.16 0)
 			(hide yes)
 			(show_name no)
@@ -8709,7 +8695,7 @@
 				(justify left)
 			)
 		)
-		(property "Description" "0.1A Ic, 45V Vce, Small Signal NPN Transistor, TO-92"
+		(property "Description" "0.1A Ic, 45V Vce, NPN small-signal transistor, TO-92 - 1=emitter 2=base 3=collector (NXP/Philips order)"
 			(at 66.04 137.16 0)
 			(hide yes)
 			(show_name no)
@@ -9211,7 +9197,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Transistor_BJT:BC547")
+		(lib_id "Transistor_BJT:Q_NPN_EBC")
 		(at 85.09 109.22 0)
 		(mirror y)
 		(unit 1)
@@ -9257,7 +9243,7 @@
 				(justify left)
 			)
 		)
-		(property "Datasheet" "https://www.onsemi.com/pub/Collateral/BC550-D.pdf"
+		(property "Datasheet" "https://doc.platan.ru/pdf/datasheets/philips/BC547.pdf"
 			(at 85.09 109.22 0)
 			(hide yes)
 			(show_name no)
@@ -9269,7 +9255,7 @@
 				(justify left)
 			)
 		)
-		(property "Description" "0.1A Ic, 45V Vce, Small Signal NPN Transistor, TO-92"
+		(property "Description" "0.1A Ic, 45V Vce, NPN small-signal transistor, TO-92 - 1=emitter 2=base 3=collector (NXP/Philips order)"
 			(at 85.09 109.22 0)
 			(hide yes)
 			(show_name no)
