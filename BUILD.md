@@ -471,47 +471,65 @@ Both readings belong in `bench/data/` as a note beside the log they were taken w
   12 V on that line (rule 4 above). The bench already provides the numbers a meter should reproduce:
   on the confirmed 0.500 divider the ITE's three dwell levels — 198, 257 and 318 counts — average
   **1.94 V, 2.51 V and 3.11 V** on the PWM wire, with 0.97 V, 1.26 V and 1.55 V at the tap.
-- **The ITE's PWM demand answers temperature, not the tach.** Measured twice on this NUC6i3SYB.
-  First the tach: a 40 s ladder of claims (800 / 2000 / 4500 RPM, fan drive pinned at 90 %) moved
-  the ITE's requested duty from 233.6 to 231.0 counts — a 5.6× swing in claimed RPM for 2.5 counts
-  out of 233 (−1.1 %), while the same claim swung 195–260 on its own. Then temperature: the claim
-  frozen at 1500 RPM (50.000 Hz) for 427 s while the package was driven 55 → 83 → 53 °C by a
-  four-core load and by bench fans switched in by hand. The divider reading tracked temperature at
-  **r = +0.822 with a 4 s lag**: 231 counts mean at 55 °C, 327 at 81 °C, back to 230 when the
-  package returned to 53 °C — +3.7 counts per °C, about 16 duty points across 26 °C. The same
-  temperature on the way up and on the way down agreed inside the ITE's own swing (80–85 °C: 321 up,
-  328 down), so it is a response and not drift. At a fixed temperature the demand still hunts by
-  about ±5 duty points, which is the ITE's controller cycling, not the machine.
-  So the tach's job is to keep the ITE satisfied — no fan error, a plausible number on the BIOS
-  screen — and Mode B's premise (follow the demand) is following what the ITE is actually driving.
+- **The ITE's PWM demand answers the board's temperature, not the cores, and not the tach.** Measured
+  three times on this NUC6i3SYB, and the third measurement corrected the second.
+
+  *The tach.* A 40 s ladder of claims (800 / 2000 / 4500 RPM, fan drive pinned at 90 %) moved the ITE's
+  requested duty from 233.6 to 231.0 counts — a 5.6× swing in claimed RPM for 2.5 counts out of 233
+  (−1.1 %), while the same claim swung 195–260 on its own. The reported speed is not in the loop.
+
+  *Temperature, first run.* The claim frozen at 1500 RPM (50.000 Hz) for 427 s while the package was
+  driven 55 → 83 → 53 °C, the bench fans switched in by hand. The divider reading tracked the package at
+  **r = +0.822 with a 4 s lag**: 231 counts at 55 °C, 327 at 81 °C, back to 230 at 53 °C. The same
+  temperature on the way up and on the way down agreed (80–85 °C: 321 up, 328 down), so it was a response
+  and not drift. What that run could not separate is *which* temperature: with weak airflow the board and
+  the cores rose together — PCH 52 → 63.5 °C alongside the package's 53 → 83 °C.
+
+  *Temperature, second run — the one that decides.* Same sketch, the same frozen claim, the bench fans at
+  maximum. `stress-ng --cpu 4` for 300 s took the package 34 → 73 °C and it cooled back to 38 °C; the PCH
+  only reached 55.5 °C. **The demand did not move:** 195–260 counts for the whole eleven minutes, the same
+  band it sits in at 34 °C, correlated with the package at r = +0.049 and with the PCH at +0.065. The
+  cores got hot and the ITE did not care.
+
+  Pool the two runs and bin by the board, and the picture is monotone where binning by the cores is not:
+
+  | PCH (the board) | n | median counts | duty at 512 | PWM wire average | package in those samples |
+  |---|---|---|---|---|---|
+  | 33–42 °C | 278 | 242 | 47.2 % | 2.36 V | 39 °C |
+  | 42–51 °C | 243 | 241 | 47.1 % | 2.35 V | 61 °C |
+  | 51–57 °C | 248 | 253 | 49.4 % | 2.47 V | 69 °C |
+  | 57–60 °C | 60 | 297 | 58.0 % | 2.90 V | 76 °C |
+  | 60–66 °C | 91 | 319 | 62.3 % | 3.12 V | 80 °C |
+
+  The discriminating subset is 192 samples with the cores at 68.5 °C and the board at 50.9 °C: median 241
+  counts, 47 % — the number the ITE asks for when everything is cold. Above a PCH of about 55 °C the
+  demand climbs at **+10.5 counts per °C, 2.0 duty points per °C**, reaching 319 counts (62 %, 3.12 V on
+  the wire) at 60–66 °C. `bench/analyze-heat.py` reproduces these tables from `bench/data/`.
+
+  Two things follow for the build. The fan this board drives sits **inside** the ITE's loop: the fan
+  cools the board, the ITE reads the board, the ITE changes the demand. And the ITE sits at its floor
+  quite happily while the cores are at 73 °C, so the enclosure has to move air across the board and the
+  ITE's own ambient sensor — the BIOS screen's "motherboard ambient", 40 °C against a CPU at 58 °C — and
+  not only over the heatsink. A fan that leaves the board warm will be told, by the ITE itself, to speed
+  up; one that cools the board will be told to slow down.
 - **The ITE's demand has a floor, and it is nowhere near zero.** With the bench fans at maximum the
-  package sat at 32–36 °C for twelve minutes — 21 °C below the plateau the temperature run had been
+  package sat at 32–36 °C for twelve minutes — 21 °C below the plateau the first temperature run had been
   stuck at — and the requested duty did not follow it down: 196–260 counts, median 239, and not one
-  sample of 717 below 100 counts. Put the two runs together and the demand is flat from 33 °C to
-  about 60 °C and ramps above it:
-
-  | package | n | median counts | duty at 512 = 100 % | duty at 605 = 100 % |
-  |---|---|---|---|---|
-  | 32–36 °C, fans at max | 717 | 239 | 46.7 % | 39.5 % |
-  | 50–55 °C | 12 | 231 | 45.1 % | 38.2 % |
-  | 55–60 °C | 54 | 246 | 47.9 % | 40.6 % |
-  | 70–75 °C | 26 | 260 | 50.8 % | 43.0 % |
-  | 75–80 °C | 98 | 309 | 60.4 % | 51.1 % |
-  | 80–85 °C | 68 | 319 | 62.3 % | 52.7 % |
-
-  There are only two samples between 60 and 70 °C, so the knee is somewhere in that gap and its exact
-  place is not measured. What is measured is the floor: the fan this board drives never stops, so
-  `FAN_DUTY_MIN` is a clamp against a broken sense wire rather than something the ITE ever reaches,
-  and a fan that is always turning is a fan whose tach claim is always plausible.
+  sample of 717 below 100 counts. The floor runs from the coldest measured board up to a PCH of about
+  55 °C, which is 47 % duty and 2.35 V on the PWM wire. So `FAN_DUTY_MIN` is a clamp against a broken
+  sense wire rather than something the ITE ever reaches, and a fan that is always turning is a fan whose
+  tach claim is always plausible.
 - **The demand is stepped, not analog, and the ITE cycles between the steps.** The dwell levels across
-  both runs are 198, 257 and 318 counts — spaced 58–61 — with everything else either a ramp between
+  all three runs are 198, 257 and 318 counts — spaced 58–61 — with everything else either a ramp between
   them or the ITE's own drift. Read as 512 counts = 100 % they are 38.8 %, 50.2 % and 62.1 %: 3/8, 4/8
   and 5/8 within 0.7 duty points, which is what a fan controller with a binary duty quantum looks
   like. Read as 605 they are 32.7 %, 42.5 % and 52.6 %, a 9.9 point step that matches no binary
   quantum — one more reason to run the ratio test above. It moves fast, too: 535 of 716 seconds changed
   by more than 3 counts, and a dwell switches to the other dwell in 1–3 s. That is why
   `DEMAND_TAU_S` is 15 s and `DEMAND_DEADBAND` is 1.5 points. Chasing the cycle with a 300 ms pole
-  would pump the fan at 0.3 Hz while the machine's own thermal time constant is minutes.
+  would pump the fan at 0.3 Hz while the machine's own thermal time constant is minutes. The cycle is
+  the ITE closing its loop through the fan: it asks for more duty, the board cools, it asks for less. A
+  follower that answers sharply sharpens that cycle; a slow one lets the ITE regulate at its own pace.
 - **The ITE's fan block is not reachable from Linux on this NUC.** `it87` refuses with `No such
   device`: the BIOS enumerates only the CIR (ITE8713) and RTC logical devices of the SuperIO, so
   there is no `fan1_input` or `pwm1` to read, and Debian 13 packages no `superiotool`. The ITE's own
