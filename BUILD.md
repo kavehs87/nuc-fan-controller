@@ -384,7 +384,7 @@ Calibration is then two numbers. At idle and at full load, read the fan's real R
 sketch's `rpm`; if the sketch reports too much or too little, move `FAN_RPM_MIN` /
 `FAN_RPM_FULL`, not the tach floor or ceiling.
 
-### Two measurements the numbered list does not cover
+### Three things the numbered list does not cover: the divider, its top, and its edge
 
 **The divider's ratio is settled: two 10 kΩ, confirmed by the builder.** The tap is exactly half the
 PWM line, so on the Uno — whose ADC reference is its own 5 V rail — 100 % duty is 512 counts, and every
@@ -416,6 +416,35 @@ input loads an open-drain output — or the step is a little under 1/8. Resistor
 this arithmetic: a 5 % mismatch inside the pair moves the inferred average by 5 %, which is 0.03 V of the
 0.57 V. Measuring the two levels with the meter, and the two resistors as well, puts all of it in one
 sitting.
+
+**Scoping the line: the top and the rising edge.** The one number still carried from an ambiguous capture
+is the ITE's flat top — 5.5 V was read once, and a 5.5 V, 30 ns spike is a different thing from a 5.5 V
+flat top. The Hantek settles both, and the Uno supplies the missing half of the arithmetic.
+
+1. **10× probe, DC coupled, 1 V/div, 20 µs/div.** A 1× probe adds ~100 pF across the line and slows the
+   edges it is being asked to measure. 23 kHz is a 43.5 µs period, so two divisions shows a whole cycle,
+   and 1 V/div puts a 5 V swing over five divisions — the finest vertical scale that still fits it, which
+   is what makes the average reading good enough to divide by.
+2. **Shortest possible ground.** The probe's own spring ground on the header's ground wire, not the long
+   lead with the alligator clip. A 15 cm ground lead is a loop-and-a-capacitor that manufactures
+   overshoot on a 23 kHz edge, which is exactly the artefact being looked for.
+3. **The flat top, from two instruments at once.** Read `Avg` on the scope and, at the same moment, the
+   `adc` count the Uno is printing. Duty is `adc / 512`, so
+
+       top = scope Avg ÷ (adc / 512)
+
+   At the cold high dwell (257 counts, 50.2 %) a 5.0 V top predicts 2.51 V average and a 5.5 V top
+   predicts 2.76 V — 0.25 V apart, a quarter of a division at 1 V/div, which is outside what the scope's
+   own DC accuracy wanders. Measure the two resistors with the meter as well: their tolerance is what
+   limits `adc / 512`.
+4. **The rising edge, single-shot.** Trigger on the PWM edge at 2.5 V, then 200 ns/div, and read the
+   10–90 % time and the peak. A 4-wire fan's PWM input is a few kΩ to ground with tens of pF, so with
+   the stock blower still on the header the edge is RC-limited and ringing that survives is the line,
+   not the probe. Compare the peak with the blower disconnected: if the top rises when the load comes
+   off, the ITE's output is open-drain with a pull-up, and the loaded top is the one the divider sees in
+   service.
+
+Both readings belong in `bench/data/` as a note beside the log they were taken with.
 
 ---
 
