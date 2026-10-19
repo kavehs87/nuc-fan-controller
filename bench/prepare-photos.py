@@ -40,20 +40,10 @@ JOBS = [
      "sensors are on the same screen: CPU 58 C, memory 44 C, motherboard ambient 40 C. Those are what "
      "its fan policy runs on, not the fan speed it is being told."),
 
-    ("photo_1405-07-27 20.52.39.jpeg", "06-probing-both-ends.jpg", (0, 0, 1160, 960),
-     "Both ends probed at once: one probe on the Uno's tach output, one on the NUC side, with the "
-     "NUC's own blower still fitted. This is the arrangement used to watch the tach line at both "
-     "ends - inverted by the open-collector BC547 at the collector, clean at the pin - while the "
-     "divider read the ITE's demand."),
-
-    ("photo_1405-07-27 20.52.34.jpeg", "07-parts-drawer.jpg", (300, 170, 1120, 700),
-     "The drawer the parts came from, with the transistor bins visible - BC547 among them. Every "
-     "part on the schematic is a cabinet part; the BOM was written against what was in these drawers."),
-
-    ("photo_1405-07-27 20.52.32.jpeg", "08-scope-and-buck.jpg", (0, 0, 960, 820),
-     "The whole bench: the Hantek DSO2D10 on top of the drawer with both probes running down to the "
-     "breadboard, the NUC board with its fans below, and a DC-DC module at the right - the buck's "
-     "output side, trimmed with the 10 kΩ pot before anything else was fitted."),
+    # Three more crops existed here - both ends probed at once, the parts drawer, the whole bench with
+    # the scope and the buck. They showed things 01 and 04 already show, and they were dropped in
+    # favour of 06-ite-fan-response.svg, which carries the measurements rather than the scenery. The
+    # originals are still in images/ (gitignored).
 ]
 
 

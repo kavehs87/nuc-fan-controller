@@ -32,10 +32,25 @@ The old Mode A board (fixed-RPM tach simulator only) is archived in
 | `firmware/nuc-tach-modeB/nuc-tach-modeB.ino` | the sketch |
 | `firmware/nuc-tach-modeA/` | the previous fixed-RPM sketch, kept for reference |
 | `firmware/probe-uno/`, `probe-gain/`, `probe-loop/`, `probe-temp/`, `probe-divider/` | the breadboard sketches the measurements below were made with |
-| `bench/analyze-ladder.py`, `bench/analyze-temp.py`, `bench/analyze-cold.py` | the analysers, run against `bench/data/` |
-| `bench/data/` | the raw logs behind every number in this file: 1 Hz traces of the divider reading, and of the NUC's temperatures |
-| `docs/bench/` | the bench photos the README shows |
+| `bench/analyze-ladder.py`, `bench/analyze-temp.py`, `bench/analyze-cold.py`, `bench/analyze-heat.py` | the analysers, run against `bench/data/` |
+| `bench/plot-curve.py` | draws `docs/bench/06-ite-fan-response.svg`, the two-panel graph of the ITE's demand, from the same logs |
+| `bench/data/` | the raw logs behind every number in this file: 1 Hz traces of the divider reading, and of the NUC's temperatures — which pair is which run is the table below |
+| `docs/bench/` | the bench photos and the fan-response graph the README shows |
 | `logs/erc.json`, `logs/drc.json`, `logs/netlist.net` | last ERC / DRC / netlist runs |
+
+**Which log is which run.** The Uno's logs print one line per second and carry no timestamps; the NUC's
+logs are epoch-stamped with `PHASE` markers, so a pair is aligned by the offset the capture scripts were
+started with (the Uno opens the port, which resets the board, a known number of seconds before the NUC
+starts logging). `analyze-heat.py` takes that offset as an argument.
+
+| Uno log | NUC log | what the run was |
+|---|---|---|
+| `loop.log` | — | the RPM ladder 800 / 2000 / 4500 with the fan drive pinned at 90 %; no temperature capture |
+| `temp.log` | `stress.log` | claim frozen at 1500 RPM, package 55 → 83 → 53 °C, bench fans switched by hand |
+| `cold.log` | `coldtemp.log` | claim frozen, bench fans at maximum, package 32–36 °C for twelve minutes |
+| `stress2.log` | `stress2-temps.log` | claim frozen, fans at maximum, `stress-ng --cpu 4` for 300 s: package 34 → 73 °C, board only to 55.5 °C |
+| `warm.log` | `warm-temps.log` | claim frozen, bench fans off, NUC blower at minimum, board warmed by hand, then `stress-ng --cpu 4` for 240 s: board to 68.5 °C, package pinned at 88 °C |
+| `nucmon-idle.log` | — | the NUC's own sensors at idle, for the record |
 
 **ERC: 0 violations.** **DRC: 0 violations, 0 unconnected items** after
 `kicad-cli pcb drc --schematic-parity --refill-zones` (2026-10-19).
@@ -316,12 +331,13 @@ The constants at the top of the file are the calibration surface:
 | `TACH_RPM_CEIL` | 10500 | the ITE stops counting above ~11 000 RPM |
 | `ADC_AT_100PCT` | 918 | 2.96 V ÷ 3.3 V × 1023 — the two-point calibration's top point, for the divider the schematic carries |
 | `ITE_READ_GAIN` | 1.0 | what the BIOS reads ÷ what the timer emits. Measured Uno → this NUC: **1188 shown for a 40.000 Hz claim** (0.9900). Measure it on the finished board |
-| `DEMAND_TAU_S` | 15 s | the pole the ITE's demand is read through. Measured, not taste: see *The ITE's demand has a floor, and it hunts* |
+| `DEMAND_TAU_S` | 15 s | the pole the ITE's demand is read through. Measured, not taste: see *The demand is stepped, not analog* and the response times under *The ITE's PWM demand answers the board's temperature* |
 | `DEMAND_DEADBAND` | 1.5 duty points | below this the fan is left alone, so the ITE's own cycling does not pump it |
 
 The demand filter is slow on purpose. Measured at a constant 33 °C package, this ITE dwells at two
-duty levels 58 counts apart — 11 duty points — and ramps between them in 1–3 s, moving by more than 3
-counts in 535 of 716 seconds. A 300 ms pole hands that whole dance to the fan, which then pumps at
+duty levels 59 counts apart — 11.5 duty points — and ramps between them in 1–3 s, moving by more than 3
+counts in 535 of 716 seconds; with the board hot it dwells at 320 and 380 instead, the same 61-count
+spacing one rung up. A 300 ms pole hands that whole dance to the fan, which then pumps at
 about 0.3 Hz for no thermal reason. tau 15 s with a 1.5 point deadband drops the pump and keeps the
 response: the lag at 0.1 °C/s is 0.6 points, inside the deadband, so the fan sits at most 1.5 duty
 points behind the ITE's own set point. The reported RPM is slewed by 400 RPM per 100 ms update
@@ -399,23 +415,27 @@ resistor, 0.25 mA of load on the ITE instead of 0.30 mA, τ = 5 kΩ × 1.1 µF =
 period, and 775 counts for 100 % on the 3.3 V rail. The bench and the board would then read the same
 scale. Until that change is made the schematic's divider is what `ADC_AT_100PCT = 918` describes.
 
-**The top of the PWM swing, from two dwell levels and a meter.** The flat top (5.0 V or 5.5 V) decides
-whether 100 % lands at 918 or 1009 counts on the board's present divider, and it cannot be got from a
-single average reading because the duty at that moment is unknown. It can be got from a *difference*.
-The ITE dwells at two levels — 198 and 257 counts — which on the confirmed 0.500 ratio are
+**The top of the PWM swing, from the dwell ladder.** The flat top (5.0 V or 5.5 V) decides whether 100 %
+lands at 918 or 1009 counts on the board's present divider, and it cannot be got from a single average
+reading because the duty at that moment is unknown. It can be got from *differences*, and the fourth bench
+run produced four consecutive dwell levels instead of two. On the confirmed 0.500 ratio:
 
     198 counts = 0.969 V at A0 = 1.938 V average on the PWM wire
     257 counts = 1.255 V at A0 = 2.510 V average on the PWM wire
-    difference = 0.571 V
+    320 counts = 1.563 V at A0 = 3.125 V average on the PWM wire
+    380 counts = 1.857 V at A0 = 3.711 V average on the PWM wire
 
-so a meter across the PWM wire should read about 1.94 V at the low dwell and 2.51 V at the high one.
-The difference pins the top once the ITE's duty quantum is known: a 1/8 step on a 5.0 V top predicts
-0.625 V, on a 4.5 V top 0.563 V. The measured 0.571 V therefore says either the ITE's top is nearer
-4.6 V than 5.0 V — plausible, since the stock blower is still on that header and a 4-wire fan's PWM
-input loads an open-drain output — or the step is a little under 1/8. Resistor tolerance is the limit on
-this arithmetic: a 5 % mismatch inside the pair moves the inferred average by 5 %, which is 0.03 V of the
-0.57 V. Measuring the two levels with the meter, and the two resistors as well, puts all of it in one
-sitting.
+Successive differences 0.572, 0.615, 0.586 V — mean 0.595 V, 60.9 counts. A straight line through the four
+is `counts = 15 + 61 k` for k = 3, 4, 5, 6, and the hottest samples in the log reach 434 counts against the
+441 that k = 7 predicts. So the ITE's quantum is 1/8, it sits on 3/8 with the board cold and reaches 6/8 or
+7/8 with the board at 68 °C — and the same line extrapolated to the ends says 15 counts (0.14 V) at zero
+duty and **502 counts (4.90 V) at 8/8**. That is the answer the two-level arithmetic could not give: the
+top is nearer 4.9 V than 5.5 V, and 100 % lands within 2 % of 512 counts rather than at 1009.
+
+What is still open is the 15-count offset at zero — the ITE's output offset, or something in the reading —
+and whether the top sags under load at the high dwell. Resistor tolerance is the limit on this arithmetic:
+a 5 % mismatch inside the pair moves the inferred average by 5 %, which is 0.03 V of the 0.60 V step.
+Measuring the levels with the meter, and the two resistors as well, closes both.
 
 **Scoping the line: the top and the rising edge.** The one number still carried from an ambiguous capture
 is the ITE's flat top — 5.5 V was read once, and a 5.5 V, 30 ns spike is a different thing from a 5.5 V
@@ -435,8 +455,10 @@ flat top. The Hantek settles both, and the Uno supplies the missing half of the 
 
    At the cold high dwell (257 counts, 50.2 %) a 5.0 V top predicts 2.51 V average and a 5.5 V top
    predicts 2.76 V — 0.25 V apart, a quarter of a division at 1 V/div, which is outside what the scope's
-   own DC accuracy wanders. Measure the two resistors with the meter as well: their tolerance is what
-   limits `adc / 512`.
+   own DC accuracy wanders. At the hot dwell (380 counts, 74.2 %) the same two predict 3.71 V and 4.07 V,
+   and the ladder's own answer — 4.90 V — predicts 3.66 V, so the hot dwell is where 4.9 V, 5.0 V and
+   5.5 V are easiest to tell apart. Measure the two resistors with the meter as well: their tolerance is
+   what limits `adc / 512`.
 4. **The rising edge, single-shot.** Trigger on the PWM edge at 2.5 V, then 200 ns/div, and read the
    10–90 % time and the peak. A 4-wire fan's PWM input is a few kΩ to ground with tens of pF, so with
    the stock blower still on the header the edge is RC-limited and ringing that survives is the line,
@@ -469,10 +491,10 @@ Both readings belong in `bench/data/` as a note beside the log they were taken w
   5.5 V, R5 drops from 10 kΩ to 8.2 kΩ and 100 % lands at 930 counts with 10 % headroom. It is
   still the one thing on this board that has to be re-checked if a different NUC generation puts
   12 V on that line (rule 4 above). The bench already provides the numbers a meter should reproduce:
-  on the confirmed 0.500 divider the ITE's three dwell levels — 198, 257 and 318 counts — average
-  **1.94 V, 2.51 V and 3.11 V** on the PWM wire, with 0.97 V, 1.26 V and 1.55 V at the tap.
+  on the confirmed 0.500 divider the ITE's four dwell levels — 198, 257, 320 and 380 counts — average
+  **1.94 V, 2.51 V, 3.13 V and 3.71 V** on the PWM wire, with 0.97 V, 1.26 V, 1.56 V and 1.86 V at the tap.
 - **The ITE's PWM demand answers the board's temperature, not the cores, and not the tach.** Measured
-  three times on this NUC6i3SYB, and the third measurement corrected the second.
+  four times on this NUC6i3SYB, and the third measurement corrected the second.
 
   *The tach.* A 40 s ladder of claims (800 / 2000 / 4500 RPM, fan drive pinned at 90 %) moved the ITE's
   requested duty from 233.6 to 231.0 counts — a 5.6× swing in claimed RPM for 2.5 counts out of 233
@@ -491,20 +513,39 @@ Both readings belong in `bench/data/` as a note beside the log they were taken w
   band it sits in at 34 °C, correlated with the package at r = +0.049 and with the PCH at +0.065. The
   cores got hot and the ITE did not care.
 
-  Pool the two runs and bin by the board, and the picture is monotone where binning by the cores is not:
+  *Temperature, third run — the top end, and the release.* Same sketch, same frozen claim, the opposite
+  airflow arrangement: the bench fans off entirely, the NUC's own blower at minimum, and the board warmed by
+  hand before the load. `stress-ng --cpu 4` for 240 s pinned the package at 87–88 °C while the board reached
+  **68.5 °C**, and this time the demand climbed out of the floor: 259 counts as the board passed 57 °C, 319
+  at 60–63 °C, **380 counts (74 %, 3.71 V on the wire) at 66–69 °C**, with 434 counts (85 %) seen. Then the
+  load was stopped and everything left alone, and the demand fell back — 381 → 242 counts within 30 s of the
+  board dropping back through 55 °C. The board and the cores were collinear in this run, so it does not
+  separate them; it extends the curve at the top and measures the response time.
 
-  | PCH (the board) | n | median counts | duty at 512 | PWM wire average | package in those samples |
+  Pool the four runs and bin by the board, and the picture is monotone where binning by the cores is not:
+
+  | board (`pch_thermal`) | n | median counts | duty at 512 | PWM wire average | package in those samples |
   |---|---|---|---|---|---|
-  | 33–42 °C | 278 | 242 | 47.2 % | 2.36 V | 39 °C |
-  | 42–51 °C | 243 | 241 | 47.1 % | 2.35 V | 61 °C |
-  | 51–57 °C | 248 | 253 | 49.4 % | 2.47 V | 69 °C |
-  | 57–60 °C | 60 | 297 | 58.0 % | 2.90 V | 76 °C |
-  | 60–66 °C | 91 | 319 | 62.3 % | 3.12 V | 80 °C |
+  | 33–51 °C | 1 946 | 239 | 46.7 % | 2.33 V | 41 °C |
+  | 51–54 °C | 228 | 248 | 48.3 % | 2.42 V | 53 °C |
+  | 54–57 °C | 182 | 254 | 49.6 % | 2.48 V | 60 °C |
+  | 57–60 °C | 95 | 259 | 50.6 % | 2.53 V | 76 °C |
+  | 60–66 °C | 149 | 319 | 62.3 % | 3.12 V | 80 °C |
+  | 66–69 °C | 174 | 380 | 74.2 % | 3.71 V | 88 °C |
 
-  The discriminating subset is 192 samples with the cores at 68.5 °C and the board at 50.9 °C: median 241
-  counts, 47 % — the number the ITE asks for when everything is cold. Above a PCH of about 55 °C the
-  demand climbs at **+10.5 counts per °C, 2.0 duty points per °C**, reaching 319 counts (62 %, 3.12 V on
-  the wire) at 60–66 °C. `bench/analyze-heat.py` reproduces these tables from `bench/data/`.
+  The discriminating subset is 196 samples with the cores at 68.5 °C and the board at 50.9 °C: median 241
+  counts, 47 %, none above 260 — the number the ITE asks for when everything is cold. The mirror subset,
+  103 samples with the cores under 55 °C and the board at 52 °C or more, sits at 243 counts: the board has
+  to pass about 55 °C before the ITE moves. `bench/analyze-heat.py` reproduces these tables from
+  `bench/data/`, and `bench/plot-curve.py` draws them as `docs/bench/06-ite-fan-response.svg`.
+
+  Two claims from before the fourth run are retired. The 297 counts at 57–60 °C was not a level the ITE
+  holds — 285–314 counts account for 34 samples out of 2 777 while 315–319 account for 89 — it was the ramp
+  passing through, so "+10.5 counts per °C, 2.0 duty points per °C" describes a transition, not a curve: the
+  ITE steps between 198, 257, 320 and 380. And the response is not equally fast in both directions: about
+  **75 s** to reach the plateau after the board crossed the knee, about **30 s** to let go of it on the way
+  down. `DEMAND_TAU_S = 15 s` sits inside both, which is the point — the follower must be quicker than the
+  ITE's own response without chasing its 1–3 s dwell switching.
 
   Two things follow for the build. The fan this board drives sits **inside** the ITE's loop: the fan
   cools the board, the ITE reads the board, the ITE changes the demand. And the ITE sits at its floor
@@ -516,16 +557,17 @@ Both readings belong in `bench/data/` as a note beside the log they were taken w
   package sat at 32–36 °C for twelve minutes — 21 °C below the plateau the first temperature run had been
   stuck at — and the requested duty did not follow it down: 196–260 counts, median 239, and not one
   sample of 717 below 100 counts. The floor runs from the coldest measured board up to a PCH of about
-  55 °C, which is 47 % duty and 2.35 V on the PWM wire. So `FAN_DUTY_MIN` is a clamp against a broken
-  sense wire rather than something the ITE ever reaches, and a fan that is always turning is a fan whose
-  tach claim is always plausible.
-- **The demand is stepped, not analog, and the ITE cycles between the steps.** The dwell levels across
-  all three runs are 198, 257 and 318 counts — spaced 58–61 — with everything else either a ramp between
-  them or the ITE's own drift. Read as 512 counts = 100 % they are 38.8 %, 50.2 % and 62.1 %: 3/8, 4/8
-  and 5/8 within 0.7 duty points, which is what a fan controller with a binary duty quantum looks
-  like. Read as 605 they are 32.7 %, 42.5 % and 52.6 %, a 9.9 point step that matches no binary
-  quantum — one more reason to run the ratio test above. It moves fast, too: 535 of 716 seconds changed
-  by more than 3 counts, and a dwell switches to the other dwell in 1–3 s. That is why
+  54 °C — 1 946 samples of it — at 46–48 % duty and 2.33 V on the PWM wire. So `FAN_DUTY_MIN` is a clamp
+  against a broken sense wire rather than something the ITE ever reaches, and a fan that is always turning
+  is a fan whose tach claim is always plausible.
+- **The demand is stepped, not analog, and the ITE cycles between the steps.** The dwell levels across all
+  four runs are 198, 257, 320 and 380 counts — spaced 59–63 — with everything else either a ramp between
+  them or the ITE's own drift, and the hottest samples reaching 434 against the 441 the spacing predicts
+  for the next rung. Read as 512 counts = 100 % they are 38.8 %, 50.2 %, 62.5 % and 74.2 %: 3/8, 4/8, 5/8
+  and 6/8 within 0.7 duty points, which is what a fan controller with a binary duty quantum looks like.
+  Read as 605 they are 32.7 %, 42.5 %, 52.9 % and 62.8 %, a 10.1 point step that matches no binary quantum —
+  one more reason to run the ratio test above. It moves fast, too: 535 of 716 seconds changed by more than
+  3 counts, and a dwell switches to the other dwell in 1–3 s. That is why
   `DEMAND_TAU_S` is 15 s and `DEMAND_DEADBAND` is 1.5 points. Chasing the cycle with a 300 ms pole
   would pump the fan at 0.3 Hz while the machine's own thermal time constant is minutes. The cycle is
   the ITE closing its loop through the fan: it asks for more duty, the board cools, it asks for less. A

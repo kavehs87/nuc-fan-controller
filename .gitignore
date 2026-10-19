@@ -22,6 +22,9 @@ logs/pro-before-*.json
 # phone originals; docs/bench/ carries the cropped, captioned versions
 images/
 
+# plot-curve.py --png writes a raster copy for reading in a viewer; the SVG is the deliverable
+docs/bench/*-check.png
+
 # KiCad session locks and its own board backups
 *.lck
 *-backups/
