@@ -381,9 +381,21 @@ sketch's `rpm`; if the sketch reports too much or too little, move `FAN_RPM_MIN`
   it is applying, so it is only honest if the fan really spins at that RPM. If the fan is
   gummed up or the wrong fan is fitted, the board will report a speed that does not exist —
   which is exactly what the ITE cannot tell apart.
-- **The ITE's PWM amplitude is assumed to be 5 V.** It is on a 5 V fan header, but the divider
-  ratio is the one thing on this board that has to be re-checked if a different NUC generation
-  puts 12 V on that line (rule 4 above).
+- **The ITE's PWM is measured, not assumed: 23 kHz square, 45 % duty mid-sweep.** A scope on this
+  NUC's fan header reads 23 kHz, inside Intel's 25 kHz ±10 % for a 4-wire fan. The divider and
+  C10/C11 are comfortably right at that frequency: 4.08 kΩ Thévenant at the node against 1.1 µF
+  gives τ = 4.49 ms against a 43.5 µs period, so the ripple at the ADC is 7 mV — 2.2 counts,
+  0.24 % of the duty span — before the sketch's 16-sample average. Had the line really been
+  1.56 kHz, the same network would have carried 116 mV, 3.6 % of the span, and C10 would have had
+  to become 4.7 µF. It does not.
+- **A 5.5 V peak is harmless; a 5.5 V flat top is not free.** A 0.5 V, 30 ns overshoot spike moves
+  the filtered node about 3 mV (3.7 nC of charge into 1.1 µF), so ringing does not touch the duty
+  read. The flat top does: 5.0 V puts 100 % duty at 918 counts, 5.5 V puts it at 1009 — 1.4 % from
+  full scale. A multimeter settles it without a scope: DC volts on the PWM wire reads the average,
+  and average ÷ duty = flat top, so 45 % duty gives 2.25 V (top 5.0) or 2.47 V (top 5.5). If it is
+  5.5 V, R5 drops from 10 kΩ to 8.2 kΩ and 100 % lands at 930 counts with 10 % headroom. It is
+  still the one thing on this board that has to be re-checked if a different NUC generation puts
+  12 V on that line (rule 4 above).
 - **Two-pin fans have no tach.** There is no way to confirm the fan is turning other than
   looking at it, or adding a separate tach wire and a 10 kΩ pull-up to +12 V and reading it
   off a spare ADC pin (A1 is free on J5 if you want it — there is no pin on the header today).

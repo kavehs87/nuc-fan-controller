@@ -30,9 +30,23 @@
 
 const uint8_t PIN_TACH = 9;    // OC1A
 const uint8_t PIN_FAN  = 11;   // OC2A (also SPI MOSI - unused here)
+const uint16_t PIN_PWM_IN = A0; // the divider's midpoint, if the PWM wire is actually wired
+
+// Measured on this NUC's fan header: 23 kHz square (Intel's 4-wire spec is 25 kHz +/-10%, so
+// the ITE is inside it) at 45% duty while the sweep walks the tach claim.
+//
+// On the Uno the ADC's reference is its own 5 V rail, so a 5 V top through the 0.5917 divider
+// lands at 0.5917 * 1023 = 605 counts for 100% duty. That is the comfortable case. On the
+// finished board the reference is 3.3 V and the same 5 V top lands at 918 counts - but a 5.5 V
+// top lands at 1009, which is 1.4% from full scale. The Uno cannot show that problem; the board
+// can, which is why ADC_AT_100PCT is a bench measurement and not a calculation.
+const uint16_t ADC_AT_100PCT = 605;
 
 const float FAN_DUTY = 40.0f;              // % the fan side gets; the pin gets the complement
-const uint16_t DWELL_MS = 8000;            // long enough for the ITE to re-read and report
+// 20 s, not 8: the ITE's own loop was still moving a second after a step (adc 433 -> 360 inside
+// one dwell), and a duty read taken while its controller is still chasing the new tach number is
+// not a measurement of anything. The dwell has to be longer than the ITE's settling time.
+const uint16_t DWELL_MS = 20000;
 
 const uint32_t CLAIMS[] = {900, 1000, 1100, 1200, 1500, 2000, 2500, 3000};
 const uint8_t N_CLAIMS = sizeof(CLAIMS) / sizeof(CLAIMS[0]);
@@ -58,13 +72,25 @@ static void set_claim(uint32_t rpm) {
   OCR1A = icr;                 // match at TOP: one OC1A toggle per cycle
 }
 
+static float duty_of(uint16_t adc) {
+  float d = (float)adc * 100.0f / (float)ADC_AT_100PCT;
+  if (d < 0.0f)   d = 0.0f;
+  if (d > 100.0f) d = 100.0f;
+  return d;
+}
+
 static void report(void) {
+  long sum = 0;
+  for (uint8_t i = 0; i < 16; i++) sum += analogRead(PIN_PWM_IN);   // ~1.8 ms, ~40 PWM periods
+  uint16_t adc = (uint16_t)(sum / 16);
   float e = emitted_rpm();
   Serial.print(F("claim="));       Serial.print(e, 1);
   Serial.print(F(" emitted_hz=")); Serial.print(e / 30.0f, 3);
   Serial.print(F("  if_gain_0.9900="));  Serial.print(e * GAIN_A, 1);
   Serial.print(F("  if_gain_0.98845=")); Serial.print(e * GAIN_B, 1);
-  Serial.println();
+  Serial.print(F("  adc="));       Serial.print(adc);
+  Serial.print(F(" duty_in="));    Serial.print(duty_of(adc), 1);
+  Serial.println(F("%"));
 }
 
 void setup() {
