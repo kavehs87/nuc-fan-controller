@@ -21,3 +21,7 @@ logs/pro-before-*.json
 
 # phone originals; docs/bench/ carries the cropped, captioned versions
 images/
+
+# KiCad session locks and its own board backups
+*.lck
+*-backups/
