@@ -25,7 +25,7 @@ discrete parts — LM2596T‑ADJ, a 100 µH / 6 A toroid, a 1N5822 catch diode a
 the XL4016E1 module in the cabinet had been ruled out. That ruling is now lifted: the converter is that
 module, and U1, L1, D1, C1, C2, R1 and RV1 came off the board in exchange for one 4‑pin header. The
 discrete design is in git at `10bc262` and every part of it is still in the cabinet, so the swap goes
-both ways. *BUILD.md* carries the arithmetic that makes the module the better choice at 12 V / 1 A.
+both ways. *BUILD.md* carries the arithmetic that makes the module the better choice at 12 V / 0.3 A.
 
 ## Open it without KiCad
 

@@ -164,7 +164,7 @@ All through-hole except the two SOT-223 regulators, all already in the cabinet.
 a 100 µH 6 A toroid, a 1N5822 catch diode, and a 10 kΩ trimmer in the feedback divider with R1 1 kΩ
 under it. That design is in git at `10bc262` and every part of it is still in the cabinet (LM2596T and
 LM2576HVT in R1 B4, 100 µH toroids in L1 D2, 1N5822 in R1 C3, 3296W trimmers in R1 D1). What changed is
-that the cabinet also holds a finished step-down module, and at 12 V / 1 A a finished module is the
+that the cabinet also holds a finished step-down module, and at 12 V / 0.3 A a finished module is the
 better answer: the **XL4016E1 module in L1 A10** carries the XL4016E1 controller and a 20S100 Schottky
 catch diode, each on its own heatsink, with its input and output electrolytics and two multi-turn trimmers
 — CV for the output voltage, CC for a constant-current limit — so RV1, R1, C1, C2, U1, D1 and L1 all left
@@ -176,14 +176,16 @@ XL4016E1 data sheet (LCSC **C55881**, TO-220-5):
 * **5–40 V in (≤32 V for continuous use), 1.2–36 V out, 8 A continuous and 12 A with extra cooling, about
   180 kHz, 95–96 % efficient, ~50 mV output ripple.** 19 V in and 12 V out sit in the middle of all of it,
   and the output must be below the input — which is this design, and the reason a buck-boost is not needed.
-* **Hugely derated at this load.** Two 0.5 A fans are 1 A out of an 8 A part, so its dual heatsinks sit
-  barely warm and its short-circuit, overload and over-temperature protections never have to do anything.
+* **Hugely derated at this load.** Three fans at full speed are 0.3 A out of an 8 A part (measured, see
+  *Power budget*), so its dual heatsinks sit barely warm and its short-circuit, overload and
+  over-temperature protections never have to do anything.
   Its record also lists input reverse-polarity protection, which is a courtesy this board does not have:
   J1 pin 1 is +19 V and C3 is a 25 V part.
-* **It stays in continuous conduction at this load**, which is what makes a big buck unpleasant at a small
-  current: inductor ripple is `Vout × (1 − Vout/Vin) / (L·f)` ≈ 12 × 0.368 / (150 µH × 180 kHz) ≈ **0.16 A**
-  peak-to-peak, so at 0.5 A average the inductor current never reaches zero. No light-load pulse-skipping,
-  and no audible ringing out of the inductor.
+* **It stays in continuous conduction where the fans actually work**, which is what makes a big buck
+  unpleasant at a small current: inductor ripple is `Vout × (1 − Vout/Vin) / (L·f)` ≈ 12 × 0.368 /
+  (150 µH × 180 kHz) ≈ **0.16 A** peak-to-peak, so the boundary is about 0.08 A and 0.3 A clears it by
+  almost 4×. Near the ITE's idle demand the rail current drops below it — see *Power budget* for why C3
+  and `FAN_DUTY_MIN` are the answer to that.
 * **Its ripple does not reach the analogue side.** 50 mV at 180 kHz on the 12 V rail goes through two
   AMS1117 LDOs before it can touch 5 V or 3.3 V, and the `PWM_IN` divider's time constant is milliseconds
   against a 5.6 µs switching period — attenuation of about 5 000×, so those 50 mV arrive at A0 as 10 µV.
@@ -225,19 +227,29 @@ so keep the SOT-223.
 
 | Rail | What hangs off it | Worst case |
 |---|---|---|
-| 19 V in | J1 → J6 → the module's input | 1.2 A at 12 V / 1 A out, 85 % efficiency |
-| +12 V | J6 pin 4, C3/C4, U2, R8, D2, J3, J4 | 1.0 A (two 0.5 A fans) |
+| 19 V in | J1 → J6 → the module's input | 0.4 A at 12 V / 0.3 A out, ~90 % efficiency |
+| +12 V | J6 pin 4, C3/C4, U2, R8, D2, J3, J4 | **0.3 A, measured** — three 12 V fans at full speed, 300 mA together |
 | 5 V | U3's input, C5/C6 | ~30 mA |
 | +3V3 | Pro Mini, C7/C8, the divider's load side | ~25 mA |
-| FAN_SW | Q3's drain, J3/J4 pin 2, D2, C12 | 1.0 A pulsed |
+| FAN_SW | Q3's drain, J3/J4 pin 2, D2, C12 | 0.3 A pulsed |
 
-The module's 8 A is eight times the 1 A the two fan connectors can draw, and the IRFZ44N at 1 A
-dissipates I²·Rds(on) = 1² × 0.045 ≈ **0.045 W** — no heatsink, and its 55 V Vds is four times the
-rail. The `Power` net class — 19V, +12V, FAN_SW, +3V3 and GND — is 1.5 mm wide, which at 1 A on 35 µm
-copper is about 15 °C above ambient; the GND pours (both layers, 326 stitching vias) carry the return
-current as a plane rather than as a trace. The class patterns are held at the renamed nets: they once
-carried the pre-rename `Net-(C1-Pad1)` strings, which left 19V and FAN_SW routed at 0.2 mm, and the
-`SW` pattern went with the switch node when the converter left the board.
+**The fan load is measured, not assumed: three 12 V fans at full speed draw 300 mA together at 12 V** —
+100 mA each, 3.6 W. The board has two fan connectors, so a third fan shares one of them: 0.2 A through a
+2.54 mm header rated at 3 A. That is 0.3 A out of an 8 A module — under 4 % of its rating, heatsinks
+cold — and the IRFZ44N dissipates I²·Rds(on) = 0.3² × 0.045 ≈ **0.004 W**, with a 55 V Vds and a 3 A
+catch diode behind a fan bank that never asks for either. The `Power` net class — 19V, +12V, FAN_SW,
++3V3 and GND — is 1.5 mm wide, which at 0.3 A on 35 µm copper is a couple of degrees above ambient; the
+GND pours (both layers, 326 stitching vias) carry the return current as a plane rather than as a trace.
+The class patterns are held at the renamed nets: they once carried the pre-rename `Net-(C1-Pad1)` strings,
+which left 19V and FAN_SW routed at 0.2 mm, and the `SW` pattern went with the switch node when the
+converter left the board.
+
+One thing the small load does bring. The module's inductor ripple is ≈0.16 A peak-to-peak, which puts its
+continuous-conduction boundary near **0.08 A**, and fan current scales with speed: at the bottom of the
+duty range three fans draw well under that. So near the ITE's idle demand the module can slip into
+discontinuous conduction — not harmful, but it is where a buck becomes audible and its ripple gets worse.
+Two things already on the board answer it: C3 470 µF sitting on the rail, and `FAN_DUTY_MIN`, which keeps
+the fan idling at its stall duty instead of at a duty so low the converter starts ringing.
 
 The two LDOs drop 7 V and 1.7 V at ~25 mA: 0.18 W and 0.04 W, both trivial for SOT-223.
 Do not hang anything bigger off 5 V — U2 is a 1 A part and its junction rises fast in a
@@ -341,7 +353,7 @@ protection, but nothing on this board has any: the 19 V runs from J1 to J6 as a 
 25 V part, so the lead that lands on J1 pin 1 has to be the + of the tap.
 
 **Mounting.** The module is about 61 × 41 × 27 mm with heatsinks on both faces. Bolt it to the
-enclosure wall where the fan's air passes it. Its 8 A rating is a heatsink rating, and at 1 A it is
+enclosure wall where the fan's air passes it. Its 8 A rating is a heatsink rating, and at 0.3 A it is
 comfortable even in a closed box, but a heatsink under a lid is a heatsink that runs 40 °C warmer
 than it has to, and the module is the one part in this design that is allowed to get warm.
 
