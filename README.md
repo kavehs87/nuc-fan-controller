@@ -31,7 +31,8 @@ Board: 124 × 85 mm, 2 layers, GND poured both sides with 326 stitching vias, `P
 | `exports/nuc-fan-controller_bom.csv` | 38 fitted parts |
 | `exports/fab/` | 8 Gerbers + `.drl` + `_pos.csv` + `job.gbrjob` — ready to zip and order |
 | `firmware/nuc-tach-modeB/nuc-tach-modeB.ino` | the sketch; calibration constants at the top |
-| `firmware/probe-uno/probe-uno.ino` | breadboard probe sketch for an Uno (5 V / 16 MHz): 40.000 Hz tach wave on D9, 31.25 kHz fan drive on D11 — for scope-checking the BC547 stages before the board exists |
+| `firmware/probe-uno/probe-uno.ino` | breadboard probe sketch for an Uno (5 V / 16 MHz): tach wave on D9 with the measured `ITE_READ_GAIN` applied, 31.25 kHz fan drive on D11 — for scope-checking the BC547 stages before the board exists |
+| `firmware/probe-gain/probe-gain.ino` | sweep sketch: emits an exact ladder of tach claims (900–3000 RPM, 8 s each) so the ITE's read gain can be measured from the BIOS/hwmon number instead of guessed |
 | `BUILD.md` | the build sheet: header identification with a meter, buck trim, calibration, bench order |
 | `archive/modeA-2026-10-19/` | the fixed‑RPM tach simulator this board replaced |
 
