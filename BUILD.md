@@ -311,6 +311,7 @@ The constants at the top of the file are the calibration surface:
 | `TACH_RPM_FLOOR` | 700 | stay above the ITE's stall detect (~1–2 s without pulses = fan error) |
 | `TACH_RPM_CEIL` | 10500 | the ITE stops counting above ~11 000 RPM |
 | `ADC_AT_100PCT` | 918 | 2.96 V / 3.3 V × 1023 — the two-point calibration's top point |
+| `ITE_READ_GAIN` | 1.0 | what the BIOS reads ÷ what the timer emits. Measured Uno → this NUC: **1188 shown for a 40.000 Hz claim** (0.9900). Measure it on the finished board |
 
 The sketch smooths the demand over ~300 ms and slews the reported RPM by 400 RPM per 100 ms
 update (4000 RPM/s). Both are deliberate: the ITE integrates the tach over about a second, and
@@ -353,12 +354,19 @@ enclosure.
 7. **Then connect the tach side to the NUC only** (J2.1 and J2.2; leave J2.3 and J2.4 open)
    and read the RPM in BIOS or hwmon. If the number appears, Q1's open-collector drive and the
    ITE's pull-up agree with each other.
-8. **Then add the PWM wire** (J2.3) and watch the serial line while you load the machine
+8. **Read the BIOS number against the claim, and set `ITE_READ_GAIN` from it.** The ITE's counting
+   window is not exactly one second and the driving board's oscillator is not exactly 8 MHz, so
+   the BIOS number is never the emitted one. On a breadboard Uno into this NUC, a claim of 1200
+   RPM (40.000 Hz at TP1) read as **1188** — 0.9900 exactly. Scope TP1 while you read the BIOS: if
+   the scope shows the emitted frequency and the BIOS sits 1 % under, the gap is the ITE's gate
+   and the gain belongs in firmware; if the scope also sits 1 % under, the gap is the oscillator,
+   and the number to fix is this board's own, measured here, not the Uno's.
+9. **Then add the PWM wire** (J2.3) and watch the serial line while you load the machine
    (`yes > /dev/null` on every core). `duty_in` should climb with the fan demand the BIOS is
    asking for. If it stays flat, the PWM wire is not where you thought it was.
-9. **Only then** connect the fan to J3/J4, and only then cut and splice the stock fan cable.
+10. **Only then** connect the fan to J3/J4, and only then cut and splice the stock fan cable.
 
-Step 7 before step 8 before step 9 matters: if something is wrong on the tach line, you want
+Step 7 before step 9 before step 10 matters: if something is wrong on the tach line, you want
 it wrong while the board is driving nothing but a signal.
 
 Calibration is then two numbers. At idle and at full load, read the fan's real RPM and the

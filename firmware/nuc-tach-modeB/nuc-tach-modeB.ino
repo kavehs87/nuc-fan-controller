@@ -113,6 +113,14 @@ const float FAN_DUTY_MIN  = 20.0f;     // duty below which this fan stalls
 const float TACH_RPM_FLOOR = 700.0f;   // stay above the ITE's stall detect
 const float TACH_RPM_CEIL  = 10500.0f; // the ITE stops counting above ~11 000 RPM
 
+// The ITE's tach gate is not exactly one second. Measured on a breadboard Uno into this NUC: a
+// claim of 1200 RPM (40.000 Hz straight out of Timer1) read as 1188 in the BIOS - 0.9900 exactly.
+// A scope says which side caused it: after applying a gain, if the tach line measures the gained
+// frequency the ITE's gate is the reason and this constant belongs here; if it measures the
+// ungained one, the driving board's oscillator is 1 % low and the number to fix is the one you
+// measure on the finished board, not this one. Left at 1.0 until the Pro Mini is fitted.
+const float ITE_READ_GAIN = 1.0f;      // emitted = wanted / gain; the Uno/NUC pair measured 0.9900
+
 // Two-point calibration of the duty read. 918 = 2.96 V / 3.3 V x 1023.
 // If a scope says the divider is off, move ADC_AT_100PCT and nothing else.
 const uint16_t ADC_AT_0PCT   = 0;
@@ -131,6 +139,8 @@ static uint16_t adc_seen = 0;            // the raw 16-sample mean, for the seri
 
 static void set_tach(uint32_t rpm) {
   const uint32_t tick = F_CPU / 8UL;                 // Timer1 clock, prescaler /8
+  if (ITE_READ_GAIN != 1.0f)
+    rpm = (uint32_t)((float)rpm / ITE_READ_GAIN + 0.5f);   // what the ITE should end up SHOWING
   uint32_t counts = 15UL * tick / rpm;               // timer counts per half-period
   const uint32_t counts_min = 15UL * tick / (uint32_t)TACH_RPM_CEIL;
   if (counts > 65536UL) counts = 65536UL;            // ICR1 is 16 bits: 229 RPM floor at 8 MHz
