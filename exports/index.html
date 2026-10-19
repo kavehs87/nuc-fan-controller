@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>nuc-fan-controller — Mode B build sheet</title>
+<style>
+ body{font:15px/1.55 -apple-system,system-ui,"Segoe UI",sans-serif;color:#1a1a1a;margin:0;background:#f7f7f5}
+ header{background:#1b2430;color:#f4f6f8;padding:22px 28px}
+ header h1{margin:0 0 4px;font-size:22px} header p{margin:0;color:#b9c4d0;max-width:78ch}
+ main{max-width:1200px;margin:0 auto;padding:22px 28px 60px}
+ section{background:#fff;border:1px solid #dcdcd8;border-radius:8px;padding:18px 20px;margin:18px 0}
+ h2{font-size:17px;margin:0 0 10px} .hint{color:#5b6570;font-size:13.5px;margin:0 0 12px}
+ img{width:100%;height:auto;background:#fff;border:1px solid #e4e4e0;border-radius:4px}
+ table{border-collapse:collapse;width:100%;font-size:13.5px}
+ th,td{border-bottom:1px solid #e6e6e2;padding:6px 8px;text-align:left;vertical-align:top}
+ .fp{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#3c4650}
+ ul.links{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:10px}
+ ul.links a{display:inline-block;padding:7px 12px;background:#1b2430;color:#fff;text-decoration:none;border-radius:5px;font-size:13.5px}
+ .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+ @media(max-width:900px){.grid{grid-template-columns:1fr}}
+ .note{background:#fff8e6;border:1px solid #ecd9a8;border-radius:6px;padding:10px 12px;font-size:14px}
+</style></head><body>
+<header>
+ <h1>nuc-fan-controller — Mode B</h1>
+ <p>19 V → 12 V buck for two 2‑pin 12 V fans; 12 V → 5 V → 3.3 V for a 3.3 V / 8 MHz Arduino Pro
+ Mini; follows the PWM duty the NUC asks for; and simulates the tach signal the ITE expects.
+ ERC 0 violations. DRC 0 violations, 0 unconnected items. Everything below opens without KiCad.</p>
+</header>
+<main>
+<section>
+ <h2>Open the drawings</h2>
+ <ul class="links">
+  <li><a href="nuc-fan-controller_schematic.pdf">Schematic PDF</a></li>
+  <li><a href="nuc-fan-controller_board.pdf">Board top PDF</a></li>
+  <li><a href="nuc-fan-controller_board_bottom.pdf">Board bottom PDF</a></li>
+  <li><a href="fab/">Gerbers + drill + placement</a></li>
+  <li><a href="../BUILD.md">BUILD.md — the build sheet</a></li>
+  <li><a href="../firmware/nuc-tach-modeB/nuc-tach-modeB.ino">Mode B sketch</a></li>
+ </ul>
+</section>
+
+<section>
+ <h2>Schematic</h2>
+ <p class="hint">Drawn with wires, not net labels. Every signal net carries a name tag, so the print,
+ the netlist and the board agree on the names. J2 pin 4 carries a no‑connect flag: that is the NUC
+ header's own fan‑supply wire, which this board never touches.</p>
+ <img src="nuc-fan-controller_schematic.svg" alt="schematic">
+</section>
+
+<section>
+ <h2>Board, 124 × 85 mm, two layers</h2>
+ <p class="hint">GND poured on both layers with 326 stitching vias. Power nets 1.5 mm, signals 0.2 mm.
+ Flow left to right: input and buck, then the 12 V rail to the LDOs and the Pro Mini header; the NUC
+ interface along the top; the fan drive and the two fan connectors bottom right.</p>
+ <div class="grid">
+  <div><strong>Top (F.Cu, silk, mask)</strong><img src="nuc-fan-controller_board.svg" alt="board top"></div>
+  <div><strong>Bottom (B.Cu, silk, mask)</strong><img src="nuc-fan-controller_board_bottom.svg" alt="board bottom"></div>
+ </div>
+</section>
+
+<section>
+ <h2>Bill of materials — 38 fitted parts, all from the cabinet</h2>
+ <table><thead><tr><th>Refs</th><th>Value</th><th>Footprint</th></tr></thead><tbody>
+<tr><td>C1</td><td>220uF 35V</td><td class=fp>Capacitor_THT:CP_Radial_D10.0mm_P5.00mm</td></tr>
+<tr><td>C2</td><td>100n</td><td class=fp>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</td></tr>
+<tr><td>C3</td><td>470uF 25V</td><td class=fp>Capacitor_THT:CP_Radial_D10.0mm_P5.00mm</td></tr>
+<tr><td>C4</td><td>100n</td><td class=fp>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</td></tr>
+<tr><td>C5</td><td>10uF</td><td class=fp>Capacitor_THT:CP_Radial_D6.3mm_P2.50mm</td></tr>
+<tr><td>C6</td><td>100n</td><td class=fp>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</td></tr>
+<tr><td>C7</td><td>10uF</td><td class=fp>Capacitor_THT:CP_Radial_D6.3mm_P2.50mm</td></tr>
+<tr><td>C8</td><td>100n</td><td class=fp>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</td></tr>
+<tr><td>C9</td><td>100p</td><td class=fp>Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm</td></tr>
+<tr><td>C10</td><td>1uF</td><td class=fp>Capacitor_THT:CP_Radial_D8.0mm_P3.50mm</td></tr>
+<tr><td>C11</td><td>100n</td><td class=fp>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</td></tr>
+<tr><td>C12</td><td>100n</td><td class=fp>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</td></tr>
+<tr><td>D1</td><td>1N5822</td><td class=fp>Diode_THT:D_DO-201AD_P15.24mm_Horizontal</td></tr>
+<tr><td>D2</td><td>1N5819</td><td class=fp>Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal</td></tr>
+<tr><td>J1</td><td>19V IN</td><td class=fp>Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical</td></tr>
+<tr><td>J2</td><td>NUC fan header</td><td class=fp>Connector:FanPinHeader_1x04_P2.54mm_Vertical</td></tr>
+<tr><td>J3</td><td>FAN 1</td><td class=fp>Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical</td></tr>
+<tr><td>J4</td><td>FAN 2</td><td class=fp>Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical</td></tr>
+<tr><td>J5</td><td>Pro Mini</td><td class=fp>Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical</td></tr>
+<tr><td>L1</td><td>100uH 6A</td><td class=fp>Inductor_THT:L_Toroid_Horizontal_D16.8mm_P14.70mm_Vishay_TJ3</td></tr>
+<tr><td>Q1</td><td>BC547B</td><td class=fp>Package_TO_SOT_THT:TO-92_Inline_Wide</td></tr>
+<tr><td>Q2</td><td>BC547B</td><td class=fp>Package_TO_SOT_THT:TO-92_Inline_Wide</td></tr>
+<tr><td>Q3</td><td>IRFZ44N</td><td class=fp>Package_TO_SOT_THT:TO-220-3_Vertical</td></tr>
+<tr><td>R1</td><td>1k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
+<tr><td>R2</td><td>1k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
+<tr><td>R3</td><td>4.7k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
+<tr><td>R4</td><td>2.2k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
+<tr><td>R5</td><td>10k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
+<tr><td>R6</td><td>1k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
+<tr><td>R7</td><td>10k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
+<tr><td>R8</td><td>1k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
+<tr><td>R9</td><td>120R</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
+<tr><td>R10</td><td>10k</td><td class=fp>Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal</td></tr>
+<tr><td>RV1</td><td>10k trim</td><td class=fp>Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical</td></tr>
+<tr><td>TP1</td><td>TACH</td><td class=fp>TestPoint:TestPoint_Pad_D1.5mm</td></tr>
+<tr><td>U1</td><td>LM2596T</td><td class=fp>Package_TO_SOT_THT:TO-220-5_P3.4x3.7mm_StaggerOdd_Lead3.8mm_Vertical</td></tr>
+<tr><td>U2</td><td>AMS1117-5.0</td><td class=fp>Package_TO_SOT_SMD:SOT-223-3_TabPin2</td></tr>
+<tr><td>U3</td><td>AMS1117-3.3</td><td class=fp>Package_TO_SOT_SMD:SOT-223-3_TabPin2</td></tr>
+ </tbody></table>
+ <p class="hint">Plus four <span class="fp">MountingHole:MountingHole_3.2mm_M3</span> holes, which are
+ board‑only and therefore correctly absent from the table above.</p>
+</section>
+
+<section>
+ <h2>Build order, in short</h2>
+ <ol>
+  <li>Identify the four NUC fan‑header wires with a meter. Mark them before cutting anything.</li>
+  <li>Fit the buck only (U1, L1, D1, C1–C4, R1, RV1) and trim the rail to 12.0 V.</li>
+  <li>Fit U2/U3, confirm 5 V and 3.3 V. Then fit Q1/Q2/Q3.</li>
+  <li>Find the fan's stall duty and measure its RPM at two duties. Those four numbers are the
+      calibration constants at the top of the sketch.</li>
+  <li>Read TP1 with a frequency counter: it must equal <em>rpm / 30</em> Hz exactly — it is a hardware timer.</li>
+  <li>Connect the tach side to the NUC alone (J2.1 + J2.2) and read the RPM in BIOS.</li>
+  <li>Add the PWM wire (J2.3) and watch the serial line while the machine is loaded.</li>
+  <li>Only then connect the fans to J3/J4 and splice the stock fan cable.</li>
+ </ol>
+ <div class="note"><strong>Two things that break hardware:</strong> a 12 V fan's tach or PWM wire
+ spliced into the NUC header (that fan pulls those lines up to its own 12 V internally), and a 5 V
+ FTDI on a 3.3 V Pro Mini (the ATmega328P's absolute maximum on any pin is VCC + 0.5 V). Flash with
+ Board → <em>Arduino Pro or Pro Mini</em>, Processor → <strong>ATmega328 (3.3V, 8MHz)</strong>.</div>
+</section>
+</main></body></html>

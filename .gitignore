@@ -1,0 +1,20 @@
+# scratch and tooling, not part of the design
+logs/routing/freerouting.jar
+logs/*.kicad_pcb
+logs/*.kicad_sch
+logs/inspect/
+logs/__pycache__/
+logs/scratch.kicad_sch
+logs/placed.txt
+logs/drc*.json
+logs/erc*.json
+logs/netlist.net
+logs/route_out.json
+logs/stitch-*.json
+logs/wires.inc
+logs/board-*.kicad_pcb
+logs/pro-before-*.json
+.mcp-backups/
+.history/
+.DS_Store
+*.orig

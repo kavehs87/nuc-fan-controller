@@ -1,0 +1,8 @@
+### Footprint positions - created on 2026-10-19T15:55:55 ###
+### Printed by KiCad version 10.0.6
+## Unit = inches, Angle = deg.
+## Side : All
+# Ref     Val          Package                 PosX       PosY       Rot  Side
+U2        AMS1117-5.0  SOT-223-3_TabPin2     3.3858    -2.2047    0.0000  top
+U3        AMS1117-3.3  SOT-223-3_TabPin2     4.0945    -2.2047    0.0000  top
+## End
