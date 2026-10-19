@@ -386,27 +386,36 @@ sketch's `rpm`; if the sketch reports too much or too little, move `FAN_RPM_MIN`
 
 ### Two measurements the numbered list does not cover
 
-**The divider's own ratio, with the Uno alone** (`firmware/probe-divider`). Every duty number printed
-so far carries an unresolved "which pair is in the breadboard": 605 counts is 4.7 kΩ + 2.2 kΩ over
-10 kΩ, 512 is 10 kΩ over 10 kΩ, and the gap is 18 % — the difference between the fan following 42 %
-and following 50 %. Feed the top of the chain from the Uno's 5 V pin and read the tap: excitation and
-ADC full scale come from the same rail, so the rail's voltage cancels and `counts ÷ 1024` *is* the
-ratio. Three connections in any order (GND, 5 V direct, 5 V through the chain) and the sketch prints
-the ratio and names the nearest pair. The ITE's dwell levels already point at 10 kΩ / 10 kΩ — see the
-lattice below — but this settles it in a minute with the meter still in the drawer.
+**The divider's ratio is settled: two 10 kΩ, confirmed by the builder.** The tap is exactly half the
+PWM line, so on the Uno — whose ADC reference is its own 5 V rail — 100 % duty is 512 counts, and every
+duty number in `bench/data/` is read on that scale. `firmware/probe-divider` stays in the tree as the
+check to run whenever a different pair goes on the bench: feed the chain from the Uno's own 5 V pin, and
+because excitation and ADC full scale share a rail the rail voltage cancels and `counts ÷ 1024` *is* the
+ratio.
+
+That makes the case for changing the board's divider to 10 kΩ / 10 kΩ too, and it is worth making:
+2.50 V on the tap instead of 2.96 V (0.8 V of headroom on a 3.3 V part instead of 0.34 V), one fewer
+resistor, 0.25 mA of load on the ITE instead of 0.30 mA, τ = 5 kΩ × 1.1 µF = 5.5 ms against a 43.5 µs
+period, and 775 counts for 100 % on the 3.3 V rail. The bench and the board would then read the same
+scale. Until that change is made the schematic's divider is what `ADC_AT_100PCT = 918` describes.
 
 **The top of the PWM swing, from two dwell levels and a meter.** The flat top (5.0 V or 5.5 V) decides
-whether 100 % lands at 918 or 1009 counts on the board, and it cannot be got from a single average
-reading because the duty at that moment is unknown. It can be got from a *difference*. The ITE dwells at
-two levels one 1/8-step apart (198 and 257 counts), so with the meter on the PWM wire,
+whether 100 % lands at 918 or 1009 counts on the board's present divider, and it cannot be got from a
+single average reading because the duty at that moment is unknown. It can be got from a *difference*.
+The ITE dwells at two levels — 198 and 257 counts — which on the confirmed 0.500 ratio are
 
-    top = 8 × (V_high − V_low)
+    198 counts = 0.969 V at A0 = 1.938 V average on the PWM wire
+    257 counts = 1.255 V at A0 = 2.510 V average on the PWM wire
+    difference = 0.571 V
 
-A 5.0 V top predicts 1.88 V at the low level and 2.50 V at the high one, a difference of 0.625 V; a
-5.5 V top predicts 2.06 V and 2.75 V, a difference of 0.688 V. Either reading pins the top to within
-about 0.08 V, which is ten times tighter than the 0.5 V question is asking. And if the difference comes
-out nowhere near 0.6 V, the wire being measured is not the PWM wire — the arithmetic checks the wiring
-at the same time it checks the amplitude.
+so a meter across the PWM wire should read about 1.94 V at the low dwell and 2.51 V at the high one.
+The difference pins the top once the ITE's duty quantum is known: a 1/8 step on a 5.0 V top predicts
+0.625 V, on a 4.5 V top 0.563 V. The measured 0.571 V therefore says either the ITE's top is nearer
+4.6 V than 5.0 V — plausible, since the stock blower is still on that header and a 4-wire fan's PWM
+input loads an open-drain output — or the step is a little under 1/8. Resistor tolerance is the limit on
+this arithmetic: a 5 % mismatch inside the pair moves the inferred average by 5 %, which is 0.03 V of the
+0.57 V. Measuring the two levels with the meter, and the two resistors as well, puts all of it in one
+sitting.
 
 ---
 
@@ -430,7 +439,9 @@ at the same time it checks the amplitude.
   and average ÷ duty = flat top, so 45 % duty gives 2.25 V (top 5.0) or 2.47 V (top 5.5). If it is
   5.5 V, R5 drops from 10 kΩ to 8.2 kΩ and 100 % lands at 930 counts with 10 % headroom. It is
   still the one thing on this board that has to be re-checked if a different NUC generation puts
-  12 V on that line (rule 4 above).
+  12 V on that line (rule 4 above). The bench already provides the numbers a meter should reproduce:
+  on the confirmed 0.500 divider the ITE's three dwell levels — 198, 257 and 318 counts — average
+  **1.94 V, 2.51 V and 3.11 V** on the PWM wire, with 0.97 V, 1.26 V and 1.55 V at the tap.
 - **The ITE's PWM demand answers temperature, not the tach.** Measured twice on this NUC6i3SYB.
   First the tach: a 40 s ladder of claims (800 / 2000 / 4500 RPM, fan drive pinned at 90 %) moved
   the ITE's requested duty from 233.6 to 231.0 counts — a 5.6× swing in claimed RPM for 2.5 counts

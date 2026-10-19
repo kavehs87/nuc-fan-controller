@@ -110,11 +110,21 @@ the step is 9.9 points and matches nothing. The cycling is fast — 535 of 716 s
 point deadband) instead of pumping the fan at 0.3 Hz while the machine's own thermal time constant is
 minutes.
 
-**Two things the bench still has to settle.** Which resistor pair is actually in the breadboard — 512 or
-605 counts for 100 %, an 18 % gap that decides whether the fan follows 42 % or 50 % — which
-`firmware/probe-divider` answers in a minute with no meter at all; and whether the ITE's PWM top is
-5.0 V or 5.5 V, which a meter answers from the *difference* between two dwell levels:
-`top = 8 × (V_high − V_low)`, predicting 0.625 V or 0.688 V between them.
+**The divider is settled: two 10 kΩ.** The tap is half the PWM line, so on the Uno 512 counts is 100 %
+duty and every count in `bench/data/` reads on that scale. In volts, which is what a meter should agree
+with: the ITE's three dwell levels — 198, 257 and 318 counts — are **0.97 V, 1.26 V and 1.55 V at A0**,
+i.e. **1.94 V, 2.51 V and 3.11 V average on the PWM wire**. That also argues for changing the board's
+divider from 4.7 kΩ + 2.2 kΩ over 10 kΩ to 10 kΩ / 10 kΩ: 2.50 V on the tap instead of 2.96 V, 0.8 V of
+headroom on a 3.3 V part instead of 0.34 V, one fewer resistor, and bench and board reading the same
+scale.
+
+**One thing the bench still has to settle: the top of the PWM swing.** 5.0 V or 5.5 V decides whether
+100 % lands at 918 or 1009 counts on the present divider, and it comes from a *difference* rather than an
+absolute reading — the two cold dwell levels are 0.571 V apart in average terms. A 1/8 duty step on a
+5.0 V top predicts 0.625 V; on a 4.5 V top, 0.563 V. So either the ITE's top is nearer 4.6 V than 5.0 V
+— plausible, since the stock blower is still on that header and a 4-wire fan's PWM input loads an
+open-drain output — or its step is a little under 1/8. A meter on the PWM wire at the two dwell levels,
+plus the two resistors themselves, puts all of it in one sitting.
 
 ![both ends probed at once](docs/bench/06-probing-both-ends.jpg)
 

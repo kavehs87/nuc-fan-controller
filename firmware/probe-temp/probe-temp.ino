@@ -28,9 +28,11 @@ const uint16_t PIN_PWM_IN = A0;   // divider midpoint
 const uint32_t CLAIM_RPM = 1500;  // 30 000 000 / 1500 = 20 000 counts -> ICR1 19999 -> 50.000 Hz
 const float FAN_DUTY = 90.0f;     // pinned
 
-// Whichever resistor pair was built: 605 counts is 6.9k over 10k at a 5.0 V top, 512 is 10k/10k.
-const uint16_t ADC_AT_100PCT = 605;
-const uint16_t ADC_AT_100PCT_ALT = 512;
+// The bench divider is two 10k, confirmed by the builder: the tap is exactly half the PWM line, so
+// 512 counts is 100% duty against the Uno's 5 V rail. 605 is kept as the alternate for the
+// schematic's 4.7k + 2.2k over 10k, in case the board's divider is fitted on the bench instead.
+const uint16_t ADC_AT_100PCT = 512;
+const uint16_t ADC_AT_100PCT_ALT = 605;
 
 static uint16_t read_adc(void) {
   long sum = 0;

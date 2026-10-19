@@ -39,9 +39,10 @@ const uint16_t DWELL_MS = 40000;  // longer than the ITE's own loop time constan
 const uint32_t CLAIMS[] = {800, 2000, 4500, 2000};
 const uint8_t N_CLAIMS = sizeof(CLAIMS) / sizeof(CLAIMS[0]);
 
-// Whichever resistor pair was built: 605 counts is 6.9k over 10k at a 5.0 V top, 512 is 10k/10k.
-const uint16_t ADC_AT_100PCT = 605;
-const uint16_t ADC_AT_100PCT_ALT = 512;
+// The bench divider is two 10k, confirmed by the builder: 512 counts is 100% duty on the Uno's 5 V
+// rail. 605 (4.7k + 2.2k over 10k, the schematic's divider) is kept as the alternate.
+const uint16_t ADC_AT_100PCT = 512;
+const uint16_t ADC_AT_100PCT_ALT = 605;
 
 static uint16_t icr1_for(uint32_t rpm) {
   uint32_t counts = 15UL * (F_CPU / 8UL) / rpm;   // counts per half period

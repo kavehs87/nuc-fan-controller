@@ -121,8 +121,14 @@ const float TACH_RPM_CEIL  = 10500.0f; // the ITE stops counting above ~11 000 R
 // measure on the finished board, not this one. Left at 1.0 until the Pro Mini is fitted.
 const float ITE_READ_GAIN = 1.0f;      // emitted = wanted / gain; the Uno/NUC pair measured 0.9900
 
-// Two-point calibration of the duty read. 918 = 2.96 V / 3.3 V x 1023.
-// If a scope says the divider is off, move ADC_AT_100PCT and nothing else.
+// Two-point calibration of the duty read, for the divider the schematic carries: 4.7k + 2.2k over
+// 10k = 0.592, so a 5.0 V top puts 2.96 V on the tap = 2.96 / 3.3 x 1023 = 918 counts.
+//
+// The breadboard's divider is two 10k (confirmed by the builder), which is the divider this board
+// should use too: 0.500 puts 2.50 V on the tap = 775 counts, which is 0.8 V of headroom instead of
+// 0.34 V, one fewer part, a lighter load on the ITE (0.25 mA instead of 0.30 mA), tau 5.5 ms instead
+// of 4.5 ms against a 43.5 us period, and 512 counts on the Uno - which is the scale every bench log
+// in bench/data/ is written in. If that change is made on the board, this constant becomes 775.
 const uint16_t ADC_AT_0PCT   = 0;
 const uint16_t ADC_AT_100PCT = 918;
 

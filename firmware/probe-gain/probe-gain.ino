@@ -35,12 +35,14 @@ const uint16_t PIN_PWM_IN = A0; // the divider's midpoint, if the PWM wire is ac
 // Measured on this NUC's fan header: 23 kHz square (Intel's 4-wire spec is 25 kHz +/-10%, so
 // the ITE is inside it) at 45% duty while the sweep walks the tach claim.
 //
-// On the Uno the ADC's reference is its own 5 V rail, so a 5 V top through the 0.5917 divider
-// lands at 0.5917 * 1023 = 605 counts for 100% duty. That is the comfortable case. On the
-// finished board the reference is 3.3 V and the same 5 V top lands at 918 counts - but a 5.5 V
-// top lands at 1009, which is 1.4% from full scale. The Uno cannot show that problem; the board
-// can, which is why ADC_AT_100PCT is a bench measurement and not a calculation.
-const uint16_t ADC_AT_100PCT = 605;
+// On the Uno the ADC's reference is its own 5 V rail. The bench divider is two 10k (confirmed by the
+// builder), so the tap is half the PWM line and 100% duty lands at 0.500 * 1024 = 512 counts. The
+// schematic's 4.7k + 2.2k over 10k would land at 605; report.py compares the two against the scope's
+// duty reading. On the finished board the reference is 3.3 V, where the same 5 V top lands at 775
+// counts for 10k/10k or 918 for the schematic's divider - and a 5.5 V top lands at 1009, 1.4% from
+// full scale. The Uno cannot show that problem; the board can, which is why ADC_AT_100PCT is a bench
+// measurement and not a calculation.
+const uint16_t ADC_AT_100PCT = 512;
 
 const float FAN_DUTY = 40.0f;              // starting value only, until the divider is read
 const float FAN_DUTY_MIN = 30.0f;          // never stop the fan, whatever the divider reads
@@ -87,11 +89,10 @@ static void report(void) {
   for (uint8_t i = 0; i < 16; i++) sum += analogRead(PIN_PWM_IN);   // ~1.8 ms, ~40 PWM periods
   uint16_t adc = (uint16_t)(sum / 16);
 
-  // Two readings of the same count, because the divider's ratio is whichever pair was built:
-  // 605 counts is 6.9k over 10k at a 5.0 V top, 512 counts is 10k over 10k. Compare the one that
-  // matches the scope's duty % and that is the ratio on the bench.
+  // Two readings of the same count. The bench ratio is confirmed 0.500 (two 10k), so duty is the
+  // 512-count reading; the 605-count one is printed alongside for the schematic's divider.
   float duty      = duty_of(adc);
-  float duty_10k  = (float)adc * 100.0f / 512.0f;
+  float duty_sch  = (float)adc * 100.0f / 605.0f;
 
   // Drive the fan with the ITE's demand, floored so it never stops.
   float drive = duty < FAN_DUTY_MIN ? FAN_DUTY_MIN : duty;
@@ -105,7 +106,7 @@ static void report(void) {
   Serial.print(F(" bios_if_0.98845="));  Serial.print(e * GAIN_B, 1);
   Serial.print(F("  adc="));       Serial.print(adc);
   Serial.print(F(" duty(6.9k/10k)="));  Serial.print(duty, 1);
-  Serial.print(F(" duty(10k/10k)="));   Serial.print(duty_10k, 1);
+  Serial.print(F(" duty(sch divider)="));   Serial.print(duty_sch, 1);
   Serial.print(F(" fan_drive="));       Serial.print(drive, 1);
   Serial.println(F("%"));
 }
