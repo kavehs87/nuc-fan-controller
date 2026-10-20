@@ -47,7 +47,9 @@
     second table; tick each row as it goes in the tray. The last table is what the photos and caliper
     readings have to answer, because those answers set the footprints and therefore the board size.
     Quantities include spares. The 19&nbsp;V→12&nbsp;V stage is the XL4016E1 module, so the board carries
-    no power inductor, no rectifier for that stage, and no buck IC.
+    no power inductor, no rectifier for that stage, and no buck IC. The board is now <b>one copper layer</b>,
+    88.90 × 76.20 mm, drawn to be etched at home, and it has <b>no 5&nbsp;V rail</b> — the 5&nbsp;V regulator
+    and its two capacitors have come off this list.
   </div>
   <div class="bar">
     <button id="print">Print</button>
@@ -64,20 +66,20 @@
     <tr><td class="chk"><input type="checkbox" data-k="q3"></td><td class="refs">Q3</td><td>IRFZ44N</td><td>low‑side fan switch</td><td class="drawer">R1 B4</td><td>IRFZ44N N‑Channel Power MOSFET (TO‑220) <span class="id">id 208</span></td><td class="n">12</td><td class="n take">2</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="q12"></td><td class="refs">Q1, Q2</td><td>BC547B</td><td>fake tach generator, fan‑gate driver</td><td class="drawer">R1 D3</td><td>BC547 NPN Transistor (TO‑92) <span class="id">id 248</span></td><td class="n">20</td><td class="n take">4</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="d2"></td><td class="refs">D2</td><td>1N5819</td><td>fan freewheel (cathode to +12 V)</td><td class="drawer">L1 E1</td><td>1N5819 <span class="id">id 48</span></td><td class="n">30</td><td class="n take">3</td></tr>
-    <tr><td class="chk"><input type="checkbox" data-k="u2"></td><td class="refs">U2</td><td>AMS1117‑5.0</td><td>12 V → 5 V</td><td class="drawer">L1 B1</td><td>AMS1117‑5.0 <span class="id">id 28</span></td><td class="n">8</td><td class="n take">2</td></tr>
-    <tr><td class="chk"><input type="checkbox" data-k="u3"></td><td class="refs">U3</td><td>AMS1117‑3.3</td><td>5 V → 3.3 V</td><td class="drawer">L1 B1</td><td>AMS1117‑3.3 (TO‑252) <span class="id">id 27</span></td><td class="n">19</td><td class="n take">2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="u3"></td><td class="refs">U3</td><td>AMS1117‑3.3</td><td>12 V → 3.3 V — the board’s only SMD part, TO‑252 pads</td><td class="drawer">L1 B1</td><td>AMS1117‑3.3 (TO‑252) <span class="id">id 27</span></td><td class="n">19</td><td class="n take">2</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="c3"></td><td class="refs">C3</td><td>470 µF 25 V</td><td>bulk on the module's 12 V</td><td class="drawer">L1 C1</td><td>470uF 25v 8x20mm Radial <span class="id">id 111</span></td><td class="n">6</td><td class="n take">2</td></tr>
-    <tr><td class="chk"><input type="checkbox" data-k="c57"></td><td class="refs">C5, C7</td><td>10 µF</td><td>regulator output caps</td><td class="drawer">L1 D3</td><td>10uF 16v Radial 4x7.5mm <span class="id">id 147</span></td><td class="n">4</td><td class="n take">3</td></tr>
-    <tr><td class="chk"><input type="checkbox" data-k="c10"></td><td class="refs">C10</td><td>1 µF</td><td>PWM_IN filter</td><td class="drawer">L1 E7</td><td>1uF 50V Radial Electrolytic Cap 8x4mm <span class="id">id 256</span></td><td class="n">8</td><td class="n take">2</td></tr>
-    <tr><td class="chk"><input type="checkbox" data-k="c100n"></td><td class="refs">C4, C6, C8, C11, C12</td><td>100 n</td><td>bypass on 12 V, 5 V, 3.3 V, PWM_IN, FAN_SW</td><td class="drawer">L1 C9</td><td>Ceramic Cap 100nF (104) <span class="id">id 294</span></td><td class="n">30</td><td class="n take">7</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="c57"></td><td class="refs">C7</td><td>10 µF</td><td>3.3 V regulator output cap</td><td class="drawer">L1 D3</td><td>10uF 16v Radial 4x7.5mm <span class="id">id 147</span></td><td class="n">4</td><td class="n take">3</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="c10"></td><td class="refs">C10</td><td>1 µF</td><td>PWM_IN filter</td><td class="drawer">L1 E7</td><td>1uF 50V Radial Electrolytic Cap 8x4mm <span class="id">id 256</span> — the board draws it Ø6.3 / P2.50</td><td class="n">8</td><td class="n take">2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="c100n"></td><td class="refs">C4, C8, C11, C12</td><td>100 n</td><td>bypass on 12 V, 3.3 V, PWM_IN, FAN_SW</td><td class="drawer">L1 C9</td><td>Ceramic Cap 100nF (104) <span class="id">id 294</span></td><td class="n">30</td><td class="n take">6</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="c9"></td><td class="refs">C9</td><td>100 p</td><td>tach output filter</td><td class="drawer">L1 C9</td><td>Ceramic Cap 100pF (101) <span class="id">id 293</span></td><td class="n">8</td><td class="n take">2</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="r1k"></td><td class="refs">R2, R6, R8</td><td>1 k</td><td>tach pull‑up, Q2 base, fan‑rail pull</td><td class="drawer">R1 A2</td><td>1k Ohm Through‑Hole Resistor <span class="id">id 221</span></td><td class="n">20</td><td class="n take">5</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="r4k7"></td><td class="refs">R3</td><td>4.7 k</td><td>PWM divider top arm</td><td class="drawer">R1 B2</td><td>4.7k Ohm Through‑Hole Resistor <span class="id">id 223</span></td><td class="n">20</td><td class="n take">2</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="r2k2"></td><td class="refs">R4</td><td>2.2 k</td><td>PWM divider mid tap</td><td class="drawer">R1 A2</td><td>2.2k Ohm Through‑Hole Resistor <span class="id">id 222</span></td><td class="n">20</td><td class="n take">2</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="r10k"></td><td class="refs">R5, R7, R10</td><td>10 k</td><td>PWM pull‑down, base pull‑down, gate pull‑down</td><td class="drawer">R1 B2</td><td>10k Ohm Through‑Hole Resistor <span class="id">id 224</span></td><td class="n">20</td><td class="n take">5</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="r120"></td><td class="refs">R9</td><td>120 Ω</td><td>Q3 gate series</td><td class="drawer">R1 B1</td><td>120 Ohm Through‑Hole Resistor <span class="id">id 213</span></td><td class="n">20</td><td class="n take">2</td></tr>
-    <tr><td class="chk"><input type="checkbox" data-k="hdr2"></td><td class="refs">J1, J3, J4, J7</td><td>1×02 header</td><td>19 V in, three fans</td><td class="drawer">L1 E9</td><td>2‑Pin Male Header 2.54mm <span class="id">id 310</span></td><td class="n">7</td><td class="n take">5</td></tr>
-    <tr><td class="chk"><input type="checkbox" data-k="hdr5"></td><td class="refs">J2, J5, J6</td><td>1×04 · 1×05 · 1×04</td><td>NUC fan header, Pro Mini, buck module</td><td class="drawer">L1 E9</td><td>5‑Pin Male Header 2.54mm <span class="id">id 309</span></td><td class="n">7</td><td class="n take">3 strips</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="r11"></td><td class="refs">R11</td><td>0 Ω — <b>board only, not in the schematic</b></td><td>the bridge that carries FAN_PWM over the divider row: the one crossing a single layer cannot route around</td><td class="drawer">any, or scrap</td><td>a 0 Ω, a lead scraped off a scrapped part, or a staple of bare wire</td><td class="n">—</td><td class="n take">1</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="hdr2"></td><td class="refs">J1, J3, J4, J7</td><td>1×02 header</td><td>19 V in, three fans — all <b>male</b></td><td class="drawer">L1 E9</td><td>2‑Pin Male Header 2.54mm <span class="id">id 310</span></td><td class="n">7</td><td class="n take">4</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="hdr5"></td><td class="refs">J2, J5, J6</td><td>1×04 · 1×05 · 1×04, all <b>male</b></td><td>NUC fan header, Pro Mini, buck module</td><td class="drawer">L1 E9</td><td>5‑Pin Male Header 2.54mm <span class="id">id 309</span></td><td class="n">7</td><td class="n take">3 strips</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="tp1"></td><td class="refs">TP1</td><td>TACH</td><td>probe point — no part, a bare 1.5 mm pad</td><td class="drawer">—</td><td>nothing to collect</td><td class="n">—</td><td class="n take">—</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="mod"></td><td class="refs">—</td><td>XL4016E1 module</td><td>the whole 19 V → 12 V stage, off the board</td><td class="drawer">L1 A10</td><td>XL4016E1 Step‑Down Module <span class="id">id 319</span></td><td class="n">1</td><td class="n take">1</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="mini"></td><td class="refs">—</td><td>Arduino Pro Mini 3.3 V/8 MHz</td><td>the controller</td><td class="drawer">L1 C5</td><td>Arduino Pro Mini <span class="id">id 125</span></td><td class="n">1</td><td class="n take">1</td></tr>
@@ -89,13 +91,13 @@
 <table>
   <thead><tr><th></th><th class="n">#</th><th>Drawer</th><th>Take</th></tr></thead>
   <tbody>
-    <tr><td class="chk"><input type="checkbox" data-k="d1"></td><td class="n">1</td><td class="drawer">L1 B1</td><td>AMS1117‑5.0 ×2, AMS1117‑3.3 ×2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d1"></td><td class="n">1</td><td class="drawer">L1 B1</td><td>AMS1117‑3.3 (TO‑252) ×2</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="d2x"></td><td class="n">2</td><td class="drawer">L1 C1</td><td>470 µF 25 V 8×20 radial ×2</td></tr>
-    <tr><td class="chk"><input type="checkbox" data-k="d3"></td><td class="n">3</td><td class="drawer">L1 C9</td><td>100 n (104) ×7, 100 p (101) ×2</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d3"></td><td class="n">3</td><td class="drawer">L1 C9</td><td>100 n (104) ×6, 100 p (101) ×2</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="d4"></td><td class="n">4</td><td class="drawer">L1 D3</td><td>10 µF 16 V 4×7.5 ×3</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="d5"></td><td class="n">5</td><td class="drawer">L1 E1</td><td>1N5819 ×3</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="d6"></td><td class="n">6</td><td class="drawer">L1 E7</td><td>1 µF 50 V 8×4 ×2, TO‑220 isolation pad ×1</td></tr>
-    <tr><td class="chk"><input type="checkbox" data-k="d7"></td><td class="n">7</td><td class="drawer">L1 E9</td><td>2‑pin headers ×5, 5‑pin headers ×3</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d7"></td><td class="n">7</td><td class="drawer">L1 E9</td><td>2‑pin male headers ×4, 5‑pin male headers ×3</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="d8"></td><td class="n">8</td><td class="drawer">L1 A10</td><td>XL4016E1 step‑down module ×1</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="d9"></td><td class="n">9</td><td class="drawer">L1 C5</td><td>Arduino Pro Mini ×1</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="d10"></td><td class="n">10</td><td class="drawer">R1 A2</td><td>1 k ×5, 2.2 k ×2</td></tr>
@@ -103,6 +105,7 @@
     <tr><td class="chk"><input type="checkbox" data-k="d12"></td><td class="n">12</td><td class="drawer">R1 B2</td><td>4.7 k ×2, 10 k ×5</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="d13"></td><td class="n">13</td><td class="drawer">R1 B4</td><td>IRFZ44N ×2</td></tr>
     <tr><td class="chk"><input type="checkbox" data-k="d14"></td><td class="n">14</td><td class="drawer">R1 D3</td><td>BC547 ×4</td></tr>
+    <tr><td class="chk"><input type="checkbox" data-k="d15"></td><td class="n">15</td><td class="drawer">any</td><td>one 0 Ω (or a scraped‑off lead) for R11</td></tr>
   </tbody>
 </table>
 <p class="sub">Only if the 3.5″ HDD 12 V tap gets built: <b>L1 A8</b> glass fuse 3–4 A ×1 and
@@ -110,34 +113,40 @@
 
 <h2>3. What the photos and calipers have to answer</h2>
 <div class="grp">
-  <h3>3.1 The nine resistors — the biggest lever on board area</h3>
+  <h3>3.1 The ten resistors — the biggest lever on board area</h3>
   <p class="note">The design assumes DIN0204: 3.6 mm body, 1.6 mm Ø, <b>5.08 mm</b> pad pitch. If the cabinet's
   are 0207 (≈5.5 × 2.5 mm, leads spread to ≈10 mm) every resistor takes twice the room. Report body length,
   body Ø, and the spacing the leads land at when the part sits flat.</p>
   <h3>3.2 The disc caps</h3>
-  <p class="note">Assumed Ø3.8 / P2.50 for the 100 n and Ø3.0 / P2.50 for the 100 p. A 104 disc is usually
-  Ø5–6 mm. Report body Ø, thickness, and lead spread where the leads exit the body.</p>
+  <p class="note">The board draws the 100 n as Ø6.0 / W2.5 / P5.00 with its pads spread to 5.08, and the 100 p
+  as Ø3.8 / W2.6 / P2.50. Report each body’s Ø, thickness, and lead spread where the leads exit the body; a
+  smaller disc simply sits loose in the pads, a bigger one is what moves the board.</p>
   <h3>3.3 Headers — the cabinet has no 4‑pin strip</h3>
   <p class="note">Three ways to make J2 and J6: snap 5‑pin strips down to 4; salvage the NUC's own fan plug and
   solder its wires into a 4‑pin header; or solder fan wires straight into the pads. The JST‑XH 4P housings in
   L1 E9 are 2.5 mm pitch and will not sit on 2.54 mm pins. Report whether the strips are breakaway.</p>
   <h3>3.4 D2's span decides the two fan rails</h3>
-  <p class="note">The footprint spreads its pads 10.16 mm apart. A DO‑41 body is ≈5.3 × 2.7 mm with ≈2.7 mm
-  natural lead spacing, so the leads can be bent out to 5.08 mm and sit flat. Report body length and Ø.</p>
+  <p class="note">The board keeps the library’s <b>10.16 mm</b> pitch so the silkscreen outline matches the part.
+  A DO‑41 body is ≈5.3 × 2.7 mm with ≈2.7 mm natural lead spacing, so its leads get bent out to 10.16 and it
+  lies flat with its body between the two rails it joins. Report body length and Ø.</p>
   <h3>3.5 The buck module decides J6</h3>
   <p class="note">Some XL4016 modules have screw terminals (5.08 mm pitch, no pins at all), some have plain pins.
   Report module L × W, what the input and output terminals are and their spacing, where the two trim pots sit,
   whether it has mounting holes, and how tall its tallest part is.</p>
-  <h3>3.6 The regulators</h3>
-  <p class="note">Confirm both AMS1117s are SOT‑223 (TO‑252). If the 5 V one is TO‑220 instead, L1 B1 also holds
-  L7805CV (TO‑220, 9 pcs) and BA033ST (TO‑220 3.3 V, 4 pcs) — a deliberate all‑THT option, at the cost of two
-  TO‑220 footprints on a board that is trying to be small.</p>
+  <h3>3.6 The regulator</h3>
+  <p class="note">Confirm the AMS1117‑3.3 is TO‑252 (SOT‑223): the board’s pads are TO‑252, and a SOT‑223 is the
+  same 6.5 mm body with a longer lead stub that will not sit down on them. If only a TO‑220 turns up, L1 B1 also
+  holds BA033ST (TO‑220 3.3 V, 4 pcs) — a deliberate all‑THT option, at the cost of a TO‑220 footprint on a board
+  that is trying to be small.</p>
   <h3>3.7 The transistors</h3>
   <p class="note">TO‑92 leads come flat (one row) or staggered (middle lead offset); the design uses
   <code>TO-92_Inline_Wide</code>. Report which the BC547s are and confirm the marking reads BC547<b>B</b>.
   Pin order facing the flat face: 1 = E, 2 = B, 3 = C.</p>
   <h3>3.8 The Pro Mini</h3>
-  <p class="note">Confirm 3.3 V / 8 MHz (crystal marked 8.000). The board's 3.3 V rail and the firmware expect it.</p>
+  <p class="note">Confirm 3.3 V / 8 MHz (crystal marked 8.000): the board's 3.3 V rail and the firmware expect it.
+  Then measure <b>where its pins actually are</b>. The board plugs it into one 1×05 header, which is only right if
+  GND, VCC, A0, D11 and D9 are reachable on one row of the Pro Mini's own headers. Photograph both rows with the
+  pin names legible: if they are split, J5 becomes two headers and the bottom edge of the layout moves.</p>
 </div>
 
 <h2>4. Not in the cabinet</h2>

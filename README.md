@@ -8,8 +8,8 @@ It does four things:
 1. **brings 12 V to the fans from a ready‑made module** — an XL4016E1 step‑down (8 A, ~180 kHz) bolted
    to the enclosure wall and wired to this board through **J6**: 19 V in on pin 3, its two returns on
    pins 1–2, 12 V out on pin 4. The board's own 12 V parts are only C3 470 µF/25 V and C4 100 n;
-2. **12 V → 5 V → 3.3 V** for a 3.3 V / 8 MHz Arduino Pro Mini (AMS1117‑5.0 then AMS1117‑3.3,
-   into the Pro Mini's **VCC**; RAW unused);
+2. **12 V → 3.3 V** for a 3.3 V / 8 MHz Arduino Pro Mini (AMS1117‑3.3 in a TO‑252, the board's only
+   SMD part, into the Pro Mini's **VCC**; RAW unused) — there is no 5 V rail anywhere on this board;
 3. **follows the duty the NUC's ITE asks for** — the ITE's PWM wire is divided to 2.96 V, read
    on A0, and re‑made as 31.25 kHz on D11 driving Q2 → IRFZ44N → the fans;
 4. **simulates the tach signal** — Timer1 hardware square wave on D9 sinks Q1's open collector;
@@ -29,15 +29,17 @@ both ways. *BUILD.md* carries the arithmetic that makes the module the better ch
 
 ## Open it without KiCad
 
-[`exports/index.html`](exports/index.html) — schematic, both board views, BOM, links.
+[`exports/index.html`](exports/index.html) — schematic, the board, the 1:1 copper print for etching, BOM, links.
 
 | File | What it is |
 |---|---|
 | `nuc-fan-controller.kicad_sch` / `.kicad_pcb` / `.kicad_pro` | KiCad 10 design |
 | `exports/nuc-fan-controller_schematic.pdf` / `.svg` | schematic, wires not net labels, name tags on every signal net |
-| `exports/nuc-fan-controller_board.pdf`, `…_board_bottom.pdf`, `…_board.svg` | board plots |
-| `exports/nuc-fan-controller_bom.csv` | 33 fitted parts — the buck module is a purchased part wired to J6, so it is correctly not in it |
-| `exports/fab/` | 8 Gerbers + `.drl` + `_pos.csv` + `job.gbrjob` — ready to zip and order |
+| `exports/nuc-fan-controller_board.pdf`, `…_board.svg` | the board as KiCad draws it: F.Cu, silk, mask, outline |
+| `exports/nuc-fan-controller_etch_copper.pdf`, `…_etch_copper.svg` | **F.Cu + Edge.Cuts at 1:1** — print with scaling off and iron it onto copper-clad; the black is the copper that stays |
+| `exports/nuc-fan-controller_etch_negative.pdf` | the same plot inverted, for a process that removes what is black |
+| `exports/nuc-fan-controller_bom.csv` | 30 lines — the buck module and the Pro Mini are purchased parts, and R11 and the mounting holes are board-only, so none of them are in it |
+| `exports/fab/` | 4 Gerbers (one copper layer) + `.drl` + `job.gbrjob` |
 | `firmware/nuc-tach-modeB/nuc-tach-modeB.ino` | the sketch; calibration constants at the top |
 | `firmware/probe-uno/probe-uno.ino` | breadboard probe sketch for an Uno (5 V / 16 MHz): tach wave on D9 with the measured `ITE_READ_GAIN` applied, 31.25 kHz fan drive on D11 — for scope-checking the BC547 stages before the board exists |
 | `firmware/probe-gain/probe-gain.ino` | sweep sketch: an exact ladder of tach claims (900–3000 RPM, 20 s each) with the fan following the ITE's demand, printing the divider's own count — measures the ITE's read gain and logs its fan curve |
@@ -212,8 +214,8 @@ reading), and whether the top is flat or droops under load at the top dwell. The
 ## Build order, short version
 
 1. Identify the four NUC fan‑header wires with a meter — Intel publishes no pinout.
-2. Fit J1, J6, C3, C4. Set the module to 12.0 V with a meter before it is wired in, confirm its
-   current limit is released, then confirm 5 V and 3.3 V.
+2. Fit J1, J6, C3, C4, U3. Set the module to 12.0 V with a meter before it is wired in, confirm its
+   current limit is released, then confirm 3.3 V at U3's output.
 3. Find the fan's stall duty and measure its RPM at two duties; those four numbers are the
    constants at the top of the sketch.
 4. Read TP1 with a frequency counter — it must equal `rpm / 30` Hz exactly, it is a hardware timer.
@@ -230,13 +232,13 @@ Mini*, Processor → **ATmega328 (3.3V, 8MHz)**.
 
 ```
 cd ..
-sh logs/export.sh                       # rebuilds exports/: PDF, SVG, BOM, Gerbers, drill, placement
+sh logs/export.sh                       # rebuilds exports/: PDF, SVG, BOM, Gerbers, drill
 kicad-cli sch erc nuc-fan-controller.kicad_sch --output logs/erc.json --format json --severity-all
+python3 logs/build1l.py                 # the board is generated: parts, drawn bars, holes, router
 kicad-cli pcb drc nuc-fan-controller.kicad_pcb --output logs/drc.json --format json \
-    --severity-all --schematic-parity --refill-zones --save-board
-docker run --rm -v "$PWD/logs/routing:/work" eclipse-temurin:25-jre \
-    java -Djava.awt.headless=true -jar /work/freerouting.jar \
-    -de /work/nuc-fan-controller.dsn -do /work/nuc-fan-controller.ses -mp 150
+    --severity-all --refill-zones --save-board
+python3 logs/pourcheck.py               # models KiCad's pour fill; writes logs/pour.png
+python3 logs/verify.py                  # nets, pour island, shorts, netlist parity
 ```
 
 **`layout.py`, `genwires.py` and `applywires.py` are parked, and running them now would undo work.**

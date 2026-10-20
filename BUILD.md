@@ -1,11 +1,11 @@
 # nuc-fan-controller — Mode B (19 V → 12 V fan supply, follows the NUC's PWM, simulates the tach)
 
-A 124 × 85 mm two-layer board that sits between a 6th-gen NUC's processor-fan header and a
-12 V fan in a custom enclosure. It does four things:
+An 88.9 × 76.2 mm single-copper-layer board — small enough to etch at home — that sits between a 6th-gen
+NUC's processor-fan header and a 12 V fan in a custom enclosure. It does four things:
 
 1. brings **12 V** to the fan from an **off-board XL4016E1 step-down module** that plugs into
    J6 (19 V in on pin 3, its two returns on pins 1–2, 12 V out on pin 4);
-2. makes **5 V then 3.3 V** from that 12 V for a 3.3 V / 8 MHz Arduino Pro Mini;
+2. makes **3.3 V** from that 12 V for a 3.3 V / 8 MHz Arduino Pro Mini;
 3. reads the **PWM duty the ITE is asking for** and drives the fan at that duty through a
    12 V low-side switch;
 4. reports a **tach rate** that matches what that duty would really produce, so the ITE's
@@ -25,11 +25,12 @@ The old Mode A board (fixed-RPM tach simulator only) is archived in
 |---|---|
 | `nuc-fan-controller.kicad_pro` / `.kicad_sch` / `.kicad_pcb` | the project |
 | `exports/nuc-fan-controller_schematic.pdf` / `.svg` | schematic, openable without KiCad |
-| `exports/nuc-fan-controller_board.pdf` | top plot: F.Cu, silk, mask, outline |
-| `exports/nuc-fan-controller_board_bottom.pdf` | bottom plot: B.Cu, silk, mask, outline |
-| `exports/nuc-fan-controller_board.svg` | top view fitted to the board outline |
-| `exports/nuc-fan-controller_bom.csv` | 32 rows — the four mounting holes are board-only, so they are correctly not in it. The buck module is a purchased part, so it is not in it either |
-| `exports/fab/` | 8 Gerbers + `nuc-fan-controller.drl` + `_pos.csv` + `job.gbrjob`, ready to zip |
+| `exports/nuc-fan-controller_board.pdf` | the board as KiCad draws it: F.Cu, silk, mask, outline |
+| `exports/nuc-fan-controller_board.svg` | the same, fitted to the board outline |
+| `exports/nuc-fan-controller_etch_copper.pdf` / `.svg` | **F.Cu and Edge.Cuts at 1:1** — print with scaling off and iron it; the black is the copper that stays. The SVG is 88.90 × 76.20 mm exactly |
+| `exports/nuc-fan-controller_etch_negative.pdf` | the same plot inverted, for a process that removes what is black |
+| `exports/nuc-fan-controller_bom.csv` | 30 lines — the mounting holes and the 0 Ω bridge R11 are board-only, so they are correctly not in it, and neither is the buck module or the Pro Mini |
+| `exports/fab/` | 4 Gerbers (F.Cu, F.Silkscreen, F.Mask, Edge.Cuts) + `nuc-fan-controller.drl` + `job.gbrjob` |
 | `firmware/nuc-tach-modeB/nuc-tach-modeB.ino` | the sketch |
 | `firmware/nuc-tach-modeA/` | the previous fixed-RPM sketch, kept for reference |
 | `firmware/probe-uno/`, `probe-gain/`, `probe-loop/`, `probe-temp/`, `probe-divider/` | the breadboard sketches the measurements below were made with |
@@ -38,7 +39,10 @@ The old Mode A board (fixed-RPM tach simulator only) is archived in
 | `bench/data/` | the raw logs behind every number in this file: 1 Hz traces of the divider reading, and of the NUC's temperatures — which pair is which run is the table below |
 | `docs/bench/` | the bench photos and the fan-response graph the README shows |
 | `logs/erc.txt`, `logs/drc.txt` | the last ERC and DRC runs, as KiCad's JSON reports (`.txt` so they sit in the repo; the `.json` copies the commands write are scratch and gitignored, along with `logs/netlist.net` and `logs/wires.inc`) |
-| `logs/layout.py`, `logs/genwires.py`, `logs/applywires.py`, `logs/export.sh` | the design's own tools: the layout and its geometry checks, the wire generator, the splice that puts its output into the schematic, and the script that rebuilds every file in `exports/` |
+| `logs/pour.png` | what `logs/pourcheck.py` sees: the pour, the copper that walls it, and every pad |
+| `logs/build1l.py`, `logs/getfp.py`, `logs/fp-templates.inc`, `logs/setrules.py` | the board is *generated*: its parts, drawn bars, holes and router live in `build1l.py`; `getfp.py` clones the footprint artwork out of the KiCad 10 libraries into `fp-templates.inc`; `setrules.py` writes the home-etch rules into the project file |
+| `logs/pourcheck.py`, `logs/verify.py` | the two checks KiCad cannot do: whether the pour is one island that reaches every GND pad, and whether every net is one piece of copper and matches the schematic pin by pin |
+| `logs/genwires.py`, `logs/applywires.py`, `logs/export.sh` | the schematic wire generator, the splice that puts its output into the schematic, and the script that rebuilds every file in `exports/` |
 
 **Which log is which run.** The Uno's logs print one line per second and carry no timestamps; the NUC's
 logs are epoch-stamped with `PHASE` markers, so a pair is aligned by the offset the capture scripts were
@@ -55,19 +59,22 @@ starts logging). `analyze-heat.py` takes that offset as an argument.
 | `hold.log` | `hold-temps.log` | claim frozen, fans off, a 300 s four-core ramp then **1200 s at a two-core load** so the board sits at 68.5–69 °C for sixteen flat minutes — the time-at-temperature test. Its `baseline` loop was left out of the capture script, so the log starts mid-ramp at 41 °C |
 | `nucmon-idle.log` | — | the NUC's own sensors at idle, for the record |
 
-**ERC: 0 violations.** **DRC: 0 violations, 0 unconnected items** after
-`kicad-cli pcb drc --schematic-parity --refill-zones` (2026-10-19).
+**ERC: 0 violations.** **DRC: 0 errors** after `kicad-cli pcb drc nuc-fan-controller.kicad_pcb
+--refill-zones --save-board` (2026-10-20), with 26 `lib_footprint_mismatch` warnings and 1
+`unconnected_items` warning, both explained under *Board*: every footprint on this board is a modified
+copy of a library footprint, and the one thing joining the two halves of `FAN_PWM` is the 0 Ω bridge R11,
+which a board-only ratsnest cannot know is a part.
 
-Parity reports **one warning**, and it is the intended one: `Pad missing net given by
-schematic (unconnected-(J2-Pin_4-Pad4))`. J2 pin 4 is the NUC header's fan-supply wire,
-which this board deliberately does not connect; `kicad-cli` names a no-connect pin as a
-net and then complains that the pad has no net. It is a wording artefact, not a wiring
-error — every other pad on the board matches the schematic exactly.
+`logs/verify.py`, which does not care what KiCad thinks, reports: every net is one piece of copper
+(`FAN_PWM`'s two pieces joined by R11), the pour is one island of 5 009 mm² and every GND pad lies inside
+it, no copper of two nets touches, and the board matches the schematic netlist pin by pin on all 30
+components.  The schematic's own no-connect is J2 pin 4, the NUC header's fan-supply wire, which this
+board deliberately does not connect.
 
 The schematic is drawn with **wires, not net labels**: every pin reaches its neighbour
-through a drawn wire, and the rails are `power:+12V / +5V / +3V3 / GND` symbols sitting on
-the pins. Every signal net carries a name tag (`19V`, `5V`, `FAN_SW`, `BASE`,
-`FAN_GATE`, `GATE`, `TACH_BASE`, `NUC_TACH`, `NUC_PWM`, `PWM_IN`, `TACH_OUT`, `FAN_PWM`) so
+through a drawn wire, and the rails are `power:+12V / +3V3 / GND` symbols sitting on
+the pins. Every signal net carries a name tag (`19V`, `FAN_SW`, `BASE`,
+`FAN_GATE`, `GATE`, `TACH_BASE`, `NUC_TACH`, `NUC_PWM`, `PWM_DIV`, `PWM_IN`, `TACH_OUT`, `FAN_PWM`) so
 the print, the netlist, the board and the Gerber netlist all use the same readable names.
 Delete a tag and KiCad renames that net to `Net-(…)` everywhere downstream.
 
@@ -76,14 +83,15 @@ Delete a tag and KiCad renames that net to `Net-(…)` everywhere downstream.
 ## The circuit, in five blocks
 
 ```
-A. 19 V in, the module, 12 V out            B. 12 V → 5 V → 3.3 V
-   J1 19V IN ─ 19V ─ J6 pin 3                 +12V ─ U2 AMS1117-5.0 ─ 5V ─ U3 AMS1117-3.3 ─ +3V3
-   J1 pin 2 ─ GND ─ J6 pin 2                   C5 10µ + C6 100n on 5V   C7 10µ + C8 100n on 3V3
+A. 19 V in, the module, 12 V out            B. 12 V → 3.3 V, for the Pro Mini only
+   J1 19V IN ─ 19V ─ J6 pin 3                 +12V ─ U3 AMS1117-3.3 ─ +3V3
+   J1 pin 2 ─ GND ─ J6 pin 2                   C7 10µ + C8 100n on 3V3
    J6 pin 1 ─ GND                              C9 100p sits on NUC_TACH, TP1 is its test point
    J6 pin 4 ─ +12V ─ C3 470 µ/25V ─ C4 100n ─ GND
    J6 is the module's socket: 19 V in on 3, its two returns on 1 and 2,
    12 V out on 4. The XL4016E1 itself is not on this board — it is bolted to
    the enclosure and connected to J6 with a four-wire harness.
+   There is no 5 V rail anywhere on this board: a drive's 5 V must never come from here.
 
 C. NUC interface (signals only)             D. 12 V fan speed drive
    J2  NUC fan header                        FAN_PWM (from D11) ─ R6 1k ─ BASE ─ R7 10k ─ GND
@@ -135,37 +143,41 @@ leaves the edges alone.
 
 ## BOM, and where the parts came from
 
-All through-hole except the two SOT-223 regulators, all already in the cabinet. `docs/parts-collection.html`
-is the same list cut as a walk-the-cabinet checklist, with quantities including spares and the measurements
-each part has to give up before its footprint can be fixed.
+All through-hole except one SMD part — U3, a TO-252 — which is hand-solderable without a stencil.  All
+already in the cabinet.  `docs/parts-collection.html` is the same list cut as a walk-the-cabinet checklist,
+with quantities including spares and the measurements each part has to give up before its footprint can be
+fixed.
 
 | Ref | Value | Footprint | Cabinet |
 |---|---|---|---|
-| C3 | 470 µF 25 V | `Capacitor_THT:CP_Radial_D10.0mm_P5.00mm` — **the cabinet's can is 8×20 mm, so this footprint waits on its lead pitch** | L1 C1 (6) |
-| C4 | 100 nF | `Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm` | L1 C9 (30) |
-| U2 | AMS1117-5.0 | `Package_TO_SOT_SMD:SOT-223-3_TabPin2` | L1 B1 (8) |
-| U3 | AMS1117-3.3 | `Package_TO_SOT_SMD:SOT-223-3_TabPin2` | L1 B1 (19) |
-| C5, C7 | 10 µF | `Capacitor_THT:CP_Radial_D6.3mm_P2.50mm` | L1 D3 (4), spare pool L1 C1 (19) |
-| C6, C8, C11, C12 | 100 nF | `Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm` | L1 C9 (30) |
-| C9 | 100 pF | `Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm` | L1 C9 (8) |
-| C10 | 1 µF | `Capacitor_THT:CP_Radial_D8.0mm_P3.50mm` | L1 E7 (8) |
+| C3 | 470 µF 25 V | `Capacitor_THT:CP_Radial_D8.0mm_P3.50mm` — the board puts its pads 5.08 mm apart; **the cabinet's 8×20 can has to give up its lead pitch** | L1 C1 (6) |
+| C4, C8, C11, C12 | 100 nF | `Capacitor_THT:C_Disc_D6.0mm_W2.5mm_P5.00mm` — the library draws 5.00 mm pitch, the board uses 5.08 so the pads sit on the grid | L1 C9 (30) |
+| C7 | 10 µF | `Capacitor_THT:CP_Radial_D6.3mm_P2.50mm` | L1 D3 (4), spare pool L1 C1 (19) |
+| C9 | 100 pF | `Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm` | L1 C9 (8) |
+| C10 | 1 µF | `Capacitor_THT:CP_Radial_D6.3mm_P2.50mm` | L1 E7 (8) |
+| U3 | AMS1117-3.3 | `Package_TO_SOT_SMD:TO-252-3_TabPin2` — the cabinet's TO-252 part; **the SOT-223 in the same drawer will not fit these pads** | L1 B1 (19) |
 | R3 | 4.7 kΩ | `Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal` | R1 B2 |
 | R4 | 2.2 kΩ | same | R1 A2 |
 | R5, R7, R10 | 10 kΩ | same | R1 B2 |
 | R2, R6, R8 | 1 kΩ | same | R1 A2 |
 | R9 | 120 Ω | same | R1 B1 |
+| **R11** | **0 Ω — board only, not in the schematic** | same DIN0204 footprint | the bridge that carries `FAN_PWM` over the divider row: a 0 Ω, a scraped-off component lead, or a staple of bare wire |
 | Q1, Q2 | BC547B | `Package_TO_SOT_THT:TO-92_Inline_Wide` | R1 D3 (20) — **meter them first, see "Which way round a BC547 goes"** |
 | Q3 | IRFZ44N | `Package_TO_SOT_THT:TO-220-3_Vertical` | R1 B4 (12) |
-| D2 | 1N5819 | `Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal` | L1 E1 (30) |
-| J1 | 19 V IN | `Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical` | L1 E9 (7) |
-| J2 | NUC fan header | `Connector:FanPinHeader_1x04_P2.54mm_Vertical` | L1 E9 — snap a 5-pin strip to 4 |
-| J7, J3, J4 | FAN 1 / FAN 2 / FAN 3 | `Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical` | L1 E9 (7) |
-| J5 | Pro Mini | `Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical` | L1 E9 (7) |
-| J6 | BUCK MODULE — 1, 2 GND · 3 19 V · 4 12 V | `Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical` | L1 E9 — snap a 5-pin strip to 4 |
+| D2 | 1N5819 | `Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal` — kept at the library's 10.16 mm pitch, so the silk outline matches the part | L1 E1 (30) |
+| J1, J3, J4, J7 | 19 V IN · FAN 1 · FAN 2 · FAN 3 | `Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical` — **male** strips | L1 E9 (7) — snap from a 5-pin strip |
+| J6 | BUCK MODULE — 1, 2 GND · 3 19 V · 4 12 V | `Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical` — male | L1 E9 — snap a 5-pin strip to 4 |
+| J5 | Pro Mini | `Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical` — male | L1 E9 (7) — a 5-pin strip, as it comes |
+| J2 | NUC fan header | `Connector:FanPinHeader_1x04_P2.54mm_Vertical` — the shrouded 4-pin header the NUC's fan plug mates with.  The board's copy has its retention-peg hole left undrilled: the peg lands on the `NUC_PWM` lane | L1 E9 — snap a 5-pin strip to 4, shrouded if the cabinet has one |
 | TP1 | TACH test point | `TestPoint:TestPoint_Pad_D1.5mm` | no part: a bare pad |
-| MH1–4 | M3 mounting holes | `MountingHole:MountingHole_3.2mm_M3` | no part: a drilled hole |
+| MK1–4 | M3 mounting holes | `MountingHole:MountingHole_3.2mm_M3` | no part: a 3.2 mm hole |
 | — | Arduino Pro Mini **3.3 V / 8 MHz** | 5-pin header into J5 | L1 C5 (1) |
 | — | **XL4016E1 step-down module**, 19 V in → 12 V out | off-board, bolted to the enclosure, four wires into J6 | L1 A10 (1) |
+
+The BOM csv KiCad writes has 30 lines, not 35: R11, the four mounting holes, the module and the Pro Mini
+are not schematic components, so they are correctly absent from it.  They are on this table because the
+table is what gets built.
+
 
 **Why the buck is a module now.** This board used to build its converter out of parts — LM2596T-ADJ,
 a 100 µH 6 A toroid, a 1N5822 catch diode, and a 10 kΩ trimmer in the feedback divider with R1 1 kΩ
@@ -235,8 +247,7 @@ so keep the SOT-223.
 | Rail | What hangs off it | Worst case |
 |---|---|---|
 | 19 V in | J1 → J6 → the module's input | 0.4 A at 12 V / 0.3 A out, ~90 % efficiency |
-| +12 V | J6 pin 4, C3/C4, U2, R8, D2, J7, J3, J4 | **0.3 A, measured** — three 12 V fans at full speed, 300 mA together |
-| 5 V | U3's input, C5/C6 | ~30 mA |
+| +12 V | J6 pin 4, C3/C4, U3, R8, D2, J7, J3, J4 | **0.3 A, measured** — three 12 V fans at full speed, 300 mA together |
 | +3V3 | Pro Mini, C7/C8, the divider's load side | ~25 mA |
 | FAN_SW | Q3's drain, J7/J3/J4 pin 2, D2, C12 | 0.3 A pulsed |
 
@@ -244,15 +255,9 @@ so keep the SOT-223.
 100 mA each, 3.6 W. The board has one 2-pin connector per fan (J7, J3, J4), so each carries 0.1 A through a
 header rated at 3 A. That is 0.3 A out of an 8 A module — under 4 % of its rating, heatsinks
 cold — and the IRFZ44N dissipates I²·Rds(on) = 0.3² × 0.045 ≈ **0.004 W**, with a 55 V Vds and a 3 A
-catch diode behind a fan bank that never asks for either. The `Power` net class — 19V, +12V, FAN_SW,
-+3V3 and GND — is 1.5 mm wide, which at 0.3 A on 35 µm copper is a couple of degrees above ambient; the
-GND pours (both layers, 322 stitching vias) carry the return current as a plane rather than as a trace.
-The class patterns are held at the renamed nets: they once carried the pre-rename `Net-(C1-Pad1)` strings,
-which left 19V and FAN_SW routed at 0.2 mm, and the `SW` pattern went with the switch node when the
-converter left the board. It happened a second time when the KiCad update renamed `FAN_SW` to
-`Net-(C12-Pad1)` and `PWM_DIV` to `Net-(R3-Pad2)` on the board — a net that drops out of its class keeps the
-copper it already has but takes the 0.25 mm clearance and the future width with it, so the names were put
-back by hand and the board re-checked.
+catch diode behind a fan bank that never asks for either. On this board the current is carried by drawn
+bars 1.80 mm wide — 0.3 A through 1.8 mm of 35 µm copper is a couple of degrees above ambient — and the
+return goes back through the ground pour, 5 009 mm² of it, rather than through a trace.
 
 One thing the small load does bring. The module's inductor ripple is ≈0.16 A peak-to-peak, which puts its
 continuous-conduction boundary near **0.08 A**, and fan current scales with speed: at the bottom of the
@@ -261,9 +266,9 @@ discontinuous conduction — not harmful, but it is where a buck becomes audible
 Two things already on the board answer it: C3 470 µF sitting on the rail, and `FAN_DUTY_MIN`, which keeps
 the fan idling at its stall duty instead of at a duty so low the converter starts ringing.
 
-The two LDOs drop 7 V and 1.7 V at ~25 mA: 0.18 W and 0.04 W, both trivial for SOT-223.
-Do not hang anything bigger off 5 V — U2 is a 1 A part and its junction rises fast in a
-closed enclosure.
+U3 drops 12 V to 3.3 V at ~25 mA: 8.7 V × 0.025 A = **0.22 W**, trivial for a TO-252 with its tab soldered
+to a copper bar.  There is no 5 V rail on this board; the Pro Mini and the sense divider are all it powers.
+Do not hang anything bigger off 3.3 V — U3 is a 1 A part and its junction rises fast in a closed enclosure.
 
 ---
 
@@ -316,29 +321,85 @@ The tach line sinks 1–5 mA into the ITE's pull-up and the PWM divider draws 5 
 
 ## Board
 
-- 124.0 × 85.0 mm, 2 layers, four M3 mounting holes at the corners.
-- **GND poured on both layers** (0.5 mm clearance, thermal relief) with 322 stitching vias,
-  so every GND pad lands on a plane on the layer it sits on.
-- Net classes: `Power` at **1.5 mm** track / 0.25 mm clearance / 0.7 mm via for `19V`, `+12V`,
-  `FAN_SW`, `+3V3` and `GND`; everything else (the signals) at the 0.2 mm default.
-- Routed by Freerouting (Specctra DSN out, SES back in): 112 track segments, 0 unrouted,
-  0 violations at the router's own rules, then re-verified against KiCad's rules. The board now
-  carries 143 segments: the router's set, plus what the module swap, the third fan connector and
-  the BC547 pad swap needed by hand.
-- Flow is left to right: the 19 V entry (J1) and the module header (J6) at the left, the 12 V rail
-  across the middle to the LDOs and the Pro Mini header, the NUC interface along the top, the fan
-  drive and the three fan connectors down the right edge.
-- `exports/fab/` plots as-is for a 2-layer prototype order.
+**88.90 × 76.20 mm, one copper layer, made at home.** The single layer is F.Cu, and F.Cu is the
+component side: pads, traces, the pour and every part are on the same side, so the copper you etch is
+the copper you solder to and nothing about the board is mirrored.  (The two-layer board this replaced was
+124.0 × 85.0 mm; it is in git, and `exports/` no longer carries a bottom plot because there is no bottom.)
 
-The layout note that replaced the old switch-node one: **there is no switching node on this board
-any more.** J1 and J6 sit together at the left edge — 19 V arrives at J1, runs 12 mm to J6 pin 3,
-and the module's 12 V comes back on J6 pin 4 and runs down and across to C3 (470 µF) at the middle
-of the rail, 48 mm away at 1.5 mm. The module's own output electrolytic does the bulk filtering at
-the module; C3 and C4 are the board's local decoupling where the rail lands. Two things follow for
-the build: the module's 12 V return goes back through J6's pins 1–2, which are 2.54 mm apart from
-its 19 V and 12 V pins, so the module's return current enters the GND plane at the same point the
-sense divider's ground does rather than somewhere down the rail; and the left third of the board is
-now empty, which is where the enclosure's wiring and the module's harness have room.
+- Four M3 mounting holes, 5.08 mm in from the left and right edges, 5.08 mm below the top edge and
+  7.62 mm above the bottom edge.  Their positions are provisional: they move when the enclosure is measured.
+- **GND is a pour over the whole board** — 5 009 mm² filled, one island — with `connect_pads yes`, so the
+  fill bonds solidly to every GND pad.  Thermal-relief spokes would be four thin necks per pad to
+  over-etch and they buy nothing at these currents.  `logs/verify.py` checks the thing DRC cannot: that
+  every GND pad lies inside *that one island*, not in a pocket the pour never reaches.
+- The rules, each one a number a home process can hold:
+
+  | rule | value | why |
+  |---|---|---|
+  | clearance, every net | 0.70 mm | the isolating scratch a toner-transfer etch can be trusted to leave |
+  | minimum track | 0.70 mm | the same scratch, on the other side of the gap |
+  | drawn rails (`+12V`, `FAN_SW`, `19V`) | 1.80 mm | 0.3 A through 1.8 mm of 35 µm copper is a few °C, and a wide rail survives a sloppy etch |
+  | copper to board edge | 0.50 mm | the outline is sawn or cut, and copper chips at the cut |
+  | minimum drill | 0.90 mm | below that a hand drill wanders; the drill file holds 0.90 / 1.00 / 1.02 / 1.10 / 3.20 mm |
+  | maximum pad | 1.80 mm | on a 2.54 mm grid two 1.80 mm pads still leave 0.74 mm, which is the clearance rule |
+  | pour minimum thickness | 0.80 mm | thinner slivers of pour etch clean off |
+  | annular ring | 0.25 mm | the smallest ring a hand-drilled hole leaves |
+
+- **One crossing, bridged by a 0 Ω resistor.** The Pro Mini's A0 (`PWM_IN`) and D11 (`FAN_PWM`) sit side by
+  side on J5, and where they have to go is on opposite sides of the divider's row: `PWM_IN` is fed from the
+  row's own bar, `FAN_PWM` has to climb from the header to the fan drive above it.  On one layer there is
+  nothing to route around — the divider row spans the band and the `FAN_PWM` column runs from the header up
+  through it.  So **R11**, a 0 Ω resistor (a scraped-off lead, or a staple of bare wire, does the same job),
+  carries `FAN_PWM` over the divider row at (53.34, 48.25).  R11 is a board part only: the schematic has no
+  such component, and the BOM lists it as one.
+- Everything else is a crossing-free route.  The nets that would fight each other are **drawn as bars**
+  rather than handed to the router — `+12V`, `FAN_SW`, `19V`, `+3V3`, `FAN_PWM`, `NUC_TACH`, `NUC_PWM`,
+  `TACH_OUT`, `TACH_BASE`, `PWM_IN` — because a long trace left to an A* wanders to the board perimeter and
+  walls the ground pour off; the router finishes only the short legs between them.
+- Flow: 19 V arrives at J1 top-right and goes to the module through J6; the module's 12 V comes back on J6
+  pin 4 and runs left along the **+12 V rail at y = 17.78**, with a riser up the right edge at x = 81.28 to
+  the 3.3 V regulator U3; the **fan rail (FAN_SW) at y = 20.32** runs under the three fan connectors, which
+  straddle the two rails with no routing at all, and lifts at x = 66.04 to Q3's drain and at x = 73.66 to
+  D2's cathode; the fan drive (Q2, R6–R10, Q3) is the band at y = 25–43; the tach front end and the PWM
+  divider are the band at y = 50–64; the NUC's fan header J2 sits bottom-left and the Pro Mini's header J5
+  runs along the bottom edge, with the 3.3 V rail 5.08 mm above it so a trace can still come down onto
+  every pin but the one its own stub lands on.
+- How it is made, and the loop that keeps it honest:
+
+  ```
+  python3 logs/build1l.py            # writes the board from PARTS / BARS / HOLES in the script
+  kicad-cli pcb drc nuc-fan-controller.kicad_pcb --refill-zones --save-board
+  python3 logs/pourcheck.py          # models KiCad's fill, writes logs/pour.png
+  python3 logs/verify.py             # nets, pour island, shorts, netlist parity
+  ```
+
+  `logs/fp-templates.inc` is the footprint artwork cloned out of the KiCad 10 libraries by `logs/getfp.py`
+  (regenerate it, never hand-edit it); `logs/setrules.py` writes the rules above into the project file.
+- **DRC after that loop: 0 errors.**  What is left is 26 `lib_footprint_mismatch` warnings and 1
+  `unconnected_items` warning, and both are the board telling the truth:
+  * every footprint here is a *modified* copy — drills enlarged to ≥ 0.90 mm, pads capped at 1.80 mm,
+    several pitches re-spaced onto the 2.54 mm grid — so KiCad is right that they differ from the library
+    copies, which is exactly the point of a home-etch board;
+  * the ratsnest wants copper joining the two halves of `FAN_PWM`, and the thing joining them is R11, which
+    a board-only ratsnest cannot know is a component.  It is downgraded to a warning in the project file
+    (`logs/setrules.py`) because `logs/verify.py` checks the real question: every net is one piece of
+    copper, with R11 named as the join.
+- Etching: `exports/nuc-fan-controller_etch_copper.pdf` and `.svg` plot F.Cu and Edge.Cuts at 1:1 — the SVG
+  is 88.90 × 76.20 mm exactly.  Print with scaling off, iron the toner onto copper-clad, etch, drill at the
+  five sizes in `exports/fab/nuc-fan-controller.drl`, then cut to the outline.  `..._etch_negative.pdf` is
+  the same plot inverted, for a process that removes what is black.
+- `exports/fab/` is 4 Gerbers (F.Cu, F.Silkscreen, F.Mask, Edge.Cuts) plus the drill file and `job.gbrjob`.
+- Two things this layout waits on, both of which are measurements rather than decisions: **J5** is drawn as
+  one 1×05 header, but a real Pro Mini's D9/D11 are on one row and A0/VCC/GND on the other, so J5 may become
+  two headers; and the outline only becomes final when the enclosure's standoff positions are known.
+
+The layout note that replaced the old switch-node one: **there is no switching node on this board any more.**
+19 V arrives at J1, runs to J6 pin 3, and the module's 12 V comes back on J6 pin 4 onto the rail.  The
+module's own output electrolytic does the bulk filtering at the module; C3 (470 µF) and C4 are the board's
+local decoupling where the rail lands, 30 mm along the rail from J6.  The module's return goes back through J6's pins 1–2, which are 2.54 mm from its 19 V and 12 V pins,
+so the module's return current enters the pour at the same point the sense divider's ground does rather than
+somewhere down the rail.
+
 
 ---
 
@@ -382,11 +443,11 @@ R8 against the 12 V rail.
    limit is engaged — turn that trimmer the other way until the rail holds above ~11 V through the
    start. A current-limited module feeding a stalled fan is a fan that never reaches the duty the
    ITE asked for, and the sketch will happily keep claiming it did.
-4. Then fit U2/U3 and check 5 V and 3.3 V. Then meter Q1/Q2 against "Which way round a BC547 goes" and fit
-   Q1/Q2/Q3.
+4. Then fit U3 (the one SMD part: tin one pad, seat it, solder the tab, then the rest) and check 3.3 V.
+   Then meter Q1/Q2 against "Which way round a BC547 goes" and fit Q1/Q2/Q3.
 5. Wire the module to the board with four short wires, twisted in pairs: module IN+ and IN− onto
    **J6 pins 3 and 2**, module OUT+ and OUT− onto **J6 pins 4 and 1**. The board's silkscreen beside
-   J6 reads `1,2 GND 3 19V 4 12V`, and J1 pin 1 is the +19 V that feeds J6 pin 3.
+   J6 reads `module: 1 2 GND 3 19V 4 12V`, and J1 pin 1 is the +19 V that feeds J6 pin 3.
 
 Check the 19 V tap's polarity before plugging in. The module's own record claims input reverse‑polarity
 protection, but nothing on this board has any: the 19 V runs from J1 to J6 as a bare track and C3 is a

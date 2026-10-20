@@ -3658,6 +3658,17 @@
 		)
 		(uuid "c0994afa-69b1-4961-a282-9cbea5ecf93a")
 	)
+	(text "U3 takes 12 V straight off the module: this board has no 5 V rail, and a drive's 5 V must never come from here"
+		(exclude_from_sim no)
+		(at 35.56 76.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "63097390-f467-49f3-8e48-c84323f6f855")
+	)
 	(junction
 		(at 60.96 104.14)
 		(diameter 0)
@@ -3682,12 +3693,7 @@
 		(color 0 0 0 0)
 		(uuid "2717de7a-a12c-4c50-a695-4cb682d65a60")
 	)
-	(junction
-		(at 193.04 44.45)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "39180188-bf4a-4147-82aa-b29149ba2134")
-	)
+
 	(junction
 		(at 179.07 127)
 		(diameter 0)
@@ -3718,6 +3724,16 @@
 	)
 	(wire
 		(pts
+			(xy 161.29 44.45) (xy 201.93 44.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "05d24e58-e298-40a1-9bac-bfcc2bd9c50f")
+	)
+	(wire
+		(pts
 			(xy 129.54 127) (xy 129.54 124.46)
 		)
 		(stroke
@@ -3726,16 +3742,7 @@
 		)
 		(uuid "1bd1e9fd-07f1-43c6-aea6-ac0923c4d6b8")
 	)
-	(wire
-		(pts
-			(xy 193.04 44.45) (xy 201.93 44.45)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1d8e3e40-857f-47de-868b-e64e50e42f9c")
-	)
+
 	(wire
 		(pts
 			(xy 81.28 132.08) (xy 87.63 132.08)
@@ -3796,16 +3803,7 @@
 		)
 		(uuid "4080b10f-d5d2-466a-8fe2-efe83d1f90c1")
 	)
-	(wire
-		(pts
-			(xy 161.29 44.45) (xy 162.56 44.45)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4803202b-29f3-4f55-9310-c1e66dc49287")
-	)
+
 	(wire
 		(pts
 			(xy 44.45 104.14) (xy 53.34 104.14)
@@ -3846,16 +3844,7 @@
 		)
 		(uuid "646a8064-4851-4304-a6f2-fcc8a2934eae")
 	)
-	(wire
-		(pts
-			(xy 185.42 44.45) (xy 193.04 44.45)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6746da12-64b9-43e5-9d07-fe6c9c0edcdd")
-	)
+
 	(wire
 		(pts
 			(xy 49.53 137.16) (xy 49.53 139.7)
@@ -4176,16 +4165,7 @@
 		)
 		(uuid "e375c6db-285c-4a08-8d06-aef8a80e32e4")
 	)
-	(wire
-		(pts
-			(xy 193.04 44.45) (xy 193.04 41.91)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ea821217-c743-4905-8fba-12c379277189")
-	)
+
 	(wire
 		(pts
 			(xy 161.29 127) (xy 179.07 127)
@@ -4206,16 +4186,7 @@
 		)
 		(uuid "f629009c-34e2-401c-ae32-39afec59a2c7")
 	)
-	(wire
-		(pts
-			(xy 177.8 44.45) (xy 185.42 44.45)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f6662d08-65c3-4ee3-a674-13a7987e5e08")
-	)
+
 	(wire
 		(pts
 			(xy 114.3 49.53) (xy 121.92 49.53)
@@ -4376,28 +4347,7 @@
 			)
 		)
 	)
-	(global_label "5V"
-		(shape bidirectional)
-		(at 193.04 41.91 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "1fb6bdd3-8317-48eb-9588-b74056bc54a1")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 193.04 41.91 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-	)
+
 	(global_label "FAN_SW"
 		(shape bidirectional)
 		(at 129.54 124.46 90)
@@ -4697,87 +4647,7 @@
 			)
 		)
 	)
-	(symbol
-		(lib_id "Device:C_Polarized")
-		(at 185.42 48.26 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "0336cd28-a870-465d-9d3b-39203a8182b6")
-		(property "Reference" "C5"
-			(at 184.15 52.07 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "10uF"
-			(at 182.118 52.07 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Capacitor_THT:CP_Radial_D6.3mm_P2.50mm"
-			(at 186.385 44.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 185.42 48.26 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Polarized capacitor"
-			(at 185.42 48.26 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "c89cf39d-3e0b-444f-b007-1d9cfae018a5")
-		)
-		(pin "2"
-			(uuid "54baa122-b4fb-4be0-a480-edba425a1a84")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "C5")
-					(unit 1)
-				)
-			)
-		)
-	)
+
 	(symbol
 		(lib_id "Device:C")
 		(at 121.92 53.34 0)
@@ -4811,7 +4681,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm"
+		(property "Footprint" "Capacitor_THT:C_Disc_D6.0mm_W2.5mm_P5.00mm"
 			(at 122.885 49.53 0)
 			(hide yes)
 			(show_name no)
@@ -5441,7 +5311,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:CP_Radial_D10.0mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm"
 			(at 115.265 49.53 0)
 			(hide yes)
 			(show_name no)
@@ -5566,87 +5436,7 @@
 			)
 		)
 	)
-	(symbol
-		(lib_id "Device:C")
-		(at 193.04 48.26 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "26186ca6-9bda-45a7-9dab-b28a2fc960c8")
-		(property "Reference" "C6"
-			(at 194.31 52.07 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "100n"
-			(at 196.342 51.816 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm"
-			(at 194.005 44.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 193.04 48.26 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Unpolarized capacitor"
-			(at 193.04 48.26 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "9cb2b973-e7f0-4fcf-8de8-13385b915ad7")
-		)
-		(pin "2"
-			(uuid "12f18ed6-7e56-48a1-b6b2-03339b4e7df9")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "C6")
-					(unit 1)
-				)
-			)
-		)
-	)
+
 	(symbol
 		(lib_id "power:GND")
 		(at 232.41 52.07 0)
@@ -6463,7 +6253,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+		(property "Footprint" "Package_TO_SOT_SMD:TO-252-3_TabPin2"
 			(at 209.55 49.53 0)
 			(hide yes)
 			(show_name no)
@@ -6672,83 +6462,7 @@
 			)
 		)
 	)
-	(symbol
-		(lib_id "power:GND")
-		(at 185.42 52.07 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "6c683a20-e4ec-4b27-ba9d-c9cccdbb2328")
-		(property "Reference" "#PWR11"
-			(at 185.42 49.53 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 185.42 55.88 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 185.42 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 185.42 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 185.42 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "46943eb8-844c-4092-bf23-5413aa5caa1a")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "#PWR11")
-					(unit 1)
-				)
-			)
-		)
-	)
+
 	(symbol
 		(lib_id "Device:R")
 		(at 53.34 87.63 90)
@@ -7834,83 +7548,7 @@
 			)
 		)
 	)
-	(symbol
-		(lib_id "power:GND")
-		(at 170.18 52.07 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "a9cbe6f9-4482-4e84-a0f5-b2ad4994bea9")
-		(property "Reference" "#PWR10"
-			(at 170.18 49.53 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 170.18 55.88 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 170.18 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 170.18 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 170.18 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "b6a67135-6b28-4d65-9b20-0702d11b0069")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "#PWR10")
-					(unit 1)
-				)
-			)
-		)
-	)
+
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x05")
 		(at 219.71 97.79 180)
@@ -8232,89 +7870,7 @@
 			)
 		)
 	)
-	(symbol
-		(lib_id "Regulator_Linear:AMS1117-5.0")
-		(at 170.18 44.45 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "b47a143e-dd1b-4629-8528-ea1b3f319a50")
-		(property "Reference" "U2"
-			(at 173.482 51.054 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "AMS1117-5.0"
-			(at 163.83 41.148 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-223-3_TabPin2"
-			(at 170.18 49.53 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "http://www.advanced-monolithic.com/pdf/ds1117.pdf"
-			(at 172.72 38.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "1A Low Dropout regulator, positive, 5.0V fixed output, SOT-223"
-			(at 170.18 44.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "e684c5b0-2b60-403c-907a-62402b236feb")
-		)
-		(pin "2"
-			(uuid "bf4fe060-ab51-43fa-bca4-29bcfce7b07e")
-		)
-		(pin "3"
-			(uuid "107b5622-34b7-490a-a059-680e0d6629f2")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "U2")
-					(unit 1)
-				)
-			)
-		)
-	)
+
 	(symbol
 		(lib_id "Device:C_Polarized")
 		(at 224.79 48.26 0)
@@ -8757,7 +8313,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm"
+		(property "Footprint" "Capacitor_THT:C_Disc_D6.0mm_W2.5mm_P5.00mm"
 			(at 192.735 127 0)
 			(hide yes)
 			(show_name no)
@@ -8882,83 +8438,7 @@
 			)
 		)
 	)
-	(symbol
-		(lib_id "power:GND")
-		(at 193.04 52.07 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "cfcfd96c-406d-4fa0-9854-ba03ae7755cc")
-		(property "Reference" "#PWR12"
-			(at 193.04 49.53 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 193.04 55.88 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 193.04 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 193.04 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 193.04 52.07 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "08845ae9-4d91-4a59-96f4-d0da52adf204")
-		)
-		(instances
-			(project "nuc-fan-controller"
-				(path "/e3690d37-65ee-4b2b-94da-91b92cad8941"
-					(reference "#PWR12")
-					(unit 1)
-				)
-			)
-		)
-	)
+
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x02")
 		(at 166.37 124.46 0)
@@ -9627,7 +9107,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm"
+		(property "Footprint" "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm"
 			(at 72.085 104.14 0)
 			(hide yes)
 			(show_name no)
@@ -9866,7 +9346,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm"
+		(property "Footprint" "Capacitor_THT:CP_Radial_D6.3mm_P2.50mm"
 			(at 89.865 87.63 0)
 			(hide yes)
 			(show_name no)
