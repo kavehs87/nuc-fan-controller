@@ -4079,7 +4079,7 @@
 				)
 			)
 		)
-		(property "Value" "80"
+		(property "Value" "120"
 			(at 266.7 158.75 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5515,7 +5515,7 @@
 		)
 		(uuid "1ee4c682-2f12-4836-a20d-bab844f39dc0")
 	)
-	(text "WHY THREE TRANSISTORS\nThe bins hold 12x IRFZ44N, 11x 2N7002 and 6x IRF7416, and no logic-level N-channel\nthat can carry a 12 V / 150 mA fan:\n- 2N7002: Id max 115 mA in my own spec record, and at Vgs = 3.0 V it only conducts\n  52 mA.  As the pass element it starves the fan and burns 408 mW, over its 200 mW\n  rating.  Here it is only a level shifter, never the pass transistor.\n- IRFZ44N: Rds(on) is specified only at Vgs = 10 V, and Vgs(th) is guaranteed\n  2.0 V .. 4.0 V.  Wired straight to the pin, /GATE only reaches 3.0 V (R1/R5\n  divider): a typical unit runs the fan but wastes 12.8 mW, and a worst-case unit\n  (Vgs(th) = 4.0 V) never turns on at all.  sim/variants.py measures every case.\nSo the 3.3 V pin only drives small signals; the +12 V rail does the real gate drive."
+	(text "WHY THREE TRANSISTORS\nThe bins hold 12x IRFZ44N, 11x 2N7002 and 6x IRF7416, and no logic-level N-channel\nthat can carry a 12 V / 100 mA fan:\n- 2N7002: Id max 115 mA in my own spec record, and at Vgs = 3.0 V it only conducts\n  52 mA.  As the pass element it starves the fan and burns 300 mW, over its 200 mW\n  rating.  Here it is only a level shifter, never the pass transistor.\n- IRFZ44N: Rds(on) is specified only at Vgs = 10 V, and Vgs(th) is guaranteed\n  2.0 V .. 4.0 V.  Wired straight to the pin, /GATE only reaches 3.0 V (R1/R5\n  divider): a typical unit runs the fan but wastes 5.2 mW, and a worst-case unit\n  (Vgs(th) = 4.0 V) never turns on at all.  sim/variants.py measures every case.\nSo the 3.3 V pin only drives small signals; the +12 V rail does the real gate drive."
 		(exclude_from_sim no)
 		(at 40 44 0)
 		(effects
@@ -5526,7 +5526,7 @@
 		)
 		(uuid "74629112-06ab-4df2-b8bb-46c856a33612")
 	)
-	(text "HOW IT WORKS\n1. Pin low: Q2 is off, no current flows in R3, so /BOOT is pulled to +12 V.  Q3 (source\n   on +12 V) sees Vgs = 0 and stays off; R5 holds /GATE at 0 V.  The fan is off.\n2. Pin high: R1/R2 give Q2's gate 3.0 V, Q2 turns on and sinks 12 V / 10 k = 1.2 mA, so\n   /BOOT collapses to 12 mV.  Q3 now sees Vgs = -12 V and turns on hard.\n3. +12 V reaches Q1's gate through R4; R4 and R5 form a divider, so /GATE settles at\n   12 V x 10 k / 11 k = 10.9 V - the region where the datasheet quotes 17.5 mOhm.\n4. Q1 is fully enhanced: Rds(on) 16 mOhm, V(drain) 2.4 mV, 0.37 mW lost, and the fan\n   gets the whole 12 V.  The Arduino pin itself never sources more than 0.3 mA.\n5. The logic is not inverted, and at power-up the pin is floating: R2 keeps Q2 off, so\n   Q3 is off, so Q1 is off.  The fan cannot drift on.\n6. Q3's SOURCE must be the +12 V side.  Swap source and drain and the P-FET's body\n   diode feeds +12 V into Q1's gate, and the fan can never switch off.\n7. D1 (1N5819, cathode to +12 V) catches the fan winding's current when Q1 opens:\n   /DRAIN peaks at 12.37 V instead of spiking hundreds of volts.\n8. C1 and C2 are not purchased parts: they are the two MOSFETs' own input capacitances\n   (Ciss) drawn explicitly so the gate RC time constants are visible.  L1 + R6 are a\n   model of the fan - the bins hold no 12 V fan."
+	(text "HOW IT WORKS\n1. Pin low: Q2 is off, no current flows in R3, so /BOOT is pulled to +12 V.  Q3 (source\n   on +12 V) sees Vgs = 0 and stays off; R5 holds /GATE at 0 V.  The fan is off.\n2. Pin high: R1/R2 give Q2's gate 3.0 V, Q2 turns on and sinks 12 V / 10 k = 1.2 mA, so\n   /BOOT collapses to 12 mV.  Q3 now sees Vgs = -12 V and turns on hard.\n3. +12 V reaches Q1's gate through R4; R4 and R5 form a divider, so /GATE settles at\n   12 V x 10 k / 11 k = 10.9 V - the region where the datasheet quotes 17.5 mOhm.\n4. Q1 is fully enhanced: Rds(on) 16 mOhm, V(drain) 1.6 mV, 0.16 mW lost, and the fan\n   gets the whole 12 V.  The Arduino pin itself never sources more than 0.3 mA.\n5. The logic is not inverted, and at power-up the pin is floating: R2 keeps Q2 off, so\n   Q3 is off, so Q1 is off.  The fan cannot drift on.\n6. Q3's SOURCE must be the +12 V side.  Swap source and drain and the P-FET's body\n   diode feeds +12 V into Q1's gate, and the fan can never switch off.\n7. D1 (1N5819, cathode to +12 V) catches the fan winding's current when Q1 opens:\n   /DRAIN peaks at 12.37 V instead of spiking hundreds of volts.\n8. C1 and C2 are not purchased parts: they are the two MOSFETs' own input capacitances\n   (Ciss) drawn explicitly so the gate RC time constants are visible.  L1 + R6 are a\n   model of the fan - the bins hold no 12 V fan."
 		(exclude_from_sim no)
 		(at 196 44 0)
 		(effects
@@ -5537,7 +5537,7 @@
 		)
 		(uuid "6459f14a-cb81-46ff-b395-32d3cf2eefc4")
 	)
-	(text "MEASURED BY sim/run.sh (ngspice)\nfan starts conducting at 2.27 V on the pin        /GATE settles at 10.91 V\nfan current 152 mA, V(drain) 2.4 mV               Rds(on) 15.9 mOhm -> 0.37 mW in Q1\nturn-off spike clamped to 12.37 V                 pin current never above 0.30 mA\n/GATE rise 5 tau = 7.5 us (R4 x C1)               /BOOT rise 5 tau = 85 us (R3 x C2)\nfan L/R = 125 us, so at 1 kHz it is chopped 0..148 mA; average at 50 % duty = 81 mA"
+	(text "MEASURED BY sim/run.sh (ngspice)\nfan starts conducting at 2.27 V on the pin        /GATE settles at 10.91 V\nfan current 102 mA, V(drain) 1.6 mV               Rds(on) 15.7 mOhm -> 0.16 mW in Q1\nturn-off spike clamped to 12.37 V                 pin current never above 0.30 mA\n/GATE rise 5 tau = 7.5 us (R4 x C1)               /BOOT rise 5 tau = 85 us (R3 x C2)\nfan L/R = 83 us, so at 1 kHz it is chopped 0..100 mA; average at 50 % duty = 54 mA"
 		(exclude_from_sim no)
 		(at 40 74 0)
 		(effects
@@ -5548,7 +5548,7 @@
 		)
 		(uuid "4e925467-1793-4e5b-a36c-dccd43c6a6d0")
 	)
-	(text "TRY IT YOURSELF   (Simulator > Run Simulator, then Transient or DC Sweep)\n- Run the DC sweep: /BOOT falls from 12 V to 0.01 V while /GATE jumps from 0 to 10.9 V.\n- Delete Q2, Q3, R3, R4 and C2 and wire R1 straight to /GATE: the fan still runs (149 mA),\n  but Q1 now burns 12.8 mW instead of 0.37 mW.  Then swap in irfz44n_wc.lib: fan stops dead.\n- Shorten R3 to 1 k and watch the turn-off delay shrink from ~55 us to a few us.\n- Remove D1 and look at the /DRAIN spike at turn-off: that is what the diode absorbs.\n- Change V2's PULSE width tw from 500u to 250u (25 % duty): average fan current falls,\n  the pulses the fan sees stay a full 12 V.  Speed control without dimming the motor."
+	(text "TRY IT YOURSELF   (Simulator > Run Simulator, then Transient or DC Sweep)\n- Run the DC sweep: /BOOT falls from 12 V to 0.01 V while /GATE jumps from 0 to 10.9 V.\n- Delete Q2, Q3, R3, R4 and C2 and wire R1 straight to /GATE: the fan still runs (100 mA),\n  but Q1 now burns 5.2 mW instead of 0.16 mW.  Then swap in irfz44n_wc.lib: fan stops dead.\n- Shorten R3 to 1 k and watch the turn-off delay shrink from ~55 us to a few us.\n- Remove D1 and look at the /DRAIN spike at turn-off: that is what the diode absorbs.\n- Change V2's PULSE width tw from 500u to 250u (25 % duty): average fan current falls,\n  the pulses the fan sees stay a full 12 V.  Speed control without dimming the motor."
 		(exclude_from_sim no)
 		(at 40 222 0)
 		(effects
@@ -5625,7 +5625,7 @@
 		)
 		(uuid "63d4ac7b-bc8a-4cab-9c32-d47bff622586")
 	)
-	(text "fan model"
+	(text "fan model: 10 mH + 120 ohm = 100 mA"
 		(exclude_from_sim no)
 		(at 247 170 0)
 		(effects
@@ -5657,6 +5657,17 @@
 			(justify left bottom)
 		)
 		(uuid "6472c335-a475-486d-b68f-3b565f5b5b61")
+	)
+	(text "3 FANS ON ONE OUTPUT (sim/fan_count.py)\n302 mA total, 4.8 mV at the drain, 1.5 mW in Q1, 295 mA peaks through the 1N5819 at\nturn-off (a 1 A part), 141 mA average from the 12 V module.  Four fans also fit; four\n150 mA fans would not - they need 452 mA and the L1 - B7 module only gives 450 mA."
+		(exclude_from_sim no)
+		(at 40 92 0)
+		(effects
+			(font
+				(size 1.4 1.4)
+			)
+			(justify left top)
+		)
+		(uuid "b01f9af8-c8a7-42fc-a13e-f647ba85a7bd")
 	)
 	(sheet_instances
 		(path "/"

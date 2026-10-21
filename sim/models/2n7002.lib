@@ -23,8 +23,9 @@
 *                                                     of drain-source, deep in
 *                                                     the ohmic region
 *
-*  Id(max) in the cabinet record is 115 mA.  The fan wants ~147 mA, so the
-*  2N7002 is used here only as a level shifter - it is NOT the pass element.
+*  Id(max) in the cabinet record is 115 mA.  The fan on this sheet wants ~100 mA,
+*  and at Vgs = 3 V this device can only deliver 52 mA, so the 2N7002 is used here
+*  only as a level shifter - it is NOT the pass element.
 *
 *  Note: a level-1 model has no subthreshold region and a straight-line
 *  transconductance, so its Rds(on) at low Vgs is a rough guess.  What it gets

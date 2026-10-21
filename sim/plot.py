@@ -46,13 +46,13 @@ def main() -> None:
     ax2b = ax2.twinx()
     ax2b.plot(vpin, fan_ma, lw=2.0, color="#1f77b4", label="fan current")
     ax2b.set_ylabel("fan current  [mA]", color="#1f77b4")
-    ax2b.set_ylim(-10, 175)
+    ax2b.set_ylim(-5, 125)
 
     vth = vpin[np.argmax(fan_ma > 20)]
     ax2.axvline(vth, ls="--", color="0.4")
     ax2.annotate(f"fan starts at ~{vth:.2f} V on the pin", (vth + 0.08, 6.4), fontsize=8, color="0.3")
     ax2.annotate("OFF: the fan sees the full 12 V\nacross the MOSFET, no current", (0.15, 11.3), fontsize=8, color="#c0392b")
-    ax2.annotate("ON: V(drain) = I x Rds(on) ~ 2 mV\nthe fan gets ~12 V and runs", (0.15, 1.3), fontsize=8, color="#1f77b4")
+    ax2.annotate("ON: V(drain) = I x Rds(on) ~ 1.6 mV\nthe fan gets ~12 V and runs", (0.15, 1.3), fontsize=8, color="#1f77b4")
     ax2.set_title("DC transfer curve - a MOSFET is a voltage-controlled resistor")
     fig.tight_layout()
     fig.savefig(OUT / "dc_transfer.png", dpi=140)
@@ -74,15 +74,15 @@ def main() -> None:
     axes[1].set_ylabel("V(drain) [V]")
     axes[1].set_ylim(-0.5, 14)
     axes[1].grid(True, alpha=0.3)
-    axes[1].annotate("12.37 V: the fan's inductance flies the node up,\nthe 1N5819 clamps it at 12 V + Vf",
+    axes[1].annotate("12.36 V: the fan's inductance flies the node up,\nthe 1N5819 clamps it at 12 V + Vf",
                      (1.05, 10.4), fontsize=8, color="0.3")
 
     axes[2].plot(t_ms, i_l1 * 1e3, lw=1.4, color="#1f77b4")
     axes[2].set_ylabel("fan current [mA]")
     axes[2].grid(True, alpha=0.3)
-    axes[2].annotate("L/R = 10 mH / 80 ohm = 125 us: at 1 kHz the fan never\n"
-                     "reaches steady state, it is chopped between 0 and 147 mA",
-                     (2.1, 60), fontsize=8, color="0.3")
+    axes[2].annotate("the fan model's L/R = 10 mH / 120 ohm = 83 us: at 1 kHz the fan never\n"
+                     "reaches steady state, it is chopped between 0 and 100 mA",
+                     (2.1, 45), fontsize=8, color="0.3")
 
     axes[3].plot(t_ms, -i_pin_t * 1e3, lw=1.4, color="#7d3c98")
     axes[3].set_ylabel("current the pin sources [mA]")
@@ -111,14 +111,14 @@ def main() -> None:
     axes[0].set_ylim(-1, 13)
     axes[0].set_title("turn-on: /BOOT collapses, /GATE charges through R4")
     axes[0].grid(True, alpha=0.3)
-    axes[0].annotate("/BOOT falls through the 2N7002\n(10 ohm x 0.6 nF, ~6 ns)", (1.2, 8.5), fontsize=8, color="#d35400")
+    axes[0].annotate("/BOOT falls through the 2N7002\n(10 ohm x 1.7 nF, ~17 ns)", (1.2, 8.5), fontsize=8, color="#d35400")
     axes[0].annotate("/GATE rises with tau = R4 x C1\n= 1 kohm x 1.5 nF = 1.5 us\nsettles in 5 tau = 7.5 us",
                      (4.0, 3.0), fontsize=8, color="#2ca02c")
     axes[0].legend(fontsize=8, loc="center right")
 
     axes[1].plot(t[m_off] * 1e6, vdrain_t[m_off], lw=2.0, color="#c0392b", label="V(drain)")
     axes[1].axhline(12.37, ls="--", lw=1.0, color="0.4")
-    axes[1].annotate("clamped at 12 V + 0.37 V by the 1N5819", (555, 11.0), fontsize=8, color="0.3")
+    axes[1].annotate("clamped at 12 V + 0.36 V by the 1N5819", (555, 11.0), fontsize=8, color="0.3")
     axes[1].annotate("/BOOT must charge back to 12 V through R3:\ntau = 10 kohm x 1.7 nF = 17 us\n-> /GATE takes tens of us to fall",
                      (545, 3.5), fontsize=8, color="#d35400")
     axes[1].set_xlabel("time around the pin going low  [µs]")
@@ -131,9 +131,9 @@ def main() -> None:
     ax1b = axes[1].twinx()
     ax1b.plot(t[m_off] * 1e6, i_l1[m_off] * 1e3, lw=1.6, color="#1f77b4", label="fan current")
     ax1b.set_ylabel("fan current [mA]", color="#1f77b4")
-    ax1b.set_ylim(0, 165)
+    ax1b.set_ylim(0, 115)
     ax1b.annotate("the fan keeps spinning: its current\nfreewheels through D1 and decays",
-                  (560, 95), fontsize=8, color="#1f77b4")
+                  (560, 60), fontsize=8, color="#1f77b4")
     fig.tight_layout()
     fig.savefig(OUT / "switching_edge.png", dpi=140)
     plt.close(fig)
@@ -150,7 +150,7 @@ def main() -> None:
     axl.barh(idx, fan, color=["#2ca02c", "#2ca02c", "#1f77b4", "#c0392b", "#1f77b4", "#d35400"])
     axl.set_yticks(idx, labels, fontsize=8)
     axl.set_xlabel("fan current while the pin is high  [mA]")
-    axl.set_xlim(0, 175)
+    axl.set_xlim(0, 115)
     axl.grid(True, alpha=0.3, axis="x")
     axl.invert_yaxis()
     for i, v in zip(idx, fan):
@@ -189,6 +189,17 @@ def main() -> None:
     rds = vds_on / i_fan_dc
     p_mos = vds_on * i_fan_dc
 
+    # the fan model lives on the sheet, so read its L and R from the exported netlist
+    netlist = (OUT / "mosfet-fan-switch.spice").read_text().splitlines()
+    eng = {"m": 1e-3, "u": 1e-6, "n": 1e-9, "p": 1e-12, "f": 1e-15,
+           "k": 1e3, "K": 1e3, "M": 1e6, "G": 1e9, "T": 1e12}.get
+
+    def value(line: str) -> float:
+        token = next(ln for ln in netlist if ln.startswith(line)).split()[3]
+        return float(token[:-1]) * eng(token[-1], 1.0) if token[-1].isalpha() else float(token)
+
+    l_fan, r_fan = value("L1"), value("R6")
+
     print()
     print("  measured from the simulation")
     print("  " + "-" * 68)
@@ -204,7 +215,7 @@ def main() -> None:
     print(f"  /GATE rise 5 tau (R4=1k, C1=1.5n)               : {5*1e3*1.5e-9*1e6:5.1f} µs")
     print(f"  /BOOT rise 5 tau (R3=10k, C2=1.7n)              : {5*10e3*1.7e-9*1e6:5.1f} µs")
     print(f"  /BOOT back at 12 V after the pin goes low       : {boot_off*1e6:5.1f} µs")
-    print(f"  fan L/R time constant                           : {10e-3/80*1e6:5.1f} µs")
+    print(f"  fan L/R time constant                           : {l_fan / r_fan * 1e6:5.1f} µs")
     print(f"  peak fan current during a PWM on-time           : {fan_on*1e3:5.1f} mA")
     print(f"  average fan current at 1 kHz / 50 % duty        : {fan_avg*1e3:5.1f} mA")
     print()

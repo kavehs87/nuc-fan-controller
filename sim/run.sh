@@ -38,5 +38,8 @@ python3 sim/plot.py
 echo "==> comparing the drive options your bin allows"
 python3 sim/variants.py
 
+echo "==> how many fans one output can carry"
+python3 sim/fan_count.py
+
 echo
 echo "done. plots and data are in $OUT/"
