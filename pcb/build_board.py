@@ -85,7 +85,7 @@ def load_footprint(lib_name: str):
     lib, name = lib_name.split(':')
     txt = (FP_DIR / f"{lib}.pretty" / f"{name}.kicad_mod").read_text()
     tree = sexpr(txt)[0]
-    fp = {'name': tree[1], 'pads': [], 'items': [], 'texts': []}
+    fp = {'name': tree[1], 'pads': [], 'items': [], 'texts': [], 'models': []}
     for it in tree[3:]:
         tag = it[0]
         if tag == 'pad':
@@ -110,6 +110,10 @@ def load_footprint(lib_name: str):
             fp['texts'].append(it)
         elif tag in ('fp_line', 'fp_rect', 'fp_poly', 'fp_circle'):
             fp['items'].append(it)
+        elif tag == 'model':
+            # the library's 3D model, so the 3D viewer and `kicad-cli pcb render`
+            # show the real package on the board
+            fp['models'].append(it)
     return fp
 
 
@@ -559,6 +563,8 @@ def emit_footprint(c: Comp, out):
         if net:
             out.append(f'\t\t\t(net {NET_ID[net]} "{net}")')
         out.append('\t\t)')
+    for m in fp['models']:
+        out.append('\t\t' + sexpr_to_str(m))
     out.append('\t)')
 
 

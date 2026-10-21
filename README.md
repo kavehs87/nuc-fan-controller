@@ -442,7 +442,10 @@ stored mirrored, and a top-side view of the board shows them reversed — `Q3` r
 `ƧQ` and pads 1–4 run right-to-left, so that view cannot tell you which pad is pin 1.
 Read the copper-side drawing, not the top render: on the copper side the notch sits
 beside pad 1, and pads 1–3 are the three pads that run straight into the wide +12 V bus.
-`docs/pcb-notes.md` has the picture and the proof.
+Rotate the datasheet's top-view picture 90° counter-clockwise and it is the board. In
+KiCad, `View → Flip Board View` shows the same thing, and the footprints carry their
+3D models so the 3D viewer shows both chips lying on the copper. `docs/pcb-notes.md` has
+the picture and the proof.
 
 The generator's comments and the end of `docs/pcb-notes.md` record the KiCad 10 behaviour
 that had to be pinned down before the DRC would go clean: **a footprint's placement rotation

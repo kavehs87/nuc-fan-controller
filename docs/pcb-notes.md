@@ -39,6 +39,11 @@ kicad-cli pcb render --side bottom --zoom 4.5 --pivot "-0.03,-0.15,0" --backgrou
         --quality high --width 1500 --height 1100 --output docs/pcb-render-smd-copper.png mosfet-fan-switch.kicad_pcb
 ```
 
+The `.kicad_pcb` is **generated** — `pcb/build_board.py` is the source of truth, not the
+board editor. If the board is open in KiCad while you re-run the generator, KiCad will
+say the file changed on disk: choose **File → Revert** rather than saving, or your
+editor session overwrites everything the script wrote.
+
 Files that matter for making the board:
 
 | file | what it is |
@@ -267,6 +272,20 @@ Numbering runs counter-clockwise around the body and the notch is next to pin 1 
 same relationship the chip has in your hand. `Q2` (SOT-23) in the same view: pad 3
 alone on the left (`/BOOT`, drain), pad 1 (`/LGATE`, gate) and pad 2 (`/GND`, source)
 on the right, with the small silk triangle marking the pad-1 end.
+
+**Against the datasheet.** The IRF7416 datasheet draws the SO-8 in *top view*: S, S, S,
+G down the left edge (1–4) and D, D, D, D up the right edge (5–8, pin 5 at the bottom).
+Turn that picture **90° counter-clockwise** and it is the board above: the left edge
+becomes the near row with pin 1 at the left, the right edge becomes the far row with
+pin 5 at the right. Nothing is mirrored; the chip is simply rotated, because on a
+one-layer board it lies on the copper rather than standing on the component side.
+
+**See it yourself in KiCad.** The footprints now carry their library 3D models, so the
+3D viewer (`View → 3D Viewer`, the teapot icon) shows a real SO-8 and SOT-23 sitting on
+the copper. In the PCB editor, `View → Flip Board View` (and `Ctrl+H` cycles the display
+modes) shows the whole board as if you were looking at it from the bottom — which is the
+view you will actually have while soldering, and the point where `Q3` stops reading
+backwards.
 
 Two things show the copper is right, not just the picture:
 
