@@ -1,7 +1,8 @@
 # 12 V fan switched by 3.3 V logic — a gate booster built from my own parts
 
-A KiCad schematic plus a real ngspice simulation of the thing every 3D printer needs:
-**an Arduino pin turning 12 V fans on and off with a MOSFET.**
+A KiCad schematic, a real ngspice simulation, and a single-copper-layer PCB you can
+etch at home — of the thing every 3D printer needs: **an Arduino pin turning 12 V fans
+on and off with a MOSFET.**
 
 Every real component on this sheet is a part that actually sits in my parts cabinets
 (`L1` and `R1`). Nothing here is a catalogue placeholder. The fan model is sized to the
@@ -276,7 +277,14 @@ Files:
 
 ```
 mosfet-fan-switch.kicad_sch     the sheet (A3, ERC clean: 0 errors / 0 warnings)
+mosfet-fan-switch.kicad_pcb     the board (generated; 56 x 44 mm, one copper layer, DRC clean)
+pcb/build_board.py              the board generator: part table, track list, design rules
+pcb/drc.txt                     the current DRC report
+pcb/gerber/  pcb/drill/         Gerbers and Excellon drill file + map
 docs/mosfet-fan-switch.pdf      the sheet as a PDF
+docs/pcb-notes.md               board rules, pad-to-net table, etch and assembly notes
+docs/pcb-etch-bottom.svg/.pdf   the print for toner transfer (1:1, mirrored)
+docs/pcb-assembly-top.pdf       component-side assembly view
 sim/run.sh                      the whole pipeline
 sim/prepare_deck.py             KiCad export -> runnable ngspice deck
 sim/variants.py                 the six-drive comparison
@@ -372,6 +380,66 @@ Kept here so the next schematic is faster:
 - ERC checks ignored by KiCad's default settings here: "SPICE model issue" and "Assigned
   footprint doesn't match footprint filters" (the 4-pin substrate symbols do not match 8-pin
   MOSFET footprint filters, which is fine for a learning sheet).
+
+---
+
+## The board
+
+`pcb/build_board.py` writes the layout. It is a generator rather than a hand-drawn board:
+the part table, the track list and the design rules are the source, and the `.kicad_pcb`
+is the output — so a placement change is an edit to a table, not an afternoon of dragging.
+
+```bash
+python3 pcb/build_board.py
+kicad-cli pcb drc --output pcb/drc.txt --severity-all mosfet-fan-switch.kicad_pcb
+```
+
+**56 × 44 mm, one copper layer (B.Cu), zero vias, DRC clean** — `Found 0 violations`,
+`Found 0 unconnected items` — against the rules a home-etched board actually needs, not
+the fab defaults KiCad ships with:
+
+| | |
+|---|---|
+| clearance between nets | **0.50 mm** |
+| signal tracks | **0.80 mm** (34 segments) |
+| `/GND` bus along the top edge | 2.0 mm · `/P12V` bus along the bottom edge 3.0 mm |
+| `/GND` return lane down the left edge | 1.5 mm · the `/DRAIN` runs to the fans 1.5 mm |
+| drills | 0.8 mm ×14, 1.0 mm ×10, 1.1 mm ×5, 3.2 mm ×4 (M3 mounting holes) |
+
+Everything lives on one side. Q2 (SOT-23) and Q3 (SO-8) are the only surface-mount parts
+and they sit on the **copper side**, which is exactly what removes the need for a via
+anywhere: 2 SMD parts, 1 TO-220, 1 SOT-23… 14 electrical parts, 4 mounting holes, one
+layer. The board is planar — the generator checks every net pair for crossings and prints
+`no net crossings - the board is planar, no jumpers needed`, so the 0 Ω jumper trick was
+never needed.
+
+The layout follows the signal: +12 V and the PWM line come in at the bottom left (J1, J2),
+the level shifter sits mid-left, the booster in the middle, the power FET on the right, the
+three fans out through a 2×03 header, and the two buses hug the top and bottom edges.
+
+**Read this before building it:** the schematic's MOSFET symbols number their pins
+**D-G-S**, because that is the order ngspice wants. The real packages are not that way
+round — SOT-23 is 1 gate / 2 source / 3 drain, the IRF7416 SO-8 is 1-3 source / 4 gate /
+5-8 drain, and the IRFZ44N TO-220 is 1 gate / 2 drain / 3 source. The board is wired to the
+**packages**, and the sheet now carries that pinout as a note block so the drawing and the
+copper agree. `docs/pcb-notes.md` has the full pad-to-net table.
+
+| file | what it is for |
+|---|---|
+| `docs/pcb-etch-bottom.svg` | the toner-transfer print: page is exactly the board size, mirrored, 1:1, black = copper |
+| `docs/pcb-etch-bottom.pdf` | the same artwork on A4 (print at 100 %, do not scale to fit) |
+| `docs/pcb-assembly-top.pdf` | component-side view: labels, outlines, pads |
+| `docs/pcb-render-top.png`, `docs/pcb-render-bottom.png` | 3D renders of both sides |
+| `pcb/gerber/`, `pcb/drill/` | Gerbers (`B.Cu`, `B.Mask`, `B.SilkS`, `Edge.Cuts`) and the Excellon drill file + map |
+| `docs/pcb-notes.md` | design rules, courtyard boxes, pad→net table, drill list, etch and assembly instructions |
+
+The generator's comments and the end of `docs/pcb-notes.md` record the KiCad 10 behaviour
+that had to be pinned down before the DRC would go clean: **a footprint's placement rotation
+rotates pad *positions* only — a pad's copper rotates only by that pad's own angle**, so a
+hand-written rotated SO-8 has overlapping pads until the angle is baked into each pad;
+**track ends are round**, so a 2 mm bus bulges 1 mm past its endpoint and can short a pad
+1.27 mm away; and **text angles in the file are board-absolute**, not relative to the
+footprint.
 
 ---
 
