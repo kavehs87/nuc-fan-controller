@@ -160,11 +160,16 @@ A few of those deserve a comment:
 
 ---
 
-## Three fans on one output
+## How many fans one output can carry
 
-`sim/fan_count.py` clones the sheet's fan branch 1..4 times and re-runs both analyses. The
-gate drive does not change at all — the fans are on the *drain* side — so the only things to
-check are the parts that carry load current: Q1, D1 and the 12 V supply.
+`sim/fan_count.py` clones the sheet's fan branch as many times as you ask and re-runs both
+analyses. The gate drive does not change at all — the fans are on the *drain* side — so the
+only things to check are the parts that carry load current: Q1, D1 and the 12 V supply.
+
+```bash
+python3 sim/fan_count.py                                   # 1..4 fans, the 450 mA bin module
+python3 sim/fan_count.py --fans 1 2 4 8 16 32 64 --supply-ma 8000
+```
 
 | fans | each | total | V(drain) | Q1 loss | spike | D1 peak | D1 avg | D1 loss | supply avg | supply peak |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -195,6 +200,54 @@ check are the parts that carry load current: Q1, D1 and the 12 V supply.
 Wiring three fans on one output also means one flyback diode serves all three, and one
 blown fan stalls the others only mechanically, not electrically.
 
+### With a bigger 12 V supply, the flyback diode becomes the limit
+
+The 450 mA module in L1 · B7 is what makes "three fans" the answer above. Fed from a real
+12 V brick (8 A, which is what this build actually uses), the same sheet and the same three
+transistors scale a long way:
+
+| fans | total | V(drain) | Q1 loss | Q1 rise | spike | **D1 peak** | D1 avg | D1 loss | supply peak |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 102 mA | 1.6 mV | 0.16 mW | +0.0 °C | 12.36 V | 99 mA | 8 mA | 2.5 mW | 102 mA |
+| 4 | 402 mA | 6.4 mV | 2.6 mW | +0.2 °C | 12.41 V | 392 mA | 30 mA | 11 mW | 402 mA |
+| 8 | 801 mA | 12.9 mV | 10.3 mW | +0.6 °C | 12.45 V | 779 mA | 58 mA | 24 mW | 800 mA |
+| 16 | 1.60 A | 25.7 mV | 41 mW | +2.5 °C | 12.51 V | 1.53 A | 104 mA | 47 mW | 1.60 A |
+| 32 | 3.19 A | 51.4 mV | 164 mW | +10 °C | 12.60 V | 2.99 A | 201 mA | 102 mW | 3.18 A |
+| 64 | 6.35 A | 102 mV | 650 mW | +40 °C | 12.77 V | 5.93 A | 399 mA | 242 mW | 6.34 A |
+
+`Q1 rise` is the junction temperature rise in free air, using the TO-220's
+62 °C/W junction-to-ambient rating with no heatsink.
+
+Read the two right-hand columns carefully, because a diode has three different ratings and
+only two of them apply here:
+
+- **Q1 is never the problem.** Sixty-four fans put 6.35 A through it and it dissipates 0.65 W,
+  which is a 40 °C rise — the part is rated to 150 °C junction and 49 A continuous. The MOSFET
+  is good for roughly eighty of these fans with no heatsink at all.
+- **D1's average current and dissipation stay comfortable** even at 64 fans: 399 mA average and
+  0.24 W in a DO-41 Schottky. That is not what limits it.
+- **What limits D1 is the repetitive peak.** At turn-off the *entire* fan current commutates
+  through the diode every single cycle. Eight fans already push 779 mA through a 1 A part;
+  sixteen push 1.53 A. The datasheet's 45 A surge figure is for a *single* pulse, not for
+  1000 pulses a second, so treat the peak as the working limit.
+
+So the practical ladder, using only parts already in **L1 · E1**:
+
+| fans | what to change |
+|---|---|
+| up to ~8 | nothing — the sheet is exactly right as drawn |
+| ~9 to ~30 | replace D1 with the **1N5822** (3 A, same DO-41 package, same drawer) |
+| ~30 to ~60 | a proper TO-220 Schottky (MBR1045 class), or two 1N5822 in parallel |
+| beyond | Q1 starts wanting a heatsink around 8 A, and the wiring matters more than the semiconductors |
+
+The turn-off spike creeps up with load — 12.36 V at one fan, 12.77 V at sixty-four — simply
+because the Schottky's forward drop grows with current. Still nowhere near the IRFZ44N's 55 V
+or the IRF7416's 30 V.
+
+And the honest caveat, again: this fan model always limits itself to 100 mA. Real fans draw a
+surge when they start, and a stalled fan draws amps. Sixteen fans all starting on the same PWM
+edge can momentarily ask for 3–5 A, which an 8 A supply absorbs and a 450 mA module does not.
+
 ---
 
 ## The plots
@@ -207,7 +260,7 @@ blown fan stalls the others only mechanically, not electrically.
 | `transient.png` | 1 kHz / 50 % PWM: all four node voltages, the fan current, and the 0.3 mA the pin actually supplies |
 | `switching_edge.png` | one turn-on edge (gate charging through R4) and one turn-off edge (the 12.36 V clamp and the freewheeling decay) |
 | `drive_compare.png` | the variant table above as a chart: fan current and dissipation for each drive option |
-| `fan_count.png` | 1 / 2 / 3 fans side by side, and the current the flyback diode carries with three |
+| `fan_count.png` | fan counts side by side, and the current the flyback diode carries at the largest count |
 
 ---
 
@@ -227,7 +280,7 @@ docs/mosfet-fan-switch.pdf      the sheet as a PDF
 sim/run.sh                      the whole pipeline
 sim/prepare_deck.py             KiCad export -> runnable ngspice deck
 sim/variants.py                 the six-drive comparison
-sim/fan_count.py                1..4 fans on one output, checked against part ratings
+sim/fan_count.py                how many fans one output carries, checked against part ratings
 sim/plot.py                     plots + printed summary
 sim/models/irfz44n.lib          level-1 fit of the IRFZ44N in my bin
 sim/models/irfz44n_wc.lib       the same part at the datasheet's worst-case threshold
@@ -327,8 +380,10 @@ Kept here so the next schematic is faster:
 - Q1 does not need a heatsink: at 100 mA it dissipates 0.16 mW, at 300 mA (three fans) 1.5 mW.
   What the TO-220 and the 17.5 mΩ are for is a stalled fan or a shorted output, where several
   amps flow.
-- The 12 V supply in the bin is rated 450 mA: comfortable for three 100 mA fans, tight for
-  four, not enough for three 150 mA fans.
+- The 12 V supply decides the fan count. The module in the bin (L1 · B7) is rated 450 mA:
+  comfortable for three 100 mA fans, tight for four, not enough for three 150 mA fans. This
+  build runs from an **8 A 12 V brick**, which moves the limit to the flyback diode — see the
+  ladder in *With a bigger 12 V supply* above.
 - Q3's SO-8 package is the awkward one. There is one IRF7416 already mounted on a breakout
   board in R1 · A4 — use that for the first build.
 - Keep R4 (1 k) in series with Q1's gate. It slows the edge just enough to keep switching noise
