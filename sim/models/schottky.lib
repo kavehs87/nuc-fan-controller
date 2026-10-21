@@ -1,0 +1,25 @@
+* ============================================================================
+*  1N5819  -  Schottky diode, 40 V / 1 A, DO-41         (cabinet L1, drawer E1)
+* ============================================================================
+*  The free-wheeling (flyback) diode across the fan.  Written as a sub-circuit
+*  so the terminal order is spelled out explicitly: KiCad's diode symbol pin 1
+*  is the cathode (K) and pin 2 is the anode (A), and this keeps that mapping
+*  unambiguous for ngspice.
+*
+*      anode (A) on the switching node (/DRAIN)
+*      cathode (K) on the +12 V rail
+*
+*  Fit to the 1N5819 datasheet:
+*
+*      Vf at 0.15 A  ~ 0.35 V   ->  is = 1e-7, rs = 0.05 gives 0.38 V
+*      Vf at 1 A     ~ 0.47 V   (datasheet max 0.5 V)
+*      Vr max 40 V, and essentially no reverse recovery - which is exactly why a
+*      Schottky is the right choice for a fan that is being chopped at 100 Hz to
+*      a few kHz.
+*
+*  KiCad reads this file through D1's "Sim.Library" / "Sim.Name" fields.
+* ============================================================================
+.subckt diode_schottky K A
+Dint A K diode_schottky_model
+.model diode_schottky_model d(is=1e-7 rs=0.05 bv=40 ibv=100u)
+.ends

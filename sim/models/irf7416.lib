@@ -1,0 +1,36 @@
+* ============================================================================
+*  IRF7416  -  P-channel power MOSFET, SO-8             (cabinet R1, drawer A4)
+* ============================================================================
+*  Role in this circuit: the gate booster.  Its source sits on +12 V; when the
+*  2N7002 pulls its gate down, Vgs becomes about -11 V and the device turns on
+*  hard, delivering +12 V (through R4) to the IRFZ44N's gate.
+*
+*  Orientation matters: the SOURCE must be the +12 V terminal.  The body diode
+*  of a P-channel device conducts drain -> source, so if the two terminals were
+*  swapped the body diode would feed +12 V straight into the power MOSFET's gate
+*  and the fan could never switch off.
+*
+*  Fit to the cabinet record:
+*
+*      Vgs(th)   -2.0 V typ                     -> vto = -2.0
+*      Rds(on)   25 mOhm max at Vgs = -10 V     -> kp = 1 / (0.025 * 8) = 5.0
+*      Vds max   30 V,  Id max 10 A, Pd 2.5 W
+*
+*  Level-1 model, ohmic region:
+*
+*      Vgs = -10 V ->  1/(5*8)     = 25 mOhm     (matches the spec)
+*      Vgs = -11 V ->  1/(5*9)     = 22 mOhm
+*      Vgs =  -1.5 V -> off
+*
+*  Vgs rating is +/-20 V; the booster node only ever swings between ~0 V and
+*  +12 V, so Vgs stays inside -12 V .. 0 V.
+*
+*  Its input capacitance (Ciss = 1700 pF typical at Vds = -25 V, datasheet) is
+*  drawn on the schematic as C2, and it is what makes R3 = 10 kOhm the slowest
+*  part of the driver: 10 k * 1.7 n = 17 us.  At Klipper's default 100 Hz fan
+*  PWM that is harmless; if you drive the fan at several kHz, drop R3 to 1 k
+*  (tau = 1.7 us) and the 2N7002 still only has to sink 12 mA.
+*
+*  KiCad reads this file through Q3's "Sim.Library" / "Sim.Name" fields.
+* ============================================================================
+.model irf7416 pmos(level=1 vto=-2.0 kp=5.0)

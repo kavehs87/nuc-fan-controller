@@ -1,0 +1,18 @@
+* ============================================================================
+*  IRLZ44N  -  N-channel logic-level power MOSFET, TO-220
+* ============================================================================
+*  Simplified ngspice level-3 model, tuned to the IRLZ44N datasheet so the
+*  switch behaves like the real part:
+*
+*      Vgs(th)   1.0 V .. 2.0 V   -> vto = 1.9
+*      Rds(on)   ~22 mOhm max at Vgs = 5 V, Id = 10 A
+*                -> this model gives ~30 mOhm at Vgs = 5 V  (rd + rs = 10 mOhm)
+*      Rds(on) at Vgs = 3 V       -> ~70 mOhm  (weakly enhanced, as in the
+*                                        datasheet transfer curve)
+*
+*  The gate capacitance (Ciss ~ 1.9 nF) is modelled explicitly on the
+*  schematic as C1, so the RC charging of the gate through R1 is visible.
+*
+*  KiCad reads this file through the Q1 "Sim.Library" / "Sim.Name" fields.
+* ============================================================================
+.model irlz44n nmos(level=3 vto=1.9 kp=15 rd=5m rs=5m)

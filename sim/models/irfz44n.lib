@@ -1,0 +1,31 @@
+* ============================================================================
+*  IRFZ44N  -  N-channel power MOSFET, TO-220          (cabinet R1, drawer B4)
+* ============================================================================
+*  Fit to the two numbers recorded in the parts cabinet:
+*
+*      Vgs(th)   2.0 V .. 4.0 V   (datasheet min..max)   -> vto = 2.8 typical
+*      Rds(on)   17.5 mOhm max at Vgs = 10 V, Id = 10 A  -> kp, rd chosen so
+*                                                           the model lands on
+*                                                           17.3 mOhm at Vgs = 10 V
+*
+*  Level-1 model: in the ohmic region  Rds ~= 1 / (kp*(Vgs - vto)) + rd
+*
+*      Vgs = 10.0 V ->  1/(11.11*7.2) + 0.005 = 17 mOhm    (matches the spec)
+*      Vgs = 10.9 V ->  1/(11.11*8.1) + 0.005 = 16 mOhm    (what the booster gives)
+*      Vgs =  4.5 V ->  1/(11.11*1.7)+ 0.005  = 57 mOhm    (5 V pin, not enhanced)
+*      Vgs =  3.0 V ->  1/(11.11*0.2) + 0.005 = 443 mOhm   (3.3 V pin: it runs,
+*                                                           but 25x more loss)
+*      Vgs =  2.8 V ->  threshold, essentially off
+*
+*  That is the whole point of the gate-booster stage: the IRFZ44N is NOT a
+*  logic-level part.  Its Rds(on) is only specified at Vgs = 10 V, and a unit at
+*  the other end of the Vgs(th) range (4.0 V, see irfz44n_wc.lib) does not turn
+*  on at all from a 3.3 V pin.
+*
+*  The gate capacitance (Ciss = 1489 pF typical, datasheet) is drawn on the
+*  schematic as C1, so the RC charging of the gate is visible.  The model itself
+*  carries no capacitance to avoid counting Ciss twice.
+*
+*  KiCad reads this file through Q1's "Sim.Library" / "Sim.Name" fields.
+* ============================================================================
+.model irfz44n nmos(level=1 vto=2.8 kp=11.11 rd=5m)

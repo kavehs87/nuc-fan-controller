@@ -1,0 +1,16 @@
+* ============================================================================
+*  IRFZ44N  -  worst case unit from the same bin (cabinet R1, drawer B4)
+* ============================================================================
+*  Same fit philosophy as irfz44n.lib - land on the datasheet limit
+*  Rds(on) <= 17.5 mOhm at Vgs = 10 V - but with the threshold at the *maximum*
+*  the datasheet allows: Vgs(th) = 4.0 V.  Because the threshold is higher, kp
+*  has to be larger for the same 10 V figure: 1/(13.33*6) + 0.005 = 17.5 mOhm.
+*
+*      Vgs =  3.3 V  ->  below threshold: the fan never turns on.
+*      Vgs = 10.9 V  ->  1/(13.33*6.9) + 0.005 = 16 mOhm  (the booster still
+*                        drives it properly, which is the point)
+*
+*  This model is what "it worked on my bench" hides: two units out of the same
+*  drawer can differ by more than a volt of gate threshold.
+* ============================================================================
+.model irfz44n_wc nmos(level=1 vto=4.0 kp=13.33 rd=5m)
