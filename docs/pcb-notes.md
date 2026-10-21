@@ -24,11 +24,19 @@ kicad-cli pcb export drill --excellon-units mm --generate-map --map-format pdf -
 kicad-cli pcb export pdf --mode-single --output docs/pcb-etch-bottom.pdf \
         --layers "B.Cu,Edge.Cuts" --mirror --black-and-white --scale 1 mosfet-fan-switch.kicad_pcb
 kicad-cli pcb export svg --mode-single --output docs/pcb-etch-bottom.svg \
-        --layers "B.Cu,Edge.Cuts" --mirror --black-and-white --page-size-mode 2 --fit-page-to-board --scale 1 mosfet-fan-switch.kicad_pcb
+        --layers "B.Cu,Edge.Cuts" --mirror --black-and-white --exclude-drawing-sheet \
+        --page-size-mode 2 --fit-page-to-board --scale 1 mosfet-fan-switch.kicad_pcb
+# the SMD parts are on the copper side, so the assembly drawing you build from is the bottom one
+kicad-cli pcb export pdf --mode-single --output docs/pcb-assembly-bottom.pdf \
+        --layers "B.Cu,B.Mask,B.SilkS,B.Fab,Edge.Cuts" --mirror --black-and-white \
+        --sketch-pads-on-fab-layers --scale 1 mosfet-fan-switch.kicad_pcb
 kicad-cli pcb export pdf --mode-single --output docs/pcb-assembly-top.pdf \
-        --layers "F.SilkS,F.Fab,B.Cu,B.SilkS,Edge.Cuts" --black-and-white --scale 1 mosfet-fan-switch.kicad_pcb
-kicad-cli pcb render --side top    --width 1400 --height 1100 --output docs/pcb-render-top.png    mosfet-fan-switch.kicad_pcb
-kicad-cli pcb render --side bottom --width 1400 --height 1100 --output docs/pcb-render-bottom.png mosfet-fan-switch.kicad_pcb
+        --layers "F.SilkS,F.Fab,Edge.Cuts" --black-and-white --sketch-pads-on-fab-layers \
+        --scale 1 mosfet-fan-switch.kicad_pcb
+kicad-cli pcb render --side top    --background opaque --width 1400 --height 1100 --output docs/pcb-render-top.png    mosfet-fan-switch.kicad_pcb
+kicad-cli pcb render --side bottom --background opaque --width 1400 --height 1100 --output docs/pcb-render-bottom.png mosfet-fan-switch.kicad_pcb
+kicad-cli pcb render --side bottom --zoom 4.5 --pivot "-0.03,-0.15,0" --background opaque \
+        --quality high --width 1500 --height 1100 --output docs/pcb-render-smd-copper.png mosfet-fan-switch.kicad_pcb
 ```
 
 Files that matter for making the board:
@@ -37,7 +45,9 @@ Files that matter for making the board:
 |---|---|
 | `docs/pcb-etch-bottom.svg` | **the print for toner transfer.** Page is exactly 55.98 × 43.99 mm, mirrored, 1:1, black = copper |
 | `docs/pcb-etch-bottom.pdf` | same artwork on an A4 page, for those who prefer PDF |
-| `docs/pcb-assembly-top.pdf` | component-side view: labels, part outlines, pads |
+| `docs/pcb-assembly-bottom.pdf` | **the assembly drawing to build from**: the copper side as you look at it, with every pad outlined and numbered |
+| `docs/pcb-assembly-top.pdf` | the component side: labels, outlines and through-hole pads only (no bottom-side artwork, so nothing reads backwards) |
+| `docs/pcb-render-smd-copper.png` | close-up of Q2 and Q3 on the copper side, notch markers visible |
 | `docs/pcb-render-top.png`, `pcb-render-bottom.png` | 3D renders of both sides |
 | `pcb/gerber/` | `B_Cu.gbl`, `B_Mask.gbs`, `B_Silkscreen.gbo`, `Edge_Cuts.gm1`, `job.gbrjob` |
 | `pcb/drill/mosfet-fan-switch.drl` | Excellon, mm, plated and non-plated in one file |
@@ -229,6 +239,58 @@ the SO-8's pads are 0.6 mm wide on a 1.27 mm pitch.
 
 ---
 
+## Which way round do Q2 and Q3 go? (they are mirror images — deliberately)
+
+Because both SMD parts live on the copper side, their outlines and their `Q2` / `Q3`
+labels are stored mirrored. Any **top-side** view of the board therefore shows them
+reversed: `Q3` reads as `ƧQ` and pads 1–4 run right-to-left, so nothing in that view
+tells you which pad is pin 1. That is how KiCad draws every bottom-side part — but it
+reads like a mistake, so here is the check.
+
+Hold the board with the **copper facing you**. Everything you knew from the top view is
+now left–right reversed: the +12 V bus still runs along the bottom edge, but J3 (the
+fans) is on your left and J1/J2 (the inputs) on your right. That is what
+`docs/pcb-assembly-bottom.pdf` and `docs/pcb-render-smd-copper.png` show:
+
+```
+      Q3 — IRF7416, SO-8, as seen from the copper side
+
+             8     7     6     5      ← pads 5-8 = /HIGATE (drains)
+         ┌───────────────────────────┐
+         │                           │
+      ▸  │  1     2     3     4      ← the notch ▸ sits beside pad 1
+         └───────────────────────────┘
+            └── 1-3 = /P12V ──┘  └ 4 = /BOOT (gate)
+```
+
+Numbering runs counter-clockwise around the body and the notch is next to pin 1 — the
+same relationship the chip has in your hand. `Q2` (SOT-23) in the same view: pad 3
+alone on the left (`/BOOT`, drain), pad 1 (`/LGATE`, gate) and pad 2 (`/GND`, source)
+on the right, with the small silk triangle marking the pad-1 end.
+
+Two things show the copper is right, not just the picture:
+
+- The footprint in `mosfet-fan-switch.kicad_pcb` is **identical, coordinate for
+  coordinate, to what KiCad itself writes** when you place
+  `Package_SO:SO-8_3.9x4.9mm_P1.27mm` on B.Cu at rotation 90° — all 20 courtyard,
+  silk and fab items match, including the notch polygon at local (−2.6, 2.47), which
+  lands at board (32.97, 23.60), immediately beside pad 1 at (32.405, 23.575).
+- The nets land on the real package pins: pads 1–3 → `/P12V`, pad 4 → `/BOOT`, pads
+  5–8 → `/HIGATE`. That is a P-channel device with its sources on +12 V, its gate on
+  the bootstrap node and its drains feeding the high-side gate node.
+
+**Finding pin 1 without silkscreen.** You are etching copper only, so the notch may
+never appear on the finished board. On this layout you do not need it: pads 1–3 merge
+straight into the wide +12 V bus, so *the row whose pads run into the fat bus is the
+source row, and the one pad in that row that is isolated from the bus is pin 4 (the
+gate)*. A multimeter confirms it before soldering — pads 1–3 continuous with +12 V,
+pad 4 not. If you would rather have the marker physically there, plot
+`--layers "B.Cu,B.SilkS"` for the transfer instead of `B.Cu` alone; the 0.2 mm silk
+lines are thin toner and often rub off, which is why the assembly PDF is the reliable
+route.
+
+---
+
 ## Drilling
 
 33 holes, four sizes:
@@ -261,19 +323,22 @@ is the map to check against.
 5. Drill, then tin the pads. The solder mask layer (`B_Mask.gbs`) is exported only so
    a fab would have it; for a home board it is the drill-and-tin guide.
 
-Silkscreen: all the labels live on **F.SilkS**, the component side. Since there is no
-copper on that side the labels never sit on copper, and they read normally when the
-board is face-up. `B.SilkS` carries only the two SMD reference labels. If you print
-only the copper for transfer, the labels are still useful as a separate assembly
-sheet (`docs/pcb-assembly-top.pdf`).
+Silkscreen: the through-hole labels live on **F.SilkS**, the component side. Since
+there is no copper on that side the labels never sit on copper, and they read normally
+when the board is face-up. `B.SilkS` carries the two SMD reference labels plus their
+notch markers, and reads normally only when the **copper** faces you. If you transfer
+copper only, use `docs/pcb-assembly-bottom.pdf` as the assembly sheet for Q2 and Q3 —
+it is the copper side, with every pad outlined and numbered.
 
 ---
 
 ## Assembly order
 
-1. **Q2 (SOT-23) and Q3 (SO-8)** — solder and inspect first; everything else depends
-   on them. Check Q3 with a multimeter before continuing: pads 1–3 (source) must be
-   continuous with the +12 V bus, pad 4 must be isolated from it.
+1. **Q2 (SOT-23) and Q3 (SO-8)** — on the **copper** side, and mirror images of the
+   library drawings because of it: read *Which way round do Q2 and Q3 go?* first.
+   Solder and inspect these before anything else; everything depends on them. Check Q3
+   with a multimeter before continuing: pads 1–3 (source) must be continuous with the
+   +12 V bus, pad 4 must be isolated from it.
 2. **R1–R5** — values matter here: R2 and R5 are what keep the fans from drifting on
    at power-up.
 3. **D1** — the banded end goes to the +12 V side. Backwards, it is a dead short
@@ -310,7 +375,19 @@ Kept here because it cost real time to find, and it will bite the next board:
   placed at x=29 really starts at x≈25.
 - **KiCad mirrors a B.Cu footprint by negating the pad's local Y** — the emitter does
   the same, and writes the footprint angle as `-c.a` because KiCad's rotation
-  handedness is the negative of the script's maths convention.
+  handedness is the negative of the script's maths convention. The mirrored silk and
+  label that come out of it are correct for the copper side and look wrong from the
+  top; see *Which way round do Q2 and Q3 go?*
+- **Plotting `B.*` layers is drawn in top-side coordinates**, so bottom-side silk reads
+  backwards unless you add `--mirror`. The first `pcb-assembly-top.pdf` plotted
+  `F.SilkS,F.Fab,B.Cu,B.SilkS` unmirrored, which is what made the IRF7416 look mounted
+  from the wrong side of the board. The assembly drawings are now split: bottom-side
+  artwork mirrored, top-side artwork `F.*` only.
+- **`kicad-cli pcb export svg` draws the board's drawing sheet** — frame, grid, `Rev:
+  v2`, date — *inside* the board area unless you pass `--exclude-drawing-sheet`. The
+  first `pcb-etch-bottom.svg` carried all of it (75 KB instead of 15 KB). `export pdf`
+  has no such flag: it leaves the border and title out unless you ask for them with
+  `--include-border-title`.
 - Footprint library texts smaller than 0.8 mm are skipped by the generator: they are
   too small to etch, and they were the source of the `text_thickness` / `text_height`
   violations.

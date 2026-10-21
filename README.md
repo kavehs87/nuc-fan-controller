@@ -284,7 +284,8 @@ pcb/gerber/  pcb/drill/         Gerbers and Excellon drill file + map
 docs/mosfet-fan-switch.pdf      the sheet as a PDF
 docs/pcb-notes.md               board rules, pad-to-net table, etch and assembly notes
 docs/pcb-etch-bottom.svg/.pdf   the print for toner transfer (1:1, mirrored)
-docs/pcb-assembly-top.pdf       component-side assembly view
+docs/pcb-assembly-bottom.pdf    assembly drawing of the copper side, pads numbered
+docs/pcb-assembly-top.pdf       component-side view (through-hole labels only)
 sim/run.sh                      the whole pipeline
 sim/prepare_deck.py             KiCad export -> runnable ngspice deck
 sim/variants.py                 the six-drive comparison
@@ -428,10 +429,20 @@ copper agree. `docs/pcb-notes.md` has the full pad-to-net table.
 |---|---|
 | `docs/pcb-etch-bottom.svg` | the toner-transfer print: page is exactly the board size, mirrored, 1:1, black = copper |
 | `docs/pcb-etch-bottom.pdf` | the same artwork on A4 (print at 100 %, do not scale to fit) |
-| `docs/pcb-assembly-top.pdf` | component-side view: labels, outlines, pads |
+| `docs/pcb-assembly-bottom.pdf` | **the assembly drawing to build from**: the copper side as you look at it, every pad outlined and numbered |
+| `docs/pcb-assembly-top.pdf` | the component side: labels, outlines and through-hole pads only |
+| `docs/pcb-render-smd-copper.png` | close-up of Q2 and Q3 on the copper side, notch markers visible |
 | `docs/pcb-render-top.png`, `docs/pcb-render-bottom.png` | 3D renders of both sides |
 | `pcb/gerber/`, `pcb/drill/` | Gerbers (`B.Cu`, `B.Mask`, `B.SilkS`, `Edge.Cuts`) and the Excellon drill file + map |
 | `docs/pcb-notes.md` | design rules, courtyard boxes, pad→net table, drill list, etch and assembly instructions |
+
+The two surface-mount parts (Q2 SOT-23, Q3 IRF7416 SO-8) sit on the **copper** side,
+which is what keeps this a one-layer board. Their outlines and labels are therefore
+stored mirrored, and a top-side view of the board shows them reversed — `Q3` reads as
+`ƧQ` and pads 1–4 run right-to-left, so that view cannot tell you which pad is pin 1.
+Read the copper-side drawing, not the top render: on the copper side the notch sits
+beside pad 1, and pads 1–3 are the three pads that run straight into the wide +12 V bus.
+`docs/pcb-notes.md` has the picture and the proof.
 
 The generator's comments and the end of `docs/pcb-notes.md` record the KiCad 10 behaviour
 that had to be pinned down before the DRC would go clean: **a footprint's placement rotation
