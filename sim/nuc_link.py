@@ -56,7 +56,7 @@ def devices() -> list[str]:
             continue
         if s.split()[0] in {"V3", "V5"}:
             continue
-        out.append(s.replace("NC-Q2-0", "GND"))
+        out.append(s)
     return out
 
 

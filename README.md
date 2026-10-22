@@ -336,8 +336,16 @@ Files:
 
 ```
 mosfet-fan-switch.kicad_sch     the sheet (A3, ERC clean: 0 errors / 0 warnings)
-mosfet-fan-switch.kicad_pcb     the board (generated; 56 x 68 mm, one copper layer, DRC clean)
+mosfet-fan-switch.kicad_sym     four package-accurate transistor symbols: pin 1 is leg 1
+sym-lib-table                   registers that library for this project
+mosfet-fan-switch.kicad_pcb     the board (56 x 68 mm, one copper layer, placed but unrouted:
+                                a routing skeleton - see "The board")
 pcb/build_board.py              the board generator: part table, track list, design rules
+tools/skeleton_board.py         strip a generated board down to placement + pad nets
+tools/make_package_symbols.py   put the four package symbols on the sheet
+tools/tidy_q3_labels.py         tie Q3's SO-8 legs together, label each node once
+tools/shift_q3_clearance.py     move Q3 clear of the /BOOT branch it was crossing
+tools/fix_schematic_junctions.py  put KiCad's junction dots back after any scripted edit
 pcb/drc.txt                     the current DRC report
 pcb/gerber/  pcb/drill/         Gerbers and Excellon drill file + map
 docs/mosfet-fan-switch.pdf      the sheet as a PDF
@@ -371,7 +379,7 @@ the real models up.
 
 - Run the DC sweep and watch `/BOOT` fall while `/GATE` rises. That step *is* the booster.
 - Delete Q2, Q3, R3, R4 and C2, wire R1 straight to `/GATE`, re-run: the fan still runs
-  (100 mA) but Q1 now burns 5.2 mW. Then change Q1's `Sim.Name` to `irfz44n_wc`: dead fan.
+  (100 mA) but Q1 now burns 5.2 mW. Then change Q1's `Sim.Name` to `mos_irfz44n_wc`: dead fan.
   Same drawer, same part number, different transistor.
 - Copy the `L1 / R6` fan branch twice, tie all three drains to `/DRAIN`, and re-run the
   transient: that is the three-fan case above, drawn.
@@ -425,9 +433,18 @@ Kept here so the next schematic is faster:
 - A `Sim.Library` file that does not exist makes KiCad export a **broken device card**
   (`Q1 Q1.irfz44n` with no nodes at all) instead of `MQ1 /DRAIN /GATE GND GND irfz44n`.
   Write the `.lib` files before exporting.
-- `Simulation_SPICE:NMOS` has three pins, so KiCad hands ngspice a dangling bulk node
-  (`NC-Q2-0`). `sim/prepare_deck.py` ties it to the source. `NMOS_Substrate` /
-  `PMOS_Substrate` avoid the problem entirely.
+- **KiCad 10 ignores `Sim.Pins` for `.model` cards** and writes every device line in
+  **symbol pin order**. So the symbol's pin numbers decide the SPICE terminal order, and
+  the only reliable way to get ngspice's order is a symbol whose pins are the real package
+  legs plus a `.subckt` wrapper that re-orders them (`sim/models/*.lib`). The old
+  `Simulation_SPICE:NMOS` three-pin symbol left KiCad handing ngspice a dangling bulk node
+  (`NC-Q2-0`) — with the package symbols and wrappers there is nothing left to repair, and
+  `sim/prepare_deck.py` no longer tries.
+- **ngspice wants four nodes on a MOSFET card**: `M d g s model` is refused with
+  `not enough nodes`; `M d g s s model` (bulk spelled out, tied to the source) runs.
+- **A pin whose endpoint lands in the middle of a wire is not connected** — KiCad calls it
+  `Pin not connected` and the netlist names the terminal `unconnected-_Q3-D-Pad7_`. When a
+  wire ties several package legs together, segment it so every pin lands on a segment end.
 - A VPULSE source needs instance-level `Sim.Device=V`, `Sim.Type=PULSE`, `Sim.Pins=1=+ 2=-` and
   a `Value` of `VPULSE`. Otherwise the export writes `V2 /PWM GND dc="3.3V PWM" y1=0 ...` which
   ngspice cannot parse.
@@ -458,14 +475,19 @@ python3 pcb/build_board.py
 kicad-cli pcb drc --output pcb/drc.txt --severity-all mosfet-fan-switch.kicad_pcb
 ```
 
-**56 × 68 mm, one copper layer (B.Cu), zero vias, DRC clean** — `Found 0 violations`,
-`Found 0 unconnected items` — against the rules a home-etched board actually needs, not
-the fab defaults KiCad ships with:
+**56 × 68 mm, one copper layer (B.Cu), zero vias** — and the board in the tree is now a
+**routing skeleton**: all 26 footprints placed, every pad carrying its net, no copper
+tracks. `tools/skeleton_board.py` produced it from the generated layout, because that
+layout was not actually clean — `kicad-cli pcb drc --severity-all` on it reports **8
+violations and 2 unconnected pads** (an unwired JP1 sitting on the GND lane, the
+top-right mounting hole sitting on the GND band, `/TBASE` too close to the band rail).
+`docs/pcb-notes.md` lists them with coordinates. The rules are the ones a home-etched
+board actually needs, not the fab defaults KiCad ships with:
 
 | | |
 |---|---|
 | clearance between nets | **0.50 mm** |
-| tracks | **63 segments**, 0.80 mm signal · 1.5 mm `/DRAIN` and the GND return lanes |
+| tracks | 0.80 mm signal · 1.5 mm `/DRAIN` and the GND return lanes (the generated routing used 63 of them) |
 | `/GND` bus along the top edge | 2.0 mm · `/P12V` bus along the bottom edge 3.0 mm |
 | drills | 0.8 mm ×29, 1.0 mm ×16, 1.1 mm ×5, 3.2 mm ×4 (M3 mounting holes) |
 
@@ -488,12 +510,15 @@ J4 — the socket the NUC's own fan cable plugs into. Its own GND return drops d
 right edge *past the end of the 12 V bus*, which is why nothing in the band has to cross
 that bus.
 
-**Read this before building it:** the schematic's MOSFET symbols number their pins
-**D-G-S**, because that is the order ngspice wants. The real packages are not that way
-round — SOT-23 is 1 gate / 2 source / 3 drain, the IRF7416 SO-8 is 1-3 source / 4 gate /
-5-8 drain, and the IRFZ44N TO-220 is 1 gate / 2 drain / 3 source. The board is wired to the
-**packages**, and the sheet now carries that pinout as a note block so the drawing and the
-copper agree. `docs/pcb-notes.md` has the full pad-to-net table.
+**The symbols on the sheet are the package pinout now.** The MOSFET and transistor symbols
+used to be KiCad's SPICE symbols, which number their pins **D-G-S** because that is the
+order ngspice wants — while SOT-23 is 1 gate / 2 source / 3 drain, the IRF7416 SO-8 is
+1-3 source / 4 gate / 5-8 drain, and the IRFZ44N TO-220 is 1 gate / 2 drain / 3 source.
+The sheet now carries four local symbols (`mosfet-fan-switch.kicad_sym`) whose pin numbers
+*are* the leg numbers, so the numbers printed beside each transistor leg match the
+footprint pad, and KiCad's *Update PCB from Schematic* agrees with the layout instead of
+fighting it. The ngspice order moved into `.subckt` wrappers in `sim/models/`.
+`docs/pcb-notes.md` has the pad-to-net table and the wrapper table.
 
 | file | what it is for |
 |---|---|

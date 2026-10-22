@@ -34,3 +34,20 @@
 *  KiCad reads this file through Q3's "Sim.Library" / "Sim.Name" fields.
 * ============================================================================
 .model irf7416 pmos(level=1 vto=-2.0 kp=5.0)
+
+
+* ---------------------------------------------------------------------------
+*  Sub-circuit wrapper - why this exists
+*
+*  The schematic symbol numbers its pins the way the package's legs are
+*  numbered, because KiCad connects symbol pin N to footprint pad N.  KiCad
+*  then writes the SPICE line in symbol pin order, so the wrapper's .subckt
+*  signature is written in that same package order and re-orders the terminals
+*  here for ngspice (which wants MOSFET as D G S [B] and BJT as C B E).
+* ---------------------------------------------------------------------------
+.subckt mos_irf7416 S1 S2 S3 G D1 D2 D3 D4
+M_int D1 G S1 S1 irf7416
+*  S1 S2 S3 are the three source legs of the SO-8 and D1..D4 the four drain legs;
+*  inside the package they are the same two nodes, so only one pair is needed for
+*  the model.  The bulk (B) of a P-channel part is tied to its source.
+.ends

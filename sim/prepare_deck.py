@@ -6,10 +6,9 @@ prints tables.  For plotting we want the raw vectors, so the cards KiCad
 exported are dropped and an equivalent .control block is appended at the end of
 the circuit - that is the ordering ngspice likes.
 
-One KiCad quirk is repaired here: the 3-pin Simulation_SPICE:NMOS symbol for Q2
-has no bulk terminal, so KiCad hands ngspice a dangling node name
-(`NC-Q2-0`).  A level-1 MOSFET does not care much, but a floating bulk node is
-never good practice, so it is tied to the source (GND).
+The transistors arrive as sub-circuit calls (`XQ1 /GATE /DRAIN GND mos_irfz44n`)
+in symbol pin order, which is the real package leg order; each wrapper in
+`sim/models/*.lib` re-orders the terminals for ngspice.  Nothing to repair here.
 """
 from pathlib import Path
 
@@ -37,14 +36,9 @@ wrdata sim/out/tran_data.txt v(/PWM) v(/LGATE) v(/BOOT) v(/GATE) v(/DRAIN) i(l1)
 """
 
 
-def clean(line: str) -> str:
-    """Repair the one thing KiCad gets wrong for a 3-pin SPICE MOSFET."""
-    return line.replace("NC-Q2-0", "GND")
-
-
 def main() -> None:
     lines = SRC.read_text().splitlines()
-    keep = [clean(l) for l in lines if not l.strip().startswith(SKIP_PREFIXES)]
+    keep = [l for l in lines if not l.strip().startswith(SKIP_PREFIXES)]
     if keep and keep[-1].strip() == ".end":
         keep.pop()
     DST.write_text("\n".join(keep) + "\n" + CONTROL + "\n.end\n")

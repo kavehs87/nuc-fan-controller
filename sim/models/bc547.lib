@@ -18,3 +18,19 @@
 * Not good for: quoting a precise hFE - real parts spread 110 to 800.
 * (KiCad's model reader wants the whole .model on one line.)
 .model bc547 npn (bf=200 is=2e-14 nf=1 ikf=0.1 vaf=100 rb=10 cje=12p tf=0.3n cjc=9p tr=5n isc=1e-14 nbr=1)
+
+
+* ---------------------------------------------------------------------------
+*  Sub-circuit wrapper - why this exists
+*
+*  The schematic symbol numbers its pins the way the package's legs are
+*  numbered, because KiCad connects symbol pin N to footprint pad N.  KiCad
+*  then writes the SPICE line in symbol pin order, so the wrapper's .subckt
+*  signature is written in that same package order and re-orders the terminals
+*  here for ngspice (which wants MOSFET as D G S [B] and BJT as C B E).
+* ---------------------------------------------------------------------------
+.subckt npn_bc547 E B C
+Q_int C B E bc547
+*  TO-92 legs, seen from the flat face with the leads down: 1 emitter, 2 base,
+*  3 collector.
+.ends

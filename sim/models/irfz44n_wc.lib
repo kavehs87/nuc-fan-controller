@@ -14,3 +14,20 @@
 *  drawer can differ by more than a volt of gate threshold.
 * ============================================================================
 .model irfz44n_wc nmos(level=1 vto=4.0 kp=13.33 rd=5m)
+
+
+* ---------------------------------------------------------------------------
+*  Sub-circuit wrapper - why this exists
+*
+*  The schematic symbol numbers its pins the way the package's legs are
+*  numbered, because KiCad connects symbol pin N to footprint pad N.  KiCad
+*  then writes the SPICE line in symbol pin order, so the wrapper's .subckt
+*  signature is written in that same package order and re-orders the terminals
+*  here for ngspice (which wants MOSFET as D G S [B] and BJT as C B E).
+* ---------------------------------------------------------------------------
+.subckt mos_irfz44n_wc G D S
+M_int D G S S irfz44n_wc
+*  ngspice wants MOSFETs as four nodes (M d g s b model), so the bulk is
+*  spelled out and tied to the source here; a three-node card is rejected with
+*  "not enough nodes".
+.ends

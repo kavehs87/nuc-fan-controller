@@ -27,17 +27,24 @@ SRC = OUT / "mosfet-fan-switch.spice"
 MODELS = ["2n7002.lib", "irf7416.lib", "irfz44n.lib", "irfz44n_wc.lib", "schottky.lib",
           "bc547.lib"]
 
-BOOSTER_ONLY = {"R2", "R3", "MQ2", "MQ3", "R4", "C2"}
+# the parts that only exist because of the booster stage
+BOOSTER_ONLY = {"R2", "R3", "XQ2", "XQ3", "R4", "C2"}
 
 
 def device_lines() -> dict[str, str]:
-    """Device lines of the exported netlist, keyed by designator."""
+    """Device lines of the exported netlist, keyed by designator.
+
+    KiCad writes every transistor as a sub-circuit call (`XQ1 ... mos_irfz44n`)
+    whose terminals follow the schematic symbol's pin numbers, which are the real
+    package leg numbers.  The ngspice terminal order lives inside the wrapper in
+    `sim/models/*.lib`, so swapping a device here means swapping the wrapper name.
+    """
     out = {}
     for line in SRC.read_text().splitlines():
         s = line.strip()
         if not s or s.startswith("."):
             continue
-        out[s.split()[0]] = s.replace("NC-Q2-0", "GND")
+        out[s.split()[0]] = s
     return out
 
 
@@ -76,24 +83,35 @@ def main() -> None:
     booster_vecs = ["v(/LGATE)", "v(/BOOT)", "v(/GATE)", "v(/DRAIN)", "i(v1)"]
     direct_vecs = ["v(/GATE)", "v(/DRAIN)", "i(v1)"]
 
-    def direct(v_drive: float, model: str = "irfz44n") -> dict[str, str]:
+    # A pass transistor wired low-side: gate on /GATE, drain on /DRAIN, source on
+    # GND.  The nets must be listed in the order the chosen sub-circuit spells
+    # its terminals (mos_2n7002 is G S D, the TO-220 wrappers are G D S), because
+    # ngspice matches sub-circuit pins by position.
+    PASS_NETS = {"G": "/GATE", "D": "/DRAIN", "S": "GND"}
+    PASS_ORDER = {"mos_irfz44n": "G D S", "mos_irfz44n_wc": "G D S", "mos_2n7002": "G S D"}
+
+    def pass_card(subckt: str) -> str:
+        nets = " ".join(PASS_NETS[t] for t in PASS_ORDER[subckt].split())
+        return f"XQ1 {nets} {subckt}"
+
+    def direct(v_drive: float, subckt: str = "mos_irfz44n") -> dict[str, str]:
         d = {k: v for k, v in base.items() if k not in BOOSTER_ONLY}
         d["V2"] = pulse(v_drive)
         d["R1"] = "R1 /PWM /GATE 1k"
-        d["MQ1"] = f"MQ1 /DRAIN /GATE GND GND {model}"
+        d["XQ1"] = pass_card(subckt)
         return d
 
     booster = dict(base)                      # exactly what the sheet shows
     booster_wc = dict(base)
-    booster_wc["MQ1"] = "MQ1 /DRAIN /GATE GND GND irfz44n_wc"
+    booster_wc["XQ1"] = pass_card("mos_irfz44n_wc")
 
     runs = [
         ("booster-3v3", booster, booster_vecs),
         ("booster-3v3-wc", booster_wc, booster_vecs),
         ("direct-3v3", direct(3.3), direct_vecs),
-        ("direct-3v3-wc", direct(3.3, "irfz44n_wc"), direct_vecs),
+        ("direct-3v3-wc", direct(3.3, "mos_irfz44n_wc"), direct_vecs),
         ("direct-5v", direct(5.0), direct_vecs),
-        ("2n7002-only", {**direct(3.3, "2n7002"), "C1": "C1 /GATE GND 45p"}, direct_vecs),
+        ("2n7002-only", {**direct(3.3, "mos_2n7002"), "C1": "C1 /GATE GND 45p"}, direct_vecs),
     ]
 
     rows = []
