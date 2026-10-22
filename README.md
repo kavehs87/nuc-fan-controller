@@ -2,7 +2,8 @@
 
 A KiCad schematic, a real ngspice simulation, and a single-copper-layer PCB you can
 etch at home — of the thing every 3D printer needs: **an Arduino pin turning 12 V fans
-on and off with a MOSFET.**
+on and off with a MOSFET.**  And since the board grew a NUC fan-header socket, the same
+Arduino now reads the NUC's own fan request and answers on its tachometer line.
 
 Every real component on this sheet is a part that actually sits in my parts cabinets
 (`L1` and `R1`). Nothing here is a catalogue placeholder. The fan model is sized to the
@@ -22,6 +23,11 @@ Arduino D9 (3.3 V PWM)
                                     R5 10k       /DRAIN --- 12 V fan(s) --- +12 V
                                     GND             |
                                                  D1 1N5819 (flyback, cathode to +12 V)
+
+NUC fan header J4
+  PWM request 5 V --R7 10k--.  R8 10k to GND  -> /DEMAND 2.50 V at full request -> A0
+  tach answer  <--Q4 BC547--  base via R9 1k from /TACH_PWM (D10, 100 Hz carrier)
+  +12 V pin    not connected            the fans are powered by this board's own brick
 ```
 
 Run everything with one command:
@@ -36,7 +42,7 @@ comparison tables, and prints the numbers that matter. Output lands in `sim/out/
 
 ---
 
-## The three stages
+## The stages, and the nets they live on
 
 | net | what it is | who drives it |
 |---|---|---|
@@ -47,6 +53,11 @@ comparison tables, and prints the numbers that matter. Output lands in `sim/out/
 | `/GATE` | IRFZ44N gate, settles at **10.91 V** | R4 1k from `/HIGATE`, pulled down by R5 10k |
 | `/DRAIN` | the switching node under the fan(s) | Q1 IRFZ44N, clamped by D1 |
 | `/FAN_W` | between a fan's winding and its drag resistance | fan model L1 + R6 |
+| `/NUC_PWM` | the NUC's own fan request, 5 V at J4 pin 1 | the NUC (V3 in simulation) |
+| `/DEMAND` | that request halved and smoothed for a 3.3 V ADC input | R7/R8 divider, C5 + C6 |
+| `/TACH_PWM` | the Pro Mini's answer, D10 = OC1B, a 100 Hz carrier | Arduino Pro Mini 3V3 |
+| `/TBASE` | `/TACH_PWM` after R9 1k, into Q4's base | R9 1k |
+| `/NUC_TACH` | the tach line the NUC reads, pulled up inside the NUC | Q4 as an open collector |
 
 **Why `/GATE` is 10.9 V and not 12 V.** A MOSFET gate draws no steady current, so R4 and
 R5 are simply a divider: 12 V × 10 k / (1 k + 10 k) = 10.91 V. That is still deep inside the
@@ -65,6 +76,45 @@ This is the single easiest way to get this circuit wrong, so the sheet draws Q3 
 
 ---
 
+## The NUC fan-header link
+
+The same board also talks to a PC. A NUC's 4-pin fan header wants to drive a fan itself:
+it puts out a PWM **request**, expects a tachometer **answer** on the second pin, and
+supplies the fan on the third. This board refuses both jobs and does them anyway:
+
+```
+NUC fan header J4                Pro Mini (off-board, at J2)
+  1  PWM request, 5 V ──R7 10k──┐
+  2  tach answer   <──Q4 BC547──┼── D10 (OC1B)  /TACH_PWM  100 Hz carrier out
+  3  +12 V         not connected│
+  4  GND ───────────────────────┴── GND (shared with the 12 V brick)
+                                 A0  /DEMAND   2.50 V at full request, read as 775 counts
+                                 D9  /PWM      the fan drive, unchanged
+        R8 10k from /DEMAND to GND, with C5 1µ + C6 100n across it
+```
+
+- **The request has to be knocked from 5 V to 3.3 V** before it touches an Arduino pin.
+  R7 (10 k, in series at the header) and R8 (10 k, to ground) halve it; C5 + C6 turn the
+  23 kHz square wave into a DC level (τ = 5.49 ms, ≤ 5 mV ripple). Full request =
+  **2.50 V = 775 counts**, 0.80 V of headroom. The NUC's PWM output only has to source
+  **250 µA**.
+- **The answer is an open collector**, because the pull-up lives in the NUC: R9 (1 k) into
+  a BC547's base, collector on the tach line. 2.58 mA of base drive sinks 4.96 mA of
+  pull-up current; the line lands at **0.037 V** low, 5.00 V high.
+- **The tach carrier is a separate signal.** An ITE counts two pulses per revolution, so
+  `RPM = 30 × f_tach`, and the legal window (700–10 500 RPM) is **23–350 Hz** on that
+  wire. Copying the 1 kHz fan drive onto it would read 30 000 RPM and be rejected, so D10
+  generates its own 100 Hz carrier (which reads 3 000 RPM). "Same PWM being sent to the
+  fans" is the right *idea* — the frequency is what has to differ.
+- J4 pin 3 (the NUC's own fan supply) is **not connected**: the fans are powered by this
+  board's 12 V brick.
+
+`sim/nuc_link.py` (run by `./sim/run.sh`) is the check: duty-by-duty tap voltage, ripple,
+ADC counts, the divider's load, the tach levels and the carrier window. Numbers and
+caveats: `docs/pcb-notes.md`, *The NUC link*.
+
+---
+
 ## Parts — all from my cabinets
 
 | ref | part | package | cabinet · drawer | qty in bin |
@@ -73,18 +123,26 @@ This is the single easiest way to get this circuit wrong, so the sheet draws Q3 
 | Q1 | IRFZ44N N-channel power MOSFET | TO-220 | R1 · B4 | 12 |
 | Q2 | 2N7002 N-channel MOSFET | SOT-23 | R1 · A4 | 11 |
 | Q3 | IRF7416 P-channel MOSFET | SO-8 | R1 · A4 | 6 (+1 already on a breakout board) |
+| Q4 | BC547 NPN small-signal transistor | TO-92 | R1 · D3 | 20 |
 | D1 | 1N5819 Schottky, 40 V / 1 A | DO-41 | L1 · E1 | 30 |
-| R1, R4 | 1 kΩ through-hole | axial | R1 · A2 | 20 |
-| R2, R3, R5 | 10 kΩ through-hole | axial | R1 · B2 | 20 |
+| R1, R4, R9 | 1 kΩ through-hole | axial | R1 · A2 | 20 |
+| R2, R3, R5, R7, R8 | 10 kΩ through-hole | axial | R1 · B2 | 20 |
+| C3, C6 | 100 n (104) ceramic disc | radial | L1 · C9 | 30 |
+| C4 | 10 µ 16 V electrolytic | radial, 6.3 mm | L1 · C1 | 20 |
+| C5 | 1 µ 50 V electrolytic | radial, 8 mm | L1 · E7 | 8 |
 | V1 | Switching Power Supply Module, 12 V 450 mA | module | L1 · B7 | 2 |
 
-Four items on the sheet are **not** bin parts and are marked as such on the drawing:
+These items on the sheet are **not** bin parts. They carry `dnp yes` (do not populate)
+and have no footprint on the board:
 
 - **C1 = 1.5 nF** — the IRFZ44N's own input capacitance (Ciss ≈ 1489 pF), drawn explicitly.
 - **C2 = 1.7 nF** — the IRF7416's Ciss (≈ 1700 pF), drawn explicitly.
 - **L1 = 10 mH + R6 = 120 Ω** — the fan. My bins hold no 12 V fan, so the fan is a model: an
   inductor for the winding and a resistor for the mechanical load. 12 V / 120 Ω = **100 mA**,
   which is what my real fans draw. Change R6 if yours are different: 80 Ω models a 150 mA fan.
+- **V2, V3, V5** (VPULSE sources) stand in for the three pins: D9's fan drive, the NUC's
+  5 V / 23 kHz request at J4 pin 1, and D10's 100 Hz tach carrier. **V4 + R10** stand in for
+  the 5 V and 1 kΩ pull-up the NUC carries on its own tach line.
 - The KiCad symbol for U1 is `MCU_Module:Arduino_Nano_v2.x` because the library has no Pro
   Mini symbol; it is the same ATmega328P pinout, and D9 is pin 12 = OC1A. U1 is excluded
   from the simulation and `V2` (a VPULSE source) stands in for the pin.
@@ -262,6 +320,7 @@ edge can momentarily ask for 3–5 A, which an 8 A supply absorbs and a 450 mA m
 | `switching_edge.png` | one turn-on edge (gate charging through R4) and one turn-off edge (the 12.36 V clamp and the freewheeling decay) |
 | `drive_compare.png` | the variant table above as a chart: fan current and dissipation for each drive option |
 | `fan_count.png` | fan counts side by side, and the current the flyback diode carries at the largest count |
+| `nuc_link.csv` | not a plot: the NUC-link duty table (tap voltage, ripple, ADC counts) that `sim/nuc_link.py` prints |
 
 ---
 
@@ -277,25 +336,29 @@ Files:
 
 ```
 mosfet-fan-switch.kicad_sch     the sheet (A3, ERC clean: 0 errors / 0 warnings)
-mosfet-fan-switch.kicad_pcb     the board (generated; 56 x 44 mm, one copper layer, DRC clean)
+mosfet-fan-switch.kicad_pcb     the board (generated; 56 x 68 mm, one copper layer, DRC clean)
 pcb/build_board.py              the board generator: part table, track list, design rules
 pcb/drc.txt                     the current DRC report
 pcb/gerber/  pcb/drill/         Gerbers and Excellon drill file + map
 docs/mosfet-fan-switch.pdf      the sheet as a PDF
-docs/pcb-notes.md               board rules, pad-to-net table, etch and assembly notes
+docs/pcb-notes.md               board rules, pad-to-net table, the NUC link, etch and assembly notes
 docs/pcb-etch-bottom.svg/.pdf   the print for toner transfer (1:1, mirrored)
 docs/pcb-assembly-bottom.pdf    assembly drawing of the copper side, pads numbered
 docs/pcb-assembly-top.pdf       component-side view (through-hole labels only)
+docs/pcb-render-*.png           3D renders of both sides, plus a copper-side close-up
 sim/run.sh                      the whole pipeline
 sim/prepare_deck.py             KiCad export -> runnable ngspice deck
 sim/variants.py                 the six-drive comparison
 sim/fan_count.py                how many fans one output carries, checked against part ratings
+sim/nuc_link.py                 the NUC fan-header link: divider, tach levels, carrier window
 sim/plot.py                     plots + printed summary
 sim/models/irfz44n.lib          level-1 fit of the IRFZ44N in my bin
 sim/models/irfz44n_wc.lib       the same part at the datasheet's worst-case threshold
 sim/models/2n7002.lib           level-1 fit of the 2N7002
 sim/models/irf7416.lib          level-1 fit of the IRF7416
+sim/models/bc547.lib            the BC547 on the tach output (one long .model line)
 sim/models/schottky.lib         1N5819 as a sub-circuit (explicit K/A terminals)
+tools/fix_schematic_junctions.py  restores junction dots that scripted schematic edits delete
 archive/                        the first version of this project (single 5 V-driven IRLZ44N)
 ```
 
@@ -395,28 +458,35 @@ python3 pcb/build_board.py
 kicad-cli pcb drc --output pcb/drc.txt --severity-all mosfet-fan-switch.kicad_pcb
 ```
 
-**56 × 44 mm, one copper layer (B.Cu), zero vias, DRC clean** — `Found 0 violations`,
+**56 × 68 mm, one copper layer (B.Cu), zero vias, DRC clean** — `Found 0 violations`,
 `Found 0 unconnected items` — against the rules a home-etched board actually needs, not
 the fab defaults KiCad ships with:
 
 | | |
 |---|---|
 | clearance between nets | **0.50 mm** |
-| signal tracks | **0.80 mm** (34 segments) |
+| tracks | **63 segments**, 0.80 mm signal · 1.5 mm `/DRAIN` and the GND return lanes |
 | `/GND` bus along the top edge | 2.0 mm · `/P12V` bus along the bottom edge 3.0 mm |
-| `/GND` return lane down the left edge | 1.5 mm · the `/DRAIN` runs to the fans 1.5 mm |
-| drills | 0.8 mm ×14, 1.0 mm ×10, 1.1 mm ×5, 3.2 mm ×4 (M3 mounting holes) |
+| drills | 0.8 mm ×29, 1.0 mm ×16, 1.1 mm ×5, 3.2 mm ×4 (M3 mounting holes) |
 
 Everything lives on one side. Q2 (SOT-23) and Q3 (SO-8) are the only surface-mount parts
 and they sit on the **copper side**, which is exactly what removes the need for a via
-anywhere: 2 SMD parts, 1 TO-220, 1 SOT-23… 14 electrical parts, 4 mounting holes, one
-layer. The board is planar — the generator checks every net pair for crossings and prints
-`no net crossings - the board is planar, no jumpers needed`, so the 0 Ω jumper trick was
-never needed.
+anywhere: 22 electrical parts, 4 mounting holes, one layer. The layout is planar except
+for **one 0 Ω link (JP1)**: `/PWM` has to travel from the Pro Mini header in the bottom
+band back up to R1, and the only corridor that does not cross the 12 V bus runs along the
+left edge — where the GND return lane is. JP1 bridges that lane. The generator checks
+every net pair for crossings and prints `no net crossings - the board is planar, no
+jumpers needed` once `JUMPERS` covers the one that is left.
 
-The layout follows the signal: +12 V and the PWM line come in at the bottom left (J1, J2),
-the level shifter sits mid-left, the booster in the middle, the power FET on the right, the
-three fans out through a 2×03 header, and the two buses hug the top and bottom edges.
+The fan driver is the top 56 × 44 exactly as in the first version (tag
+`checkpoint-fan-driver-v1`): +12 V and the PWM line come in at the bottom left, the level
+shifter sits mid-left, the booster in the middle, the power FET on the right, the three
+fans out through a 2×03 header, and the two buses hug the top and bottom edges. The
+**NUC interface band** (y = 44…68) hangs below the 12 V bus: the Pro Mini header J2, the
+5 V → 3.3 V request divider R7/R8 with C5/C6, the open-collector tach answer R9 + Q4, and
+J4 — the socket the NUC's own fan cable plugs into. Its own GND return drops down the
+right edge *past the end of the 12 V bus*, which is why nothing in the band has to cross
+that bus.
 
 **Read this before building it:** the schematic's MOSFET symbols number their pins
 **D-G-S**, because that is the order ngspice wants. The real packages are not that way
@@ -492,6 +562,30 @@ footprint.
   fan while the heater is active, which is what you want on a printer. Klipper drives one fan
   per pin, so three fans on one output means wiring them together in parallel — which is exactly
   the case `sim/fan_count.py` just measured.
+
+### Wiring the NUC side
+
+- **J2 is the Pro Mini.** Four wires only: pad 1 `/PWM` (D9), pad 2 `/GND`, pad 3 `/DEMAND`
+  (read it on A0), pad 4 `/TACH_PWM` (drive it on D10 = OC1B). The board carries no
+  regulator and no 3.3 V rail: the Pro Mini brings its own, and its ground must be the same
+  ground as J1's 12 V brick and J4's pin 4.
+- **J4 is where the NUC's fan cable plugs in** — but check your own header with a meter
+  first. Pin 1 is the ground-side PWM request, pin 2 the tach input, pin 3 the NUC's own fan
+  supply (left unconnected here), pin 4 ground. A mis-mapped header puts 12 V on a 3.3 V
+  input, so meter it before you plug it in.
+- **JP1 is a real part.** A 0 Ω axial with its leads spread to the 7.62 mm pitch, or a piece
+  of tinned wire, between the two pads at (1.69, 14) and (13.12, 14). Without it the PWM line
+  is open-circuited and the fans never switch.
+- **The tach carrier is firmware's job.** Drive D10 between 23 and 350 Hz — 100 Hz reads
+  3 000 RPM on an ITE that counts two pulses per revolution. At the fan drive's 1 kHz the NUC
+  sees 30 000 RPM and reports a fan that is not there. Nothing on the board enforces this.
+- Read `/DEMAND` on A0 and map it straight onto the fan duty: 2.50 V is a full request
+  (775 counts), so `duty = min(1.0, counts / 775)` is the whole control law. The 5.5 ms
+  time constant at the tap means the ADC reading is already the average, so a plain
+  `analogRead` per 100 ms is enough — no oversampling needed.
+- The Uno stays usable: the same four signals work on it at 5 V logic, in which case R7/R8
+  should become a 10 k / 20 k divider (or simply go, if you feed `/DEMAND` from a 3.3 V
+  reference instead of the NUC's 5 V).
 
 ---
 

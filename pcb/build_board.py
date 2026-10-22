@@ -30,10 +30,12 @@ TRACK = 0.80         # signal traces
 TRACK_POWER = 2.00   # 12 V and GND buses (~1 A safe at this width)
 DRILL_MIN = 0.80
 
-W, H = 56.0, 44.0    # board outline
+W, H = 56.0, 68.0    # board outline: the fan driver plus the NUC interface band
 RAIL_GND_Y = 3.0     # GND bus along the top edge
 RAIL_12V_Y = 41.0    # +12 V bus along the bottom edge
-SPINE_X = 5.5        # GND return lane down the left edge
+SPINE_X = 5.5        # GND return lane down the left edge, old part of the board
+BAND_GND_Y = 58.0    # GND bus along the bottom edge, through the NUC band
+DEMAND_Y = 49.0      # the divider's output rail in the NUC band
 
 # Reference labels sit just outside each part's courtyard, horizontal on the
 # board.  REF_AT overrides the default spot when that spot is taken; REF_NONE
@@ -43,7 +45,8 @@ REF_NONE = {"MK1", "MK2", "MK3", "MK4"}
 
 
 # ------------------------------------------------------------------ nets --
-NETS = ["/P12V", "/GND", "/PWM", "/LGATE", "/BOOT", "/HIGATE", "/GATE", "/DRAIN"]
+NETS = ["/P12V", "/GND", "/PWM", "/LGATE", "/BOOT", "/HIGATE", "/GATE", "/DRAIN",
+        "/NUC_PWM", "/DEMAND", "/TACH_PWM", "/TBASE", "/NUC_TACH"]
 NET_ID = {n: i + 1 for i, n in enumerate(NETS)}
 
 
@@ -138,8 +141,10 @@ PARTS = [
     # 12 V in, PWM in, fans out
     ("J1", "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
      9.0, 37.0, 90, "F.Cu", {"1": "/P12V", "2": "/GND"}),
-    ("J2", "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
-     11.0, 20.0, 90, "F.Cu", {"1": "/PWM", "2": "/GND"}),
+    # the Pro Mini header now lives in the NUC band at the bottom of the board
+    ("J2", "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
+     27.0, 44.0, 0, "F.Cu",
+     {"1": "/PWM", "2": "/GND", "3": "/DEMAND", "4": "/TACH_PWM"}),
     # each row of J3 is one fan: pin 1 (odd) = +12 V, pin 2 (even) = the switched side
     ("J3", "Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical",
      48.54, 31.08, 180, "F.Cu",
@@ -177,15 +182,39 @@ PARTS = [
     ("C4", "Capacitor_THT:CP_Radial_D6.3mm_P2.50mm",
      20.0, 36.0, 270, "F.Cu", {"1": "/P12V", "2": "/GND"}),
 
+    # 4. the NUC fan-header interface, in the band below the 12 V rail.
+    #    J4 is the NUC's own 4-pin fan socket; the divider turns the NUC's 5 V
+    #    PWM request into the 3.3 V the Pro Mini expects, and Q4 is the open
+    #    collector that answers with the fan-drive carrier on the tach line.
+    ("J4", "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
+     44.0, 49.0, 270, "F.Cu",
+     {"1": "/NUC_PWM", "2": "/NUC_TACH", "4": "/GND"}),          # pin 3 = no connect
+    ("R7", "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+     37.7, 49.0, 180, "F.Cu", {"1": "/NUC_PWM", "2": "/DEMAND"}),
+    ("R8", "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+     22.5, 49.0, 90, "F.Cu", {"1": "/DEMAND", "2": "/GND"}),
+    ("C5", "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm",
+     16.5, 49.0, 90, "F.Cu", {"1": "/DEMAND", "2": "/GND"}),
+    ("C6", "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm",
+     10.5, 49.0, 90, "F.Cu", {"1": "/DEMAND", "2": "/GND"}),
+    ("R9", "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+     40.5, 44.0, 90, "F.Cu", {"1": "/TACH_PWM", "2": "/TBASE"}),
+    ("Q4", "Package_TO_SOT_THT:TO-92_Inline_Wide",
+     40.46, 57.0, 0, "F.Cu", {"1": "/GND", "2": "/TBASE", "3": "/NUC_TACH"}),
+
     # mechanical
     ("MK1", "MountingHole:MountingHole_3.2mm_M3", 2.5, 2.5, 0, "F.Cu", {}),
     ("MK2", "MountingHole:MountingHole_3.2mm_M3", 53.5, 2.5, 0, "F.Cu", {}),
-    ("MK3", "MountingHole:MountingHole_3.2mm_M3", 2.5, 41.5, 0, "F.Cu", {}),
-    ("MK4", "MountingHole:MountingHole_3.2mm_M3", 53.5, 41.5, 0, "F.Cu", {}),
+    ("MK3", "MountingHole:MountingHole_3.2mm_M3", 2.5, 65.5, 0, "F.Cu", {}),
+    ("MK4", "MountingHole:MountingHole_3.2mm_M3", 53.5, 65.5, 0, "F.Cu", {}),
 ]
 
 # 0 ohm jumpers used to cross a wire.  Not in the schematic on purpose.
-JUMPERS: list[tuple[str, str, float, float, float]] = []
+# JP1 carries /PWM across the GND spine on its way from J2 up to R1.
+JUMPERS: list[tuple] = [
+    ("JP1", "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+     5.5, 14.0, 0, "F.Cu", {"1": "/PWM", "2": "/PWM"}),
+]
 
 
 # ------------------------------------------------------------- placement --
@@ -250,21 +279,22 @@ def T(net, pts, width=TRACK):
 # ------------------------------------------------------------------ build --
 def build_tracks():
     # the two buses, and the GND return lane down the left edge
-    bus("/GND", SPINE_X, 42.0, RAIL_GND_Y)
+    bus("/GND", SPINE_X, 51.5, RAIL_GND_Y)
     bus("/P12V", 9.0, 48.54, RAIL_12V_Y, 3.0)
     track("/GND", [(SPINE_X, RAIL_GND_Y), (SPINE_X, 37.0)], 1.5)
 
-    # 12 V in, PWM in, decoupling
+    # 12 V in, decoupling
     T("/P12V", ["J1.1", (9.0, RAIL_12V_Y)])
     T("/GND", ["J1.2", (SPINE_X, 37.0)])
-    T("/GND", ["J2.2", (SPINE_X, 20.0)])
     T("/P12V", ["C3.1", (13.0, RAIL_12V_Y)])
     T("/P12V", ["C4.1", (20.0, RAIL_12V_Y)])
     T("/GND", ["C3.2", (SPINE_X, 31.0)])
     T("/GND", ["C4.2", (SPINE_X, 33.5)])
 
-    # 1. level shifter
-    T("/PWM", ["J2.1", "R1.1"])
+    # 1. level shifter.  /PWM arrives from the NUC band along the free left
+    # edge and crosses the GND spine on JP1, the only crossing on the board.
+    track("/PWM", [(27.0, 44.0), (1.69, 44.0), (1.69, 14.0)])
+    T("/PWM", ["JP1.2", "R1.1"])
     T("/LGATE", ["R1.2", "R2.1"])
     T("/LGATE", ["R1.2", (21.62, 22.5), (24.06, 22.5), "Q2.1"])
     T("/GND", ["Q2.2", (24.06, RAIL_GND_Y)])
@@ -289,6 +319,27 @@ def build_tracks():
     track("/DRAIN", [(44.16, 36.0), (44.16, 31.08), (46.0, 31.08)], 1.5)
     T("/P12V", ["D1.1", (34.0, RAIL_12V_Y)])
     T("/P12V", ["J3.1", "J3.3", "J3.5", (48.54, RAIL_12V_Y)])
+
+    # 4. the NUC interface band.  GND reaches it down the right edge, past the
+    # end of the 12 V bus, so nothing has to cross that bus to get down here.
+    track("/GND", [(51.5, RAIL_GND_Y), (51.5, BAND_GND_Y)], 1.5)
+    bus("/GND", 8.0, 51.62, BAND_GND_Y, 1.5)
+    track("/GND", [(27.0, 46.54), (8.0, 46.54), (8.0, BAND_GND_Y)], 1.5)
+
+    # the divider: /DEMAND is the rail the three shunt parts hang off
+    track("/DEMAND", [(10.5, DEMAND_Y), (30.08, DEMAND_Y)])
+    track("/DEMAND", [(27.0, 49.08), (27.0, DEMAND_Y)])
+    track("/GND", [(10.5, 51.5), (10.5, BAND_GND_Y)])
+    track("/GND", [(16.5, 52.5), (16.5, BAND_GND_Y)])
+    track("/GND", [(22.5, 56.62), (22.5, BAND_GND_Y)])
+
+    # the tach output: 1 k series, then Q4 as an open collector
+    track("/TACH_PWM", [(27.0, 51.62), (35.5, 51.62), (35.5, 44.0), (40.5, 44.0)])
+    track("/TBASE", [(40.5, 51.62), (43.0, 51.62), (43.0, 57.0)])
+    track("/GND", [(40.46, 57.0), (40.46, BAND_GND_Y)])
+    track("/NUC_TACH", [(45.54, 57.0), (46.54, 57.0), (46.54, DEMAND_Y)])
+    track("/NUC_PWM", [(44.0, DEMAND_Y), (37.7, DEMAND_Y)])
+    track("/GND", [(51.62, DEMAND_Y), (51.62, BAND_GND_Y)])
 
 
 # ------------------------------------------------------- courtyard geometry --
@@ -646,13 +697,15 @@ def emit():
     notes = [
         ("12V FAN DRIVER", 11.0, 6.0),
         ("3 x 100 mA", 9.6, 8.5),
-        ("3.3V logic in", 10.5, 11.0),
-        ("copper on back", 10.7, 13.5),
+        ("JP1 = 0 ohm link", 9.3, 17.6),
+        ("copper on back", 50.0, 8.0),
         ("+12V IN", 7.7, 31.8),
-        ("PWM IN", 9.6, 15.4),
         ("FAN OUT", 47.3, 33.9),
         ("Q1 G-D-S", 36.5, 26.5),
         ("D1 K +12V", 32.0, 33.5),
+        ("PRO MINI", 30.5, 56.5),
+        ("NUC FAN HEADER", 49.0, 43.6),
+        ("NUC INTERFACE", 14.0, 62.5),
     ]
     for text, x, y in notes:
         out.append(f'\t(gr_text "{text}" (at {fmt(x)} {fmt(y)} 0) (layer "F.SilkS")'
