@@ -6685,7 +6685,7 @@
 		)
 		(uuid "4d769529-65d2-4ddf-8eb6-62d038d7fc43")
 	)
-	(text "Arduino Pro Mini 3V3, on sockets\nD9 = OC1A drives /PWM\nD10 = OC2B drives /TACH_PWM"
+	(text "Arduino Pro Mini 3V3, on sockets\nD9 = OC1A drives /PWM\nD10 = OC1B drives /TACH_PWM"
 		(exclude_from_sim no)
 		(at 44 192 0)
 		(effects

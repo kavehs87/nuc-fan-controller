@@ -1,5 +1,5 @@
 ** Drc report for mosfet-fan-switch.kicad_pcb **
-** Created on 2026-10-22T17:08:42 **
+** Created on 2026-10-22T17:20:09 **
 ** Report includes: Errors, Warnings, Exclusions **
 
 ** Found 7 DRC violations **
