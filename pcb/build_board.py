@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import math
 import re
+import sys
 import uuid
 from pathlib import Path
 
@@ -23,6 +24,10 @@ BOARD = ROOT / "mosfet-fan-switch.kicad_pcb"
 SCHEMATIC = ROOT / "mosfet-fan-switch.kicad_sch"
 FP_DIR = Path("/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints")
 
+sys.path.insert(0, str(ROOT / "pcb"))
+import pro_mini                                   # the Pro Mini hole map and socket
+FOOTPRINT_LIB = "mosfet-fan-switch"              # pcb/footprints/mosfet-fan-switch.pretty
+
 # ---------------------------------------------------------------- geometry --
 # Home-etch rules of thumb for a 35 um copper board.
 CLEARANCE = 0.50     # mm between two different nets
@@ -30,9 +35,9 @@ TRACK = 0.80         # signal traces
 TRACK_POWER = 2.00   # 12 V and GND buses (~1 A safe at this width)
 DRILL_MIN = 0.80
 
-W, H = 56.0, 68.0    # board outline: the fan driver plus the NUC interface band
+W, H = 56.0, 92.0    # fan driver (top), NUC interface band, microcontroller strip
 RAIL_GND_Y = 3.0     # GND bus along the top edge
-RAIL_12V_Y = 41.0    # +12 V bus along the bottom edge
+RAIL_12V_Y = 41.0    # +12 V bus, bottom edge of the fan driver
 SPINE_X = 5.5        # GND return lane down the left edge, old part of the board
 BAND_GND_Y = 58.0    # GND bus along the bottom edge, through the NUC band
 DEMAND_Y = 49.0      # the divider's output rail in the NUC band
@@ -40,13 +45,16 @@ DEMAND_Y = 49.0      # the divider's output rail in the NUC band
 # Reference labels sit just outside each part's courtyard, horizontal on the
 # board.  REF_AT overrides the default spot when that spot is taken; REF_NONE
 # suppresses the label (mounting holes).
-REF_AT = {"Q3": (30.5, 26.0), "R2": (18.5, 6.8), "R5": (41.5, 6.0)}
+REF_AT = {"Q3": (30.5, 26.0), "R2": (18.5, 6.8), "R5": (41.5, 6.0),
+          "J3": (47.3, 34.2)}
 REF_NONE = {"MK1", "MK2", "MK3", "MK4"}
 
 
 # ------------------------------------------------------------------ nets --
 NETS = ["/P12V", "/GND", "/PWM", "/LGATE", "/BOOT", "/HIGATE", "/GATE", "/DRAIN",
-        "/NUC_PWM", "/DEMAND", "/TACH_PWM", "/TBASE", "/NUC_TACH"]
+        "/NUC_PWM", "/DEMAND", "/TACH_PWM", "/TBASE", "/NUC_TACH",
+        # the microcontroller strip
+        "/P3V3", "/RST", "/DTR", "/BLK", "/TX0", "/RX1", "/MOSI", "/MISO", "/SCK"]
 NET_ID = {n: i + 1 for i, n in enumerate(NETS)}
 
 
@@ -86,9 +94,15 @@ def sexpr(s: str):
 
 def load_footprint(lib_name: str):
     lib, name = lib_name.split(':')
-    txt = (FP_DIR / f"{lib}.pretty" / f"{name}.kicad_mod").read_text()
+    if lib == FOOTPRINT_LIB:                 # the project's own footprint library
+        path = ROOT / "pcb" / "footprints" / f"{lib}.pretty" / f"{name}.kicad_mod"
+    else:
+        path = FP_DIR / f"{lib}.pretty" / f"{name}.kicad_mod"
+    txt = path.read_text()
     tree = sexpr(txt)[0]
-    fp = {'name': tree[1], 'pads': [], 'items': [], 'texts': [], 'models': []}
+    # 'name' is the footprint's own name; 'id' is what the board file records, so
+    # KiCad can find U1 again in pcb/footprints/ when you update from library.
+    fp = {'name': tree[1], 'id': lib_name, 'pads': [], 'items': [], 'texts': [], 'models': []}
     for it in tree[3:]:
         tag = it[0]
         if tag == 'pad':
@@ -141,10 +155,6 @@ PARTS = [
     # 12 V in, PWM in, fans out
     ("J1", "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
      9.0, 37.0, 90, "F.Cu", {"1": "/P12V", "2": "/GND"}),
-    # the Pro Mini header now lives in the NUC band at the bottom of the board
-    ("J2", "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
-     27.0, 44.0, 0, "F.Cu",
-     {"1": "/PWM", "2": "/GND", "3": "/DEMAND", "4": "/TACH_PWM"}),
     # each row of J3 is one fan: pin 1 (odd) = +12 V, pin 2 (even) = the switched side
     ("J3", "Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical",
      48.54, 31.08, 180, "F.Cu",
@@ -175,6 +185,15 @@ PARTS = [
      42.0, 22.0, 270, "F.Cu", {"1": "/GATE", "2": "/DRAIN", "3": "/GND"}),
     ("D1", "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal",
      34.0, 36.0, 0, "F.Cu", {"1": "/P12V", "2": "/DRAIN"}),
+    # Two spare flyback diodes, in parallel with D1, standing at the fan end of
+    # the board.  Neither is populated as built: 3 A of fan current is D1's job.
+    # D2 (1N5822, 3 A) covers about 12-20 fans; D3 (MBR10100CT, 10 A dual
+    # Schottky, common cathode) covers anything this driver can switch.  See
+    # sim/fan_count.py.  D3's pads 1 and 3 are the two anodes, pad 2 the cathode.
+    ("D2", "Diode_THT:D_DO-27_P15.24mm_Horizontal",
+     47.5, 6.0, 90, "F.Cu", {"1": "/P12V", "2": "/DRAIN"}),
+    ("D3", "Package_TO_SOT_THT:TO-220-3_Vertical",
+     52.2, 30.0, 90, "F.Cu", {"1": "/DRAIN", "2": "/P12V", "3": "/DRAIN"}),
 
     # decoupling at the 12 V input
     ("C3", "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P5.00mm",
@@ -202,18 +221,54 @@ PARTS = [
     ("Q4", "Package_TO_SOT_THT:TO-92_Inline_Wide",
      40.46, 57.0, 0, "F.Cu", {"1": "/GND", "2": "/TBASE", "3": "/NUC_TACH"}),
 
+    # 5. the microcontroller strip, below the NUC band.  U1 is the Pro Mini
+    # sitting on three female headers; its pad numbers are the hole numbers of
+    # the clone hole map in pcb/pro_mini.py, so a pad name on the board and the
+    # pin number in the schematic are the same thing.  U1 stands at 270 degrees:
+    # row B (RAW .. D10) is the upper row nearest the band, with RAW at its
+    # band end and D10 at the far end; row A (TX0 .. D9) is the lower row, with
+    # D9 at the far end.  The programming row stands at the band end of the
+    # module and GND/A6/A7 at the far end, between the two rows.
+    ("U1", f"{FOOTPRINT_LIB}:{pro_mini.FOOTPRINT}",
+     14.0, 87.0, 270, "F.Cu",
+     {"3": "/RST", "4": "/GND", "12": "/PWM", "13": "/P12V", "15": "/RST",
+      "16": "/P3V3", "20": "/DEMAND", "21": "/SCK", "22": "/MISO",
+      "23": "/MOSI", "24": "/TACH_PWM", "25": "/DTR", "26": "/TX0",
+      "27": "/RX1", "28": "/P3V3", "29": "/GND", "30": "/BLK", "31": "/GND"}),
+    # J5 mirrors U1's own programming row pad for pad, so an FTDI/CH340 adapter
+    # can plug in beside the module instead of on top of it.  Placed at 180
+    # degrees so that J5 pin n sits straight across from U1 pin 24+n: pin 1
+    # (DTR) at the bottom end of the board, pin 6 (BLK) at the band end.  One
+    # column left of the GND descent, so MK4's courtyard stays clear of it.
+    ("J5", "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical",
+     48.5, 85.73, 180, "F.Cu",
+     {"1": "/DTR", "2": "/TX0", "3": "/RX1", "4": "/P3V3", "5": "/GND",
+      "6": "/BLK"}),
+    # J6 is the plain 2x3 ICSP header for programming the 328 with another
+    # Arduino.  It sits in the band corner freed by MK4, directly above D11,
+    # D12 and D13, so the six-way ribbon is a handfull of short stubs.
+    # Pin 2 (the programmer's VCC) is deliberately a dead pad: the Pro Mini
+    # powers itself from /P12V, and feeding an Uno's 5 V into a 3.3 V board is
+    # how boards get destroyed.  Use five wires, not six.
+    ("J6", "Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical",
+     16.0, 62.0, 0, "F.Cu",
+     {"1": "/MISO", "3": "/SCK", "4": "/MOSI", "5": "/RST", "6": "/GND"}),
+
     # mechanical
     ("MK1", "MountingHole:MountingHole_3.2mm_M3", 2.5, 2.5, 0, "F.Cu", {}),
     ("MK2", "MountingHole:MountingHole_3.2mm_M3", 53.5, 2.5, 0, "F.Cu", {}),
-    ("MK3", "MountingHole:MountingHole_3.2mm_M3", 2.5, 65.5, 0, "F.Cu", {}),
-    ("MK4", "MountingHole:MountingHole_3.2mm_M3", 53.5, 65.5, 0, "F.Cu", {}),
+    ("MK3", "MountingHole:MountingHole_3.2mm_M3", 2.5, 89.5, 0, "F.Cu", {}),
+    ("MK4", "MountingHole:MountingHole_3.2mm_M3", 53.5, 89.5, 0, "F.Cu", {}),
 ]
 
 # 0 ohm jumpers used to cross a wire.  Not in the schematic on purpose.
-# JP1 carries /PWM across the GND spine on its way from J2 up to R1.
+# JP1 flies over the GND spine: its pads sit either side of the spine copper
+# (which spans x = 4.75..6.25), so /PWM can cross the return lane on the top
+# side while its traces stay on the bottom.  It is the only crossing the board
+# needs, and it is a 0 ohm link, not a component with a value.
 JUMPERS: list[tuple] = [
     ("JP1", "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
-     5.5, 14.0, 0, "F.Cu", {"1": "/PWM", "2": "/PWM"}),
+     2.0, 14.0, 0, "F.Cu", {"1": "/PWM", "2": "/PWM"}),
 ]
 
 
@@ -291,9 +346,12 @@ def build_tracks():
     T("/GND", ["C3.2", (SPINE_X, 31.0)])
     T("/GND", ["C4.2", (SPINE_X, 33.5)])
 
-    # 1. level shifter.  /PWM arrives from the NUC band along the free left
-    # edge and crosses the GND spine on JP1, the only crossing on the board.
-    track("/PWM", [(27.0, 44.0), (1.69, 44.0), (1.69, 14.0)])
+    # 1. level shifter.  /PWM leaves U1's D9 pad, runs left past the far end of
+    # the module and up the free left edge: x = 2.0 is the one lane that clears
+    # the +12 V bus (whose rounded end reaches x = 7.5), the band rail (7.25)
+    # and the GND spine (4.75).  JP1 then flies over the spine.
+    T("/PWM", ["U1.12", (2.0, 87.0)])
+    track("/PWM", [(2.0, 87.0), "JP1.1"])
     T("/PWM", ["JP1.2", "R1.1"])
     T("/LGATE", ["R1.2", "R2.1"])
     T("/LGATE", ["R1.2", (21.62, 22.5), (24.06, 22.5), "Q2.1"])
@@ -322,19 +380,23 @@ def build_tracks():
 
     # 4. the NUC interface band.  GND reaches it down the right edge, past the
     # end of the 12 V bus, so nothing has to cross that bus to get down here.
-    track("/GND", [(51.5, RAIL_GND_Y), (51.5, BAND_GND_Y)], 1.5)
+    # The same lane carries on down to the microcontroller strip and lands on
+    # U1's programming-row GND pad, which is where the strip's return goes.
+    track("/GND", [(51.5, RAIL_GND_Y), (51.5, 75.57)], 1.5)
     bus("/GND", 8.0, 51.62, BAND_GND_Y, 1.5)
-    track("/GND", [(27.0, 46.54), (8.0, 46.54), (8.0, BAND_GND_Y)], 1.5)
+    track("/GND", [(51.5, 75.57), "U1.29"], 1.5)
 
     # the divider: /DEMAND is the rail the three shunt parts hang off
     track("/DEMAND", [(10.5, DEMAND_Y), (30.08, DEMAND_Y)])
-    track("/DEMAND", [(27.0, 49.08), (27.0, DEMAND_Y)])
     track("/GND", [(10.5, 51.5), (10.5, BAND_GND_Y)])
     track("/GND", [(16.5, 52.5), (16.5, BAND_GND_Y)])
     track("/GND", [(22.5, 56.62), (22.5, BAND_GND_Y)])
 
     # the tach output: 1 k series, then Q4 as an open collector
-    track("/TACH_PWM", [(27.0, 51.62), (35.5, 51.62), (35.5, 44.0), (40.5, 44.0)])
+    track("/TACH_PWM", [(40.5, 44.0), (3.4, 44.0), (3.4, 71.76), "U1.24"])
+    # /DEMAND leaves the divider's rail at C6's pad, runs left past the end of
+    # the band rail and down, then in at U1's A0 pad from above.
+    track("/DEMAND", [(10.5, DEMAND_Y), (4.8, DEMAND_Y), (4.8, 70.0), "U1.20"])
     track("/TBASE", [(40.5, 51.62), (43.0, 51.62), (43.0, 57.0)])
     track("/GND", [(40.46, 57.0), (40.46, BAND_GND_Y)])
     track("/NUC_TACH", [(45.54, 57.0), (46.54, 57.0), (46.54, DEMAND_Y)])
@@ -575,7 +637,7 @@ def emit_footprint(c: Comp, out):
     suid, sval = SCH_PARTS.get(c.ref, (None, ''))
     if suid is None:                      # mounting holes: no symbol to match
         suid = did('footprint', c.ref)
-    out.append(f'\t(footprint "{fp["name"]}" (version 20260206) (generator "pcbnew")'
+    out.append(f'\t(footprint "{fp["id"]}" (version 20260206) (generator "pcbnew")'
                f' (generator_version "10.0")')
     out.append(f'\t\t(layer "{side}")')
     out.append(f'\t\t(uuid "{suid}")')
@@ -697,15 +759,18 @@ def emit():
     notes = [
         ("12V FAN DRIVER", 11.0, 6.0),
         ("3 x 100 mA", 9.6, 8.5),
-        ("JP1 = 0 ohm link", 9.3, 17.6),
-        ("copper on back", 50.0, 8.0),
+        ("copper on back", 29.0, 7.0),
+        ("JP1 = 0 ohm link", 6.0, 18.0),
         ("+12V IN", 7.7, 31.8),
-        ("FAN OUT", 47.3, 33.9),
+        ("FAN OUT", 47.3, 23.4),
         ("Q1 G-D-S", 36.5, 26.5),
         ("D1 K +12V", 32.0, 33.5),
-        ("PRO MINI", 30.5, 56.5),
+        ("D2 D3 spare", 31.5, 43.5),
         ("NUC FAN HEADER", 49.0, 43.6),
-        ("NUC INTERFACE", 14.0, 62.5),
+        ("NUC INTERFACE", 27.0, 61.0),
+        ("ICSP: no 5V wire", 27.0, 64.5),
+        ("PRO MINI 328 SOCKET", 41.0, 68.5),
+        ("J5: 1=DTR 6=BLK", 43.0, 90.5),
     ]
     for text, x, y in notes:
         out.append(f'\t(gr_text "{text}" (at {fmt(x)} {fmt(y)} 0) (layer "F.SilkS")'
@@ -717,6 +782,7 @@ def emit():
 
 
 def main():
+    print(f"wrote {pro_mini.write_footprint()}")     # regenerate U1's socket
     build_tracks()
     print("pad positions (mm, KiCad board coordinates, Y down):")
     for c in PART.values():

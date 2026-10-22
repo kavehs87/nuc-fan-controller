@@ -1,0 +1,4 @@
+(fp_lib_table
+	(version 7)
+	(lib (name "mosfet-fan-switch") (type "KiCad") (uri "${KIPRJMOD}/pcb/footprints/mosfet-fan-switch.pretty") (options "") (descr "Arduino Pro Mini socket, built by pcb/pro_mini.py from the clone hole map"))
+)
