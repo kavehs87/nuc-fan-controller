@@ -36,7 +36,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LIB_DIR = ROOT / "pcb" / "footprints" / "mosfet-fan-switch.pretty"
+LIB_NAME = "mosfet-fan-switch"          # the project's own footprint/symbol library
 FOOTPRINT = "Arduino_Pro_Mini_328_Socket"
+SYMBOL_LIB = ROOT / "mosfet-fan-switch.kicad_sym"
 
 PITCH = 2.54
 ROW_SPACING = 15.24          # centre to centre between the two long rows
@@ -143,9 +145,96 @@ def write_footprint() -> Path:
     return path
 
 
+# --------------------------------------------------------------- schematic --
+SYMBOL = "Arduino_Pro_Mini_328"
+SYM_BOX = (-15.24, -22.86, 15.24, 22.86)      # symbol body, library Y up
+PIN_LEN = 2.54
+
+
+def symbol_pins():
+    """[(pin number, name, x, y, angle)] in symbol coordinates (Y up).
+
+    The symbol is the module's hole map, not an IC's pin model: every hole is a
+    passive pin, and a pin number is a pad number in the socket footprint, which
+    is what lets the schematic, the footprint and the board's silkscreen use one
+    numbering.  Row A and the spare holes go down the left side, row B and the
+    programming row down the right.
+    """
+    ps = pads()
+    left = ([p for p in ps if p[0] <= PADS_PER_ROW]
+            + [p for p in ps if p[0] > 2 * PADS_PER_ROW + len(PROG)])
+    right = [p for p in ps if PADS_PER_ROW < p[0] <= 2 * PADS_PER_ROW + len(PROG)]
+    out = []
+    for group, x, ang in ((left, -17.78, 0), (right, 17.78, 180)):
+        y = (len(group) - 1) * PITCH / 2
+        for num, name, _, _ in group:
+            out.append((num, name, x, y, ang))
+            y -= PITCH
+    return sorted(out)
+
+
+def symbol_text() -> str:
+    x1, y1, x2, y2 = SYM_BOX
+    lines = [f'\t(symbol "{SYMBOL}"',
+             '\t\t(exclude_from_sim yes)',
+             '\t\t(in_bom yes)',
+             '\t\t(on_board yes)',
+             '\t\t(in_pos_files yes)',
+             '\t\t(duplicate_pin_numbers_are_jumpers no)',
+             '\t\t(property "Reference" "U" (at 0 24.13 0) (show_name no)'
+             '\t\t\t(effects (font (size 1.27 1.27)) (justify left)))',
+             f'\t\t(property "Value" "{SYMBOL}" (at 0 -24.13 0) (show_name no)'
+             '\t\t\t(effects (font (size 1.27 1.27)) (justify left)))',
+             '\t\t(property "Footprint" "' + LIB_NAME + f':{FOOTPRINT}" (at 0 0 0)'
+             '\t\t\t(hide yes) (show_name no) (effects (font (size 1.27 1.27))))',
+             '\t\t(property "Datasheet" "https://www.arduino.cc/en/uploads/Main/'
+             'ArduinoProMiniSchematic.pdf" (at 0 0 0) (hide yes) (show_name no)'
+             '\t\t\t(effects (font (size 1.27 1.27))))',
+             '\t\t(property "Description" "Arduino Pro Mini ATmega328P (3.3 V, 8 MHz), '
+             'clone hole map: every module hole as a passive pin" (at 0 0 0)'
+             '\t\t\t(hide yes) (show_name no) (effects (font (size 1.27 1.27))))',
+             '\t\t(property "ki_keywords" "arduino pro mini atmega328p module socket"'
+             ' (at 0 0 0) (hide yes) (show_name no) (effects (font (size 1.27 1.27))))',
+             f'\t\t(property "ki_fp_filters" "{FOOTPRINT}*" (at 0 0 0) (hide yes)'
+             '\t\t\t(show_name no) (effects (font (size 1.27 1.27))))',
+             f'\t\t(symbol "{SYMBOL}_0_1"',
+             f'\t\t\t(rectangle (start {x1} {y1}) (end {x2} {y2})',
+             '\t\t\t\t(stroke (width 0.254) (type default)) (fill (type none)))',
+             '\t\t\t(polyline (pts (xy -15.24 -22.86) (xy -12.70 -22.86))',
+             '\t\t\t\t(stroke (width 0.254) (type default)) (fill (type none)))',
+             '\t\t)',
+             f'\t\t(symbol "{SYMBOL}_1_1"']
+    for num, name, x, y, ang in symbol_pins():
+        lines.append(f'\t\t\t(pin passive line (at {x} {y:.2f} {ang}) (length {PIN_LEN})')
+        lines.append(f'\t\t\t\t(name "{name}" (effects (font (size 1.0 1.0))))')
+        lines.append(f'\t\t\t\t(number "{num}" (effects (font (size 1.0 1.0))))')
+        lines.append('\t\t\t)')
+    lines += ['\t\t)', '\t)']
+    return '\n'.join(lines) + '\n'
+
+
+def write_symbol(lib_path: Path) -> Path:
+    """Put (or refresh) this symbol inside the project's symbol library."""
+    txt = lib_path.read_text()
+    head = f'\t(symbol "{SYMBOL}"\n'
+    i = txt.find(head)
+    if i >= 0:                                    # drop the previous copy
+        depth, j = 0, i
+        while j < len(txt):
+            depth += txt.count('(', j, j + 1) - txt.count(')', j, j + 1)
+            j += 1
+            if depth <= 0:
+                break
+        txt = txt[:i] + txt[j:]
+    end = txt.rstrip().rfind(')')                 # the library's own closing paren
+    lib_path.write_text(txt[:end] + symbol_text() + txt[end:])
+    return lib_path
+
+
 if __name__ == '__main__':
     p = write_footprint()
     print(f"wrote {p}")
+    print(f"wrote symbol {SYMBOL} into {write_symbol(SYMBOL_LIB).name}")
     print(f"{len(pads())} pads, courtyard {COURT[0]}..{COURT[2]} x {COURT[1]}..{COURT[3]}")
     for num, name, x, y in pads():
         print(f"  pad {num:>2}  {name:<4} local ({x:6.2f}, {y:6.2f})")
