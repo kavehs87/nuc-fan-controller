@@ -1,0 +1,20 @@
+* bc547.lib - the tach output transistor Q4
+* ------------------------------------------------------------------
+* Q4 is the BC547 (TO-92) in cabinet R1 - D3.  It is an open-collector
+* switch: the NUC's own pull-up makes the high side of the tach line,
+* Q4 only ever sinks it.  Nothing here needs a vendor model - what has
+* to be checked is that 2.6 mA of base drive saturates the part hard
+* against the few milliamps a tach pull-up moves, and that it turns on
+* and off fast enough to follow the carrier.
+*
+* Level-1 (Gummel-Poon) parameters, read off the BC547B datasheet:
+*   hFE 200-450 (B bin)          -> bf = 200 (the low end: pessimistic drive)
+*   Vce(sat) 0.2 V at Ic 2 mA    -> falls out of the model at Ib = 2.6 mA
+*   Ic max 100 mA                -> ikf = 0.1 A
+*   Vceo 45 V                    -> irrelevant here, the line sits at 5 V
+*   Cjc 9 pF, Cje 12 pF, fT 100 MHz
+*
+* Good for: saturation depth, base current, switching speed.
+* Not good for: quoting a precise hFE - real parts spread 110 to 800.
+* (KiCad's model reader wants the whole .model on one line.)
+.model bc547 npn (bf=200 is=2e-14 nf=1 ikf=0.1 vaf=100 rb=10 cje=12p tf=0.3n cjc=9p tr=5n isc=1e-14 nbr=1)

@@ -41,5 +41,8 @@ python3 sim/variants.py
 echo "==> how many fans one output can carry"
 python3 sim/fan_count.py
 
+echo "==> the NUC fan-header link: PWM request divider and tach output"
+python3 sim/nuc_link.py
+
 echo
 echo "done. plots and data are in $OUT/"

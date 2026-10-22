@@ -3257,6 +3257,958 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Connector_Generic:Conn_01x04"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "J"
+				(at 0 5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x04"
+				(at 0 -7.62 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Conn_01x04_1_1"
+				(rectangle
+					(start -1.27 3.81)
+					(end 1.27 -6.35)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 2.667)
+					(end 0 2.413)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -2.413)
+					(end 0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -4.953)
+					(end 0 -5.207)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 2.54 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "Pin_3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -5.08 0)
+					(length 3.81)
+					(name "Pin_4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Simulation_SPICE:NPN"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "Q"
+				(at -2.54 7.62 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "NPN"
+				(at -2.54 5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 63.5 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" "https://ngspice.sourceforge.io/docs/ngspice-html-manual/manual.xhtml#cha_BJTs"
+				(at 63.5 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Bipolar transistor symbol for simulation only, substrate tied to the emitter"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Device" "NPN"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Type" "GUMMELPOON"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Pins" "1=C 2=B 3=E"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "simulation"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "NPN_0_1"
+				(polyline
+					(pts
+						(xy -2.54 0) (xy 0.635 0)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 1.905) (xy 0.635 -1.905) (xy 0.635 -1.905)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 0.635) (xy 2.54 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 -0.635) (xy 2.54 -2.54) (xy 2.54 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 1.27 0)
+					(radius 2.8194)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -1.778) (xy 1.778 -1.27) (xy 2.286 -2.286) (xy 1.27 -1.778) (xy 1.27 -1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.794 -1.27) (xy 2.794 -1.27)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.794 -1.27) (xy 2.794 -1.27)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "NPN_1_1"
+				(pin open_collector line
+					(at 2.54 5.08 270)
+					(length 2.54)
+					(name "C"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin open_emitter line
+					(at 2.54 -5.08 90)
+					(length 2.54)
+					(name "E"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Transistor_BJT:Q_NPN_EBC"
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "Q"
+				(at 5.08 1.27 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "Q_NPN_EBC"
+				(at 5.08 -1.27 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" ""
+				(at 5.08 2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "NPN transistor, emitter/base/collector"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Device" "NPN"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Pins" "1=E 2=B 3=C"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "BJT"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Q_NPN_EBC_0_1"
+				(polyline
+					(pts
+						(xy -2.54 0) (xy 0.635 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 1.905) (xy 0.635 -1.905)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 1.27 0)
+					(radius 2.8194)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Q_NPN_EBC_1_1"
+				(polyline
+					(pts
+						(xy 0.635 0.635) (xy 2.54 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 -0.635) (xy 2.54 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -1.778) (xy 1.778 -1.27) (xy 2.286 -2.286) (xy 1.27 -1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(pin passive line
+					(at 2.54 -5.08 90)
+					(length 2.54)
+					(name "E"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 5.08 270)
+					(length 2.54)
+					(name "C"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Transistor_BJT:BC547"
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "Q"
+				(at 5.08 1.905 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "BC547"
+				(at 5.08 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" "Package_TO_SOT_THT:TO-92_Inline"
+				(at 5.08 -1.905 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+						(italic yes)
+					)
+					(justify left)
+				)
+			)
+			(property "Datasheet" "https://www.onsemi.com/pub/Collateral/BC550-D.pdf"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Description" "0.1A Ic, 45V Vce, Small Signal NPN Transistor, TO-92"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Device" "NPN"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Pins" "1=C 2=B 3=E"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "NPN Transistor"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "BC547_0_1"
+				(polyline
+					(pts
+						(xy -2.54 0) (xy 0.635 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 1.905) (xy 0.635 -1.905)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 1.27 0)
+					(radius 2.8194)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "BC547_1_1"
+				(polyline
+					(pts
+						(xy 0.635 0.635) (xy 2.54 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 -0.635) (xy 2.54 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -1.778) (xy 1.778 -1.27) (xy 2.286 -2.286) (xy 1.27 -1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(pin passive line
+					(at 2.54 5.08 270)
+					(length 2.54)
+					(name "C"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 -5.08 90)
+					(length 2.54)
+					(name "E"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+			(property "ki_fp_filters" "TO?92*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+		)
 	)
 	(symbol
 		(lib_id "MCU_Module:Arduino_Nano_v2.x")
@@ -4776,22 +5728,6 @@
 	)
 	(wire
 		(pts
-			(xy 113.03 170.18) (xy 113.03 185.42)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5846139e-ac9e-421b-8e42-fca34dfc81af")
-	)
-	(junction
-		(at 113.03 170.18)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "b4d6f360-d81c-427f-aaf6-014f331dc7e6")
-	)
-	(wire
-		(pts
 			(xy 138.42999999999998 170.18) (xy 138.43 179.07)
 		)
 		(stroke
@@ -4799,12 +5735,6 @@
 			(type default)
 		)
 		(uuid "2e76526b-f2c8-4a4d-b65e-47ed3bdb46ae")
-	)
-	(junction
-		(at 138.43 170.18)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "f1769cf9-316f-4dc7-aa8c-148e61740c0b")
 	)
 	(wire
 		(pts
@@ -4856,12 +5786,6 @@
 		)
 		(uuid "0d803ec9-ca91-40c3-b2f1-8288d4c33548")
 	)
-	(junction
-		(at 165.1 152.4)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "5f1cf67e-1802-40ed-87e4-5a48e2d65a74")
-	)
 	(wire
 		(pts
 			(xy 195.58 152.4) (xy 195.58 170.18)
@@ -4911,12 +5835,6 @@
 			(type default)
 		)
 		(uuid "c7cf4dc4-e498-4c46-83b4-e1041392bad6")
-	)
-	(junction
-		(at 181.61 165.1)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "9707a753-9b22-4c5b-9c79-ef86acafcc57")
 	)
 	(wire
 		(pts
@@ -5018,12 +5936,6 @@
 		)
 		(uuid "5f2cf36d-dc2d-4861-9d86-e8d4b74fdc3d")
 	)
-	(junction
-		(at 227.33 195.58)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "6c16f817-e6e9-43ad-93c8-060d58700b1d")
-	)
 	(wire
 		(pts
 			(xy 203.2 207.01) (xy 203.2 210.82)
@@ -5124,12 +6036,6 @@
 		)
 		(uuid "66377a66-25d8-42de-acc5-cf35df94800f")
 	)
-	(junction
-		(at 203.2 190.5)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "8542064e-5103-4d6f-956e-53523be6be23")
-	)
 	(wire
 		(pts
 			(xy 215.9 190.5) (xy 215.9 199.39)
@@ -5139,12 +6045,6 @@
 			(type default)
 		)
 		(uuid "de47b9b7-093a-447c-baa7-ceb3e43a11ce")
-	)
-	(junction
-		(at 215.9 190.5)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "1bfa8ca3-798c-4833-8141-a6c0e62ba271")
 	)
 	(wire
 		(pts
@@ -5206,12 +6106,6 @@
 		)
 		(uuid "831bf5ee-d980-4dc2-988c-e3a157f13608")
 	)
-	(junction
-		(at 241.3 162.56)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "6195de71-e6b7-41d6-9b36-53cb97e73793")
-	)
 	(wire
 		(pts
 			(xy 266.7 130.81) (xy 266.7 154.94)
@@ -5231,16 +6125,6 @@
 			(justify right bottom)
 		)
 		(uuid "f7c0aaac-6330-4412-9576-06c9b35bbaf5")
-	)
-	(label "PWM"
-		(at 113.03 170.18 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "fe8f0c12-83ee-4564-bc1a-f3e24ccf1176")
 	)
 	(label "GND"
 		(at 97.78999999999999 187.96 270)
@@ -5271,16 +6155,6 @@
 			(justify right bottom)
 		)
 		(uuid "86865445-4f36-47b6-9efd-e16112999b45")
-	)
-	(wire
-		(pts
-			(xy 123.19 170.18) (xy 113.03 170.18)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3493f985-991a-413e-8fdb-58c7ff532428")
 	)
 	(label "LGATE"
 		(at 130.81 170.18 0)
@@ -5633,10 +6507,6 @@
 		(uuid "1a309c8c-b45e-4612-88a7-4df29b556f65")
 	)
 	(no_connect
-		(at 113.03 172.72)
-		(uuid "aae7a0bd-d4c6-407f-bf7e-6f75469c350e")
-	)
-	(no_connect
 		(at 113.03 175.26)
 		(uuid "09827e4e-f614-4726-9c6d-fc21cdce0a89")
 	)
@@ -5655,10 +6525,6 @@
 	(no_connect
 		(at 87.63 157.48)
 		(uuid "dae3a4e8-c813-4f53-9aa0-a76b015f31ab")
-	)
-	(no_connect
-		(at 87.63 162.56)
-		(uuid "062cdb6a-97af-4c95-b08b-e18baba91db6")
 	)
 	(no_connect
 		(at 87.63 165.1)
@@ -5864,12 +6730,6 @@
 		)
 		(uuid "7195c622-3381-4aa3-9111-9930751dc0fa")
 	)
-	(junction
-		(at 177.8 152.4)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "b2dd2499-b13a-484e-a751-f55e9491b709")
-	)
 	(wire
 		(pts
 			(xy 177.8 186.69) (xy 177.8 210.82)
@@ -5880,12 +6740,6 @@
 		)
 		(uuid "e5628e7e-8113-43aa-8bec-7b1683857d92")
 	)
-	(junction
-		(at 177.8 210.82)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "652aa15f-eb28-426b-aa74-bf30cb5ac0ad")
-	)
 	(wire
 		(pts
 			(xy 100.33 187.96) (xy 100.33 210.82)
@@ -5895,78 +6749,6 @@
 			(type default)
 		)
 		(uuid "099bd1ce-bb00-49eb-af0f-1818c3e9887a")
-	)
-	(junction
-		(at 100.33 210.82)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "8bd3dcb8-1af3-46c1-9406-25d058f4f8db")
-	)
-	(junction
-		(at 181.61 111.76)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "ca24a832-c4ea-4f8a-9eef-aad275e6ff48")
-	)
-	(junction
-		(at 241.3 111.76)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "65a15ca8-c135-4b63-8d6d-a7419de024e8")
-	)
-	(junction
-		(at 266.7 111.76)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "05dec7f9-4651-4a6c-bb1c-42117d52c9ff")
-	)
-	(junction
-		(at 200.66 111.76)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "29710fba-19d0-4038-aa9c-fd2220f56278")
-	)
-	(junction
-		(at 146.05 210.82)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "42ce88c2-0754-4400-a0a0-1dece9a0e36f")
-	)
-	(junction
-		(at 138.43 210.82)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "03a26d25-efcf-41e4-8e80-09fd4c792469")
-	)
-	(junction
-		(at 113.03 210.82)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "5b8dfe7a-02ba-4082-b9bc-bfc4ffc043b7")
-	)
-	(junction
-		(at 227.33 210.82)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "0554751e-3c71-4183-8789-c5f957606fe0")
-	)
-	(junction
-		(at 203.2 210.82)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "e697134e-cfd6-4566-af95-ab38d0005516")
-	)
-	(junction
-		(at 215.9 210.82)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "c49d778d-842d-4ad3-98fc-757ef9627887")
-	)
-	(junction
-		(at 120.65 210.82)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "d28d3c04-3223-4c2f-9a12-c3319e1c6a9c")
 	)
 	(text "12 V fan switched by 3.3 V logic - a gate booster built from my own parts"
 		(exclude_from_sim no)
@@ -6229,85 +7011,6 @@
 			(project "mosfet-fan-switch"
 				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
 					(reference "J1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:Conn_01x02_Pin")
-		(at 312.42 171.45 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim yes)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "ce4aef14-47cf-4c33-9b97-1f269e7ebf8a")
-		(property "Reference" "J2"
-			(at 312.42 168.91 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "PWM IN"
-			(at 312.42 173.99 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
-			(at 312.42 171.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 312.42 171.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x02, script generated"
-			(at 312.42 171.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "9398f411-e683-431d-8958-232d07bb321c")
-		)
-		(pin "2"
-			(uuid "f93fafb0-1b88-44f7-bd64-b57d24ef1d09")
-		)
-		(instances
-			(project "mosfet-fan-switch"
-				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
-					(reference "J2")
 					(unit 1)
 				)
 			)
@@ -6586,26 +7289,6 @@
 		)
 		(uuid "d121e3ac-df8e-4d2f-95a0-a1ea2eccfd85")
 	)
-	(label "PWM"
-		(at 317.5 171.45 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "3f08a34a-fcca-424a-be02-3d18ce18626f")
-	)
-	(label "GND"
-		(at 317.5 173.98999999999998 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "a4f499d6-1c2f-45b0-ae56-fd30b99a45d5")
-	)
 	(label "P12V"
 		(at 342.90000000000003 147.32000000000002 180)
 		(effects
@@ -6705,6 +7388,1654 @@
 			(justify right bottom)
 		)
 		(uuid "1d472738-9380-41f0-9348-8b0f6d0a80b5")
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x04")
+		(at 312.42 171.45 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim yes)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "b1e84c79-379b-42a6-b798-b885d07fe4df")
+		(property "Reference" "J2"
+			(at 312.42 166.37 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "PRO MINI"
+			(at 312.42 179.07 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+			(at 312.42 171.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 312.42 171.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 312.42 171.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "32aff970-000c-4789-8ec4-8fca4e3eafd9")
+		)
+		(pin "2"
+			(uuid "3d374c9a-81af-48d6-bb7f-45119fb8b4e4")
+		)
+		(pin "3"
+			(uuid "db9b1628-b366-4129-916f-658a8d83627e")
+		)
+		(pin "4"
+			(uuid "8254cdd1-b400-4578-ac01-0c5d39d5ed04")
+		)
+		(instances
+			(project "mosfet-fan-switch"
+				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+					(reference "J2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x04")
+		(at 306.07 200.66 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim yes)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "6c8e3fe4-acda-40a3-8ef5-d8a1a7b7c622")
+		(property "Reference" "J4"
+			(at 306.07 198.12 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "NUC FAN HEADER"
+			(at 306.07 203.2 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+			(at 306.07 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 306.07 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 306.07 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Note" "the NUC header's own fan supply pin is left open (no-connect)."
+			(at 306.07 200.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f6675675-fd68-439c-9649-a0c6b1aa4204")
+		)
+		(pin "2"
+			(uuid "21c36e87-08bc-473d-9b35-90cc9efac3db")
+		)
+		(pin "3"
+			(uuid "bbe0173e-2925-4211-a88c-fee5fa41487e")
+		)
+		(pin "4"
+			(uuid "c657b106-26cb-4fc5-8f9f-19e2fa56bb58")
+		)
+		(instances
+			(project "mosfet-fan-switch"
+				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+					(reference "J4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 322.58 200.66 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "83a08eef-e566-4005-b9c2-26eaaec0a2fa")
+		(property "Reference" "R7"
+			(at 322.58 198.12 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 322.58 203.2 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
+			(at 322.58 202.438 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 322.58 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 322.58 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "b945a4f7-4c8a-480d-ab4e-5a4df5cd711e")
+		)
+		(pin "2"
+			(uuid "513cedbe-cbd3-4251-a7be-41eede244703")
+		)
+		(instances
+			(project "mosfet-fan-switch"
+				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+					(reference "R7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 330.2 209.55 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "92367227-9a50-418c-adec-756486740323")
+		(property "Reference" "R8"
+			(at 330.2 207.01 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 330.2 212.09 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
+			(at 328.422 209.55 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 330.2 209.55 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 330.2 209.55 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "9ce6f9cb-2329-40e6-89a3-dfb19e0cba9c")
+		)
+		(pin "2"
+			(uuid "fa350f27-a134-46f1-87ed-0f6c1e697895")
+		)
+		(instances
+			(project "mosfet-fan-switch"
+				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+					(reference "R8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 337.82 209.55 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "424d7266-ec27-47ae-a117-2bd1163ccd98")
+		(property "Reference" "C5"
+			(at 337.82 207.01 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "1u"
+			(at 337.82 212.09 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm"
+			(at 338.785 205.74 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 337.82 209.55 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 337.82 209.55 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "2ae8a05b-1b7e-49d3-8287-d582311a087a")
+		)
+		(pin "2"
+			(uuid "aaf03d87-a18f-48a6-a1ce-35f753107332")
+		)
+		(instances
+			(project "mosfet-fan-switch"
+				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+					(reference "C5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 345.44 209.55 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "4a7eaecb-cca6-4d6b-896d-b96b6bc39367")
+		(property "Reference" "C6"
+			(at 345.44 207.01 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100n"
+			(at 345.44 212.09 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm"
+			(at 346.405 205.74 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 345.44 209.55 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 345.44 209.55 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "6cfac637-d1a0-454d-8068-2f67b7940dad")
+		)
+		(pin "2"
+			(uuid "06668ca4-6e45-431c-8c7c-c4addf9995bd")
+		)
+		(instances
+			(project "mosfet-fan-switch"
+				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+					(reference "C6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 360.68 200.66 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "33ef2d95-6528-4f03-a416-9b445e77e45a")
+		(property "Reference" "R9"
+			(at 360.68 198.12 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "1k"
+			(at 360.68 203.2 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
+			(at 360.68 202.438 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 360.68 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 360.68 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "53f6354e-400c-4520-96d7-15ca32191839")
+		)
+		(pin "2"
+			(uuid "686c9673-44f7-4743-9df3-144d62281d8a")
+		)
+		(instances
+			(project "mosfet-fan-switch"
+				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+					(reference "R9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "PWM"
+		(at 307.34000000000003 168.91 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "337f1c79-da72-4e82-8bde-4393cf4e8978")
+	)
+	(label "GND"
+		(at 307.34000000000003 171.45 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "ce5f976b-6f17-4e49-9946-cbbf9cb46ffd")
+	)
+	(label "NUC_PWM"
+		(at 300.99 198.12 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "84a92d76-dcbd-4997-b748-d7d118d482ba")
+	)
+	(label "NUC_TACH"
+		(at 300.99 200.66 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "e8ba1dc6-b8f4-48e1-b4d4-e72052a14f35")
+	)
+	(label "GND"
+		(at 300.99 205.74 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "aa2944ec-c249-4f73-bdeb-ab54a1811084")
+	)
+	(label "NUC_PWM"
+		(at 318.77 200.66 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "7b132aab-8a67-4d05-ad22-1841bc0a2f9e")
+	)
+	(label "DEMAND"
+		(at 326.39 200.66 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d69eacf5-42ca-4230-abfc-4ea8630377d9")
+	)
+	(label "DEMAND"
+		(at 330.2 205.74 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d10ed0fa-ca98-4899-927f-820bfd5f236d")
+	)
+	(label "GND"
+		(at 330.2 213.36 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "e3240b66-88b6-4cc1-b78e-a8990f367b8b")
+	)
+	(label "DEMAND"
+		(at 337.82 205.74 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "25ff5095-9c92-4712-8f69-ef26b3512760")
+	)
+	(label "GND"
+		(at 337.82 213.36 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "2e3e9642-e581-439d-acde-98d07f87a7e3")
+	)
+	(label "DEMAND"
+		(at 345.44 205.74 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "ae37eb6b-7064-4b05-b3c7-1abcf2c2b665")
+	)
+	(label "GND"
+		(at 345.44 213.36 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "826ee3eb-20ba-42b7-b2b0-a3af042c00b8")
+	)
+	(label "TACH_PWM"
+		(at 356.87 200.66 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "129e471e-6105-4eb3-8aca-613a5e0ab20a")
+	)
+	(label "TBASE"
+		(at 364.49 200.66 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "bd3275ba-9882-4ac8-be74-95d03d1fa457")
+	)
+	(no_connect
+		(at 300.99 203.2)
+		(uuid "d41d4f7e-12f0-4c18-bad2-ce6c955d3de3")
+	)
+	(junction
+		(at 100.33 210.82)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "191d56e2-1290-4735-a3ff-615a861e6455")
+	)
+	(junction
+		(at 113.03 210.82)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "5a767380-e146-4e1b-a83f-133e3331ee52")
+	)
+	(junction
+		(at 120.65 210.82)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "0316c61b-856f-4460-aa0c-e6a94b28d85e")
+	)
+	(junction
+		(at 138.43 170.18)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "c06548b6-3924-4d20-b0c7-d46cfde845e5")
+	)
+	(junction
+		(at 138.43 210.82)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "fed11276-b939-4fdc-ab63-7ce59d67e2f7")
+	)
+	(junction
+		(at 146.05 210.82)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "c8dbe57e-a387-4fc6-9f9f-807553d174ff")
+	)
+	(junction
+		(at 165.1 152.4)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "fd387115-390c-4f3b-9f8e-36f04fda2792")
+	)
+	(junction
+		(at 177.8 152.4)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "d3a072f7-5b28-4120-96fe-e8e9cad3db0c")
+	)
+	(junction
+		(at 177.8 210.82)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "a2ff9137-2c34-46e1-9c52-ceb46d97c127")
+	)
+	(junction
+		(at 181.61 111.76)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "31c48483-ad4c-498d-a7ac-461f5e84c42d")
+	)
+	(junction
+		(at 181.61 165.1)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "6d04e362-90af-4168-9653-90ad84292621")
+	)
+	(junction
+		(at 200.66 111.76)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "d1b66729-941e-49d3-b250-6bacc6d1f021")
+	)
+	(junction
+		(at 203.2 190.5)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b1d2bf26-69e5-4d0e-bab9-7108f0d1df7d")
+	)
+	(junction
+		(at 203.2 210.82)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "a8498a3d-1063-490e-83d9-4a589e506557")
+	)
+	(junction
+		(at 215.9 190.5)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "4bcbda89-7a30-4520-b339-77350baff11f")
+	)
+	(junction
+		(at 215.9 210.82)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "be5d0e9d-eedb-4bbc-947a-018982760b96")
+	)
+	(junction
+		(at 227.33 195.58)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "edcf1f2b-6047-4ff9-9820-6691fc9f46cb")
+	)
+	(junction
+		(at 227.33 210.82)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "83d6309f-2fe5-457d-b645-2989bec244a8")
+	)
+	(junction
+		(at 241.3 111.76)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b98d2f8c-0c74-46e3-95f5-2af552b93c2c")
+	)
+	(junction
+		(at 241.3 162.56)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "747f086c-1432-48eb-87df-fa4b4b26d552")
+	)
+	(junction
+		(at 266.7 111.76)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "6fb4b620-a285-4b98-8b1f-1b2525a351c9")
+	)
+	(junction
+		(at 364.49 200.66)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "584afb60-9ae2-41ca-a194-6db84437349a")
+	)
+	(junction
+		(at 373.38 204.47)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "1daedeef-74fb-4ae3-a7ca-d904bd212aff")
+	)
+	(symbol
+		(lib_id "Simulation_SPICE:VPULSE")
+		(at 365.76 172.72 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp yes)
+		(uuid "58ba3d25-b8ec-40de-b555-88b2e94d8106")
+		(property "Reference" "V3"
+			(at 363.22 172.72 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "VPULSE"
+			(at 368.3 172.72 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 365.76 172.72 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://ngspice.sourceforge.io/docs/ngspice-html-manual/manual.xhtml#sec_Independent_Sources_for"
+			(at 365.76 172.72 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Voltage source, pulse"
+			(at 365.76 172.72 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Sim.Device" "V"
+			(at 365.76 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Type" "PULSE"
+			(at 365.76 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Params" "y1=0 y2=5 td=0 tr=20n tf=20n tw=21.7u per=43.5u"
+			(at 365.76 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Pins" "1=+ 2=-"
+			(at 365.76 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Note" "sim-only: the ITE's PWM request, 5 V at 23 kHz. The ITE lives in the NUC."
+			(at 365.76 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "7268c06d-f46c-49c7-a6da-6efd624c0099")
+		)
+		(pin "2"
+			(uuid "ce6b7dc4-21a0-4dd9-81d1-a99e2ff34848")
+		)
+		(instances
+			(project "mosfet-fan-switch"
+				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+					(reference "V3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 383.54 172.72 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp yes)
+		(uuid "5c8645bf-b090-49b0-8444-7694540ab57c")
+		(property "Reference" "R10"
+			(at 383.54 170.18 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "1k"
+			(at 383.54 175.26 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 381.762 172.72 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 383.54 172.72 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 383.54 172.72 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Sim.Device" "R"
+			(at 383.54 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Note" "sim-only: the ITE's internal tach pull-up. Not a part you fit."
+			(at 383.54 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "ee5d2a63-0bc5-42e7-af6a-4efee0b4d279")
+		)
+		(pin "2"
+			(uuid "74fa57bc-d14b-4f6a-847a-d7b2752e6e6a")
+		)
+		(instances
+			(project "mosfet-fan-switch"
+				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+					(reference "R10")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Simulation_SPICE:VDC")
+		(at 400.05 172.72 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp yes)
+		(uuid "75d49e12-51eb-46e8-8ce7-4546550455b8")
+		(property "Reference" "V4"
+			(at 400.05 170.18 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "5"
+			(at 400.05 175.26 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 400.05 172.72 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://ngspice.sourceforge.io/docs/ngspice-html-manual/manual.xhtml#sec_Independent_Sources_for"
+			(at 400.05 172.72 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Voltage source, DC"
+			(at 400.05 172.72 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Sim.Device" "V"
+			(at 400.05 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Type" "DC"
+			(at 400.05 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Params" "dc=5"
+			(at 400.05 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Pins" "1=+ 2=-"
+			(at 400.05 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Note" "sim-only: the rail the ITE pulls the tach line up to."
+			(at 400.05 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "34e9a358-adbe-4134-a73d-39d972ac4a47")
+		)
+		(pin "2"
+			(uuid "d58a0aef-6e13-4c27-ba8a-7dc8c02a7759")
+		)
+		(instances
+			(project "mosfet-fan-switch"
+				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+					(reference "V4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "NUC_PWM"
+		(at 365.76 167.64 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "784013b1-2a85-4dde-b337-86bfadd76609")
+	)
+	(label "GND"
+		(at 365.76 177.8 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "d6deb022-2c1a-4b03-a558-980786f9608d")
+	)
+	(label "NUC_TACH"
+		(at 383.54 168.91 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "cdcf5460-5383-4347-80f1-80f0be660b09")
+	)
+	(label "P5V"
+		(at 383.54 176.53 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "e3d6bef4-32f6-441c-906d-f7edbb0ab9e8")
+	)
+	(label "P5V"
+		(at 400.05 167.64 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "ee76f233-7452-4c3a-ac07-07cf29e9c049")
+	)
+	(label "GND"
+		(at 400.05 177.8 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "0436c60d-9bfc-4b4b-b43a-bdd4c550dd42")
+	)
+	(wire
+		(pts
+			(xy 373.38 204.47) (xy 364.49 200.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a0291c49-8194-4c6b-9350-b5dac855db50")
+	)
+	(symbol
+		(lib_id "Transistor_BJT:BC547")
+		(at 378.46 204.47 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "11c01254-dea2-43b0-b044-35027f000b5c")
+		(property "Reference" "Q4"
+			(at 378.46 196.85 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "BC547"
+			(at 378.46 212.09 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_THT:TO-92_Inline_Wide"
+			(at 383.54 202.565 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+			)
+		)
+		(property "Datasheet" "https://www.onsemi.com/pub/Collateral/BC550-D.pdf"
+			(at 378.46 204.47 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Description" "0.1A Ic, 45V Vce, Small Signal NPN Transistor, TO-92"
+			(at 378.46 204.47 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Sim.Type" "GUMMELPOON"
+			(at 378.46 204.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Name" "bc547"
+			(at 378.46 204.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Library" "sim/models/bc547.lib"
+			(at 378.46 204.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Note" "cabinet BC547 is the NXP E-B-C order: board pad1=GND, pad2=TBASE, pad3=NUC_TACH"
+			(at 378.46 204.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "2e880c16-ac41-4e1e-9e12-0a8c0a141c9c")
+		)
+		(pin "2"
+			(uuid "4bb8cf49-2321-44ea-93ba-bdbdbaefb56f")
+		)
+		(pin "3"
+			(uuid "f92b658a-0589-47c7-890d-be4d105fa973")
+		)
+		(instances
+			(project "mosfet-fan-switch"
+				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+					(reference "Q4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "NUC_TACH"
+		(at 381.0 199.39 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "107b3fd4-b409-437f-bf7e-e0e0fefc5021")
+	)
+	(wire
+		(pts
+			(xy 373.38 204.47) (xy 364.49 200.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "65a8211f-5299-4942-99d3-46e7f7931775")
+	)
+	(label "GND"
+		(at 381.0 209.55 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "11fed694-b1c1-401c-90f5-562dc734aa2c")
+	)
+	(label "PWM"
+		(at 123.19 170.18 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "af807dfb-d6a5-4add-a3ea-237b8b2fe780")
+	)
+	(label "PWM"
+		(at 113.03 170.18 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "f6593a19-8db3-45ca-a2e2-55b575aad773")
+	)
+	(label "TACH_PWM"
+		(at 113.03 172.72 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "80d03734-8f50-45a9-ba60-d42394c45a73")
+	)
+	(label "DEMAND"
+		(at 87.63 162.56 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "52eed806-a4e7-42ed-b56b-3ef40dd1fa67")
+	)
+	(symbol
+		(lib_id "Simulation_SPICE:VPULSE")
+		(at 365.76 190.5 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp yes)
+		(uuid "00e62184-ff1e-4e9e-bb72-645d2deca787")
+		(property "Reference" "V5"
+			(at 363.22 190.5 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "VPULSE"
+			(at 368.3 190.5 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 365.76 190.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://ngspice.sourceforge.io/docs/ngspice-html-manual/manual.xhtml#sec_Independent_Sources_for"
+			(at 365.76 190.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Voltage source, pulse"
+			(at 365.76 190.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Sim.Device" "V"
+			(at 365.76 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Type" "PULSE"
+			(at 365.76 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Pins" "1=+ 2=-"
+			(at 365.76 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Params" "y1=0 y2=3.3 td=0 tr=20n tf=20n tw=5m per=10m"
+			(at 365.76 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Note" "sim-only stand-in for the Pro Mini pin D10 (OC1B), the tach carrier: 100 Hz, 50 %."
+			(at 365.76 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "4a285461-7db6-422a-9cd8-3d825e02a8cd")
+		)
+		(pin "2"
+			(uuid "aa5b0b39-8299-4614-8c37-a9d7a9355aca")
+		)
+		(instances
+			(project "mosfet-fan-switch"
+				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+					(reference "V5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "TACH_PWM"
+		(at 365.76 185.42 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "f91754e3-cf97-4b74-bd66-f73962417986")
+	)
+	(label "GND"
+		(at 365.76 195.58 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "26596565-4bc9-4aae-bd0c-16d2a2667be7")
+	)
+	(label "DEMAND"
+		(at 307.34000000000003 173.98999999999998 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "8ead1bc1-3a77-40c1-90a6-12e782528beb")
+	)
+	(label "TACH_PWM"
+		(at 307.34000000000003 176.53 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "7f2d57c7-14ef-46d0-a42e-1d81673f5a24")
 	)
 	(sheet_instances
 		(path "/"

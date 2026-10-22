@@ -24,7 +24,8 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "sim" / "out"
 SRC = OUT / "mosfet-fan-switch.spice"
 
-MODELS = ["2n7002.lib", "irf7416.lib", "irfz44n.lib", "irfz44n_wc.lib", "schottky.lib"]
+MODELS = ["2n7002.lib", "irf7416.lib", "irfz44n.lib", "irfz44n_wc.lib", "schottky.lib",
+          "bc547.lib"]
 
 BOOSTER_ONLY = {"R2", "R3", "MQ2", "MQ3", "R4", "C2"}
 
