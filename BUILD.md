@@ -146,13 +146,14 @@ leaves the edges alone.
 
 ## BOM, and where the parts came from
 
-*This is the retired board's BOM. The perfboard's parts, all from the same drawers, are listed in
-`fan-switch-booster/README.md`, *Parts — all from my cabinets*.*
+*This is the retired board's BOM. The reference build — the perfboard — has its own parts sheet now:
+`docs/parts-collection.md` §1, and the schematic‑side list is `fan-switch-booster/README.md`,
+*Parts — all from my cabinets*.*
 
 All through-hole except one SMD part — U3, a TO-252 — which is hand-solderable without a stencil.  All
-already in the cabinet.  `docs/parts-collection.html` is the same list cut as a walk-the-cabinet checklist,
-with quantities including spares and the measurements each part has to give up before its footprint can be
-fixed.
+already in the cabinet.  `docs/parts-collection.md` and its `.html` twin carry the same list as a
+walk-the-cabinet checklist, with quantities including spares and the measurements each part has to give up
+before its footprint can be fixed.
 
 | Ref | Value | Footprint | Cabinet |
 |---|---|---|---|

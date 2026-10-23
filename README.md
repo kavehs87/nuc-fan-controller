@@ -40,8 +40,9 @@ bench/                     the ITE measurements
                              directory was purged, so it no longer runs
 
 docs/
-  bench/                     five bench photographs, two graphs
-  parts-collection.*         the cabinet walk for the retired board's BOM
+  bench/                     five bench photographs, two graphs, and a README.md naming each one
+  parts-collection.*         the parts sheet: §1 the perfboard build as it actually is, §2–3 the retired
+                             board's cabinet walk, §4 the measurements that decide footprints
 
 firmware/                  the sketches that made those measurements
   nuc-tach-modeB/            the ITE constants live here
@@ -167,12 +168,12 @@ numbers.
 | `bench/analyze-ladder.py`, `bench/analyze-temp.py`, `bench/analyze-cold.py`, `bench/analyze-heat.py` | the analysers that produced the numbers below, run against `bench/data/` — `analyze-heat.py` is the one that separates the cores from the board |
 | `bench/analyze-hold.py` | the analyser for the "does it integrate time?" test: flat-window trend, same-temperature early against late, and a two-variable fit |
 | `bench/plot-curve.py`, `bench/plot-hold.py` | draw `docs/bench/06-ite-fan-response.svg` and `docs/bench/07-ite-hold-test.svg`, the two graphs below, from the same logs |
+| `docs/bench/` | the five bench photographs and those two graphs, with `docs/bench/README.md` naming what each one shows |
 | `bench/data/` | the raw logs: 1 Hz traces of the divider reading, and of the NUC's temperatures |
 | `firmware/nuc-tach-modeA/nuc-tach-modeA.ino` | the archived tach simulator's sketch — the fixed‑RPM answer this project replaced |
 | `bench/prepare-photos.py` | the tool that cropped `docs/bench/` out of the phone originals. Its input directory was purged in the cleanup, so it no longer runs; the recipe is in the file |
-| `docs/parts-collection.md`, `.html` | the cabinet walk for the **retired board's** BOM — every line with the drawer it came from, and the measurements each part has to give up before its footprint can be drawn |
+| `docs/parts-collection.md`, `.html` | the parts sheet, in two halves: **§1 the perfboard build as it actually is** — what is fitted, what is on the schematic but not on this bench, and what is on the shelf modelled but not fitted; §2–3 the **retired** board's cabinet walk, kept because those parts are still in the drawers and this is the record of where they came from; §4 the eight measurements that decide footprints, each one now marked *still live* or *retired board's footprint detail*. The `.html` is the same sheet with tick boxes |
 | `BUILD.md` | the bench sheet: identifying the four header wires with a meter, setting a buck module to 12.0 V, the divider / top‑of‑swing procedure, the BC547 pin‑order check, calibration order. Its assembly steps name parts of the retired board |
-| `docs/parts-collection.html` | the collection sheet: every BOM line with the exact cabinet drawer it comes from, in drawer‑walk order, plus the eight measurements that decide the footprints (also `docs/parts-collection.md`) |
 | `fan-switch-booster/archive/` | the booster's first version — a single logic‑level IRLZ44N driven directly at 5 V, with its plots. Kept because the reason it worked is the reason 3.3 V needs a booster |
 
 ## On the bench

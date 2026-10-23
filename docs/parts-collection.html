@@ -41,15 +41,16 @@
 </head>
 <body>
 <header>
-  <h1>Parts collection sheet — NUC fan controller</h1>
+  <h1>Parts collection sheet — what is built, and where every part came from</h1>
   <div class="sub">
-    Every BOM line and the exact cabinet drawer it comes from. Walk the drawers in the order of the
-    second table; tick each row as it goes in the tray. The last table is what the photos and caliper
-    readings have to answer, because those answers set the footprints and therefore the board size.
-    Quantities include spares. The 19&nbsp;V→12&nbsp;V stage is the XL4016E1 module, so the board carries
-    no power inductor, no rectifier for that stage, and no buck IC. The board is now <b>one copper layer</b>,
-    88.90 × 76.20 mm, drawn to be etched at home, and it has <b>no 5&nbsp;V rail</b> — the 5&nbsp;V regulator
-    and its two capacitors have come off this list.
+    <b>Two halves, and they are not equally live.</b> Section&nbsp;1 is the <b>perfboard build</b> in
+    <code>fan-switch-booster/</code> — the circuit that exists, was scoped, and produced every fan-side
+    number in this repo. Sections&nbsp;2–3 are the cabinet walk for the <b>retired</b>
+    <code>nuc-fan-controller</code> enclosure board: kept because those parts are still in the drawers and
+    this sheet is the record of where they came from, but that board lives at the tag
+    <code>nuc-fan-controller-full-2026-10-23</code> and is not being built. Section&nbsp;4 is what the photos
+    and caliper readings have to answer — each item now says whether it still matters. Quantities include
+    spares. Nothing here needs buying except possibly M3 hardware.
   </div>
   <div class="bar">
     <button id="print">Print</button>
@@ -59,7 +60,42 @@
 </header>
 <main>
 
-<h2>1. By reference</h2>
+<h2>1. The perfboard build, as it actually is</h2>
+<p class="sub">Nothing to collect in this section — it is what is on the board right now, and which drawer
+each part came from. These are the parts behind every scope trace and multimeter reading in
+<code>fan-switch-booster/README.md</code>.</p>
+<table>
+  <thead><tr><th>Ref</th><th>Part</th><th>Cabinet</th><th>On the bench</th></tr></thead>
+  <tbody>
+    <tr><td class="refs">U1</td><td>Arduino Pro Mini, 3.3 V / 8 MHz, ATmega328P <span class="id">id 125</span></td><td class="drawer">L1 C5</td><td><b>Fitted</b>, in female sockets. Flashed through its own bootloader at 57600</td></tr>
+    <tr><td class="refs">Q1</td><td>IRFZ44N N‑channel power MOSFET, TO‑220 <span class="id">id 208</span></td><td class="drawer">R1 B4</td><td><b>Fitted.</b> <code>/GATE</code> is pin 1, <code>/DRAIN</code> is the tab — the two probe points</td></tr>
+    <tr><td class="refs">Q2</td><td>2N7002 N‑channel MOSFET, SOT‑23</td><td class="drawer">R1 A4</td><td><b>Fitted.</b> Sinks <code>/BOOT</code> when the Arduino pin goes high</td></tr>
+    <tr><td class="refs">Q3</td><td>IRF7416 P‑channel MOSFET, SO‑8</td><td class="drawer">R1 A4</td><td><b>Fitted.</b> The booster — it is what puts 10.9 V on the gate from a 3.3 V pin. One of the six is already on a breakout board</td></tr>
+    <tr><td class="refs">D1</td><td>1N5819 Schottky 40 V / 1 A, DO‑41 <span class="id">id 48</span></td><td class="drawer">L1 E1</td><td><b>Fitted</b>, <code>/DRAIN</code> to +12 V. Its freewheel collapsing is what pulls <code>/DRAIN</code> to −1.2 V</td></tr>
+    <tr><td class="refs">R1</td><td>1 kΩ <span class="id">id 221</span></td><td class="drawer">R1 A2</td><td><b>Fitted.</b> Arduino pin → Q2 base</td></tr>
+    <tr><td class="refs">R2</td><td>10 kΩ <span class="id">id 224</span></td><td class="drawer">R1 B2</td><td><b>Fitted.</b> Q2 base pull‑down</td></tr>
+    <tr><td class="refs">R3</td><td>10 kΩ <span class="id">id 224</span></td><td class="drawer">R1 B2</td><td><b>Fitted, and it decides the carrier.</b> <code>/BOOT</code> charges back through it into a node that measures <b>~8 nF</b> — the fixed ~170 µs turn‑off</td></tr>
+    <tr><td class="refs">R4</td><td>1 kΩ <span class="id">id 221</span></td><td class="drawer">R1 A2</td><td><b>Fitted.</b> <code>/HIGATE</code> → <code>/GATE</code> series, and the edge‑rate limiter</td></tr>
+    <tr><td class="refs">R5</td><td>10 kΩ <span class="id">id 224</span></td><td class="drawer">R1 B2</td><td><b>Fitted, and it stays 10 k.</b> With R4 it sets 10.9 V of gate drive; at 1 k <code>/GATE</code> collapses to 6.0 V</td></tr>
+    <tr><td class="refs">—</td><td>12 V supply on the bench</td><td class="drawer">an 8 A brick</td><td>not the 450 mA module in <b>L1 B7</b>. The brick is what moves the fan limit from the supply to the flyback diode</td></tr>
+    <tr><td class="refs">—</td><td>the fans</td><td class="drawer">—</td><td>real 12 V <b>two‑pin</b> fans — no PWM pin, no tach, 100 mA each at full speed</td></tr>
+  </tbody>
+</table>
+<p class="sub"><b>On the schematic but not on this bench:</b> Q4 (BC547, <b>R1 D3</b>) and the tach pull‑up —
+the bench has no tach path; R7 / R8 and C5 / C6 — the <code>/DEMAND</code> divider, and <b>A0 is unused</b> here;
+D2 (1N5822) and D3 (MBR10100CT), <code>dnp</code> spare footprints for a dozen fans; C1 = 1.5 n and C2 = 1.7 n,
+which are not parts at all but the two FETs' own <code>Ciss</code> drawn explicitly — the perfboard's
+<code>/BOOT</code> carries about <b>8 nF</b>, and the extra ~6 nF is the wiring; and V1, the 450 mA module in
+<b>L1 B7</b>.</p>
+<p class="sub"><b>On the shelf, modelled and not fitted:</b> Q5 (BC547, <b>R1 D3</b>), emitter to ground, base
+to <code>/BOOT</code> through 4.7 kΩ (<b>R1 B2</b>), collector to <code>/GATE</code>, with R3 dropped to 1 kΩ
+(<b>R1 A2</b>). Modelled exact from 1 kHz to 25 kHz. R3 then carries ~12 mA and dissipates <b>~145 mW</b>, so it
+is a power‑rated part chosen knowingly. Worth fitting only if a carrier above hearing is actually wanted —
+100 Hz already solved the noise.</p>
+
+<h2>2. The retired board's BOM, by reference</h2>
+<p class="sub">Kept as the record of that design and of where its parts came from. Tick each row as it goes in
+the tray only if that board is rebuilt from the tag.</p>
 <table>
   <thead><tr><th></th><th>Ref</th><th>Value</th><th>On the board</th><th>Cabinet</th><th>Inventory entry</th><th class="n">Stock</th><th class="n">Take</th></tr></thead>
   <tbody>
@@ -87,7 +123,9 @@
   </tbody>
 </table>
 
-<h2>2. Walk the cabinet in this order</h2>
+<h2>3. The same list as a drawer walk</h2>
+<p class="sub">This is the <b>retired board's</b> walk — the drawer order for everything in section&nbsp;2.
+The perfboard's parts are a subset of these drawers and are already on the board.</p>
 <table>
   <thead><tr><th></th><th class="n">#</th><th>Drawer</th><th>Take</th></tr></thead>
   <tbody>
@@ -111,45 +149,55 @@
 <p class="sub">Only if the 3.5″ HDD 12 V tap gets built: <b>L1 A8</b> glass fuse 3–4 A ×1 and
 <b>L1 B6</b> glass fuse socket ×1 for the tapped 19 V lead.</p>
 
-<h2>3. What the photos and calipers have to answer</h2>
+<h2>4. What the photos and calipers have to answer</h2>
+<p class="sub">Each item now says whether it still matters. <i>Still live</i> applies to any rebuild, including
+the perfboard; <i>retired board's footprint detail</i> is kept only because the footprints at the tag were
+drawn from those numbers.</p>
 <div class="grp">
-  <h3>3.1 The ten resistors — the biggest lever on board area</h3>
-  <p class="note">The design assumes DIN0204: 3.6 mm body, 1.6 mm Ø, <b>5.08 mm</b> pad pitch. If the cabinet's
-  are 0207 (≈5.5 × 2.5 mm, leads spread to ≈10 mm) every resistor takes twice the room. Report body length,
-  body Ø, and the spacing the leads land at when the part sits flat.</p>
-  <h3>3.2 The disc caps</h3>
-  <p class="note">The board draws the 100 n as Ø6.0 / W2.5 / P5.00 with its pads spread to 5.08, and the 100 p
-  as Ø3.8 / W2.6 / P2.50. Report each body’s Ø, thickness, and lead spread where the leads exit the body; a
-  smaller disc simply sits loose in the pads, a bigger one is what moves the board.</p>
-  <h3>3.3 Headers — the cabinet has no 4‑pin strip</h3>
-  <p class="note">Three ways to make J2 and J6: snap 5‑pin strips down to 4; salvage the NUC's own fan plug and
-  solder its wires into a 4‑pin header; or solder fan wires straight into the pads. The JST‑XH 4P housings in
-  L1 E9 are 2.5 mm pitch and will not sit on 2.54 mm pins. Report whether the strips are breakaway.</p>
-  <h3>3.4 D2's span decides the two fan rails</h3>
-  <p class="note">The board keeps the library’s <b>10.16 mm</b> pitch so the silkscreen outline matches the part.
-  A DO‑41 body is ≈5.3 × 2.7 mm with ≈2.7 mm natural lead spacing, so its leads get bent out to 10.16 and it
-  lies flat with its body between the two rails it joins. Report body length and Ø.</p>
-  <h3>3.5 The buck module decides J6</h3>
-  <p class="note">Some XL4016 modules have screw terminals (5.08 mm pitch, no pins at all), some have plain pins.
-  Report module L × W, what the input and output terminals are and their spacing, where the two trim pots sit,
-  whether it has mounting holes, and how tall its tallest part is.</p>
-  <h3>3.6 The regulator</h3>
-  <p class="note">Confirm the AMS1117‑3.3 is TO‑252 (SOT‑223): the board’s pads are TO‑252, and a SOT‑223 is the
-  same 6.5 mm body with a longer lead stub that will not sit down on them. If only a TO‑220 turns up, L1 B1 also
-  holds BA033ST (TO‑220 3.3 V, 4 pcs) — a deliberate all‑THT option, at the cost of a TO‑220 footprint on a board
-  that is trying to be small.</p>
-  <h3>3.7 The transistors</h3>
-  <p class="note">TO‑92 leads come flat (one row) or staggered (middle lead offset); the design uses
-  <code>TO-92_Inline_Wide</code>. Report which the BC547s are and confirm the marking reads BC547<b>B</b>.
-  Pin order facing the flat face: 1 = E, 2 = B, 3 = C.</p>
-  <h3>3.8 The Pro Mini</h3>
-  <p class="note">Confirm 3.3 V / 8 MHz (crystal marked 8.000): the board's 3.3 V rail and the firmware expect it.
-  Then measure <b>where its pins actually are</b>. The board plugs it into one 1×05 header, which is only right if
-  GND, VCC, A0, D11 and D9 are reachable on one row of the Pro Mini's own headers. Photograph both rows with the
-  pin names legible: if they are split, J5 becomes two headers and the bottom edge of the layout moves.</p>
+  <h3>4.1 The resistors — the biggest lever on area</h3>
+  <p class="note"><i>Still live.</i> The design assumes DIN0204: 3.6 mm body, 1.6 mm Ø, <b>5.08 mm</b> pad
+  pitch. If the cabinet's are 0207 (≈5.5 × 2.5 mm, leads spread to ≈10 mm) every resistor takes twice the room,
+  and a 0207 can also be seated with its body off the board to halve that. Report body length, body Ø, and the
+  spacing the leads land at when the part sits flat. This is also what decides how R1–R5 sit on a perfboard.</p>
+  <h3>4.2 The disc caps</h3>
+  <p class="note"><i>Retired board's footprint detail.</i> The board draws the 100 n as Ø6.0 / W2.5 / P5.00 with
+  its pads spread to 5.08, and the 100 p as Ø3.8 / W2.6 / P2.50. Report each body’s Ø, thickness, and lead spread
+  where the leads exit the body; a smaller disc simply sits loose in the pads, a bigger one is what moves the board.</p>
+  <h3>4.3 Headers — the cabinet has no 4‑pin strip</h3>
+  <p class="note"><i>Still live</i> — any build that plugs into the NUC needs one. Three ways to make J2 and J6:
+  snap 5‑pin strips down to 4; salvage the NUC's own fan plug and solder its wires into a 4‑pin header; or solder
+  fan wires straight into the pads. The JST‑XH 4P housings in L1 E9 are 2.5 mm pitch and will not sit on
+  2.54 mm pins. Report whether the strips are breakaway.</p>
+  <h3>4.4 The flyback diode's span</h3>
+  <p class="note"><i>Retired board's footprint detail.</i> The board keeps the library’s <b>10.16 mm</b> pitch so
+  the silkscreen outline matches the part. A DO‑41 body is ≈5.3 × 2.7 mm with ≈2.7 mm natural lead spacing, so its
+  leads get bent out to 10.16 and it lies flat with its body between the two rails it joins. Report body length
+  and Ø. On the perfboard the same part just needs its leads long enough to reach the two rails.</p>
+  <h3>4.5 The buck module</h3>
+  <p class="note"><i>Live if a 12 V rail is ever built as a module.</i> Some XL4016 modules have screw terminals
+  (5.08 mm pitch, no pins at all), some have plain pins. Report module L × W, what the input and output terminals
+  are and their spacing, where the two trim pots sit, whether it has mounting holes, and how tall its tallest part
+  is. The perfboard bench uses an 8 A brick instead, so nothing here blocks it.</p>
+  <h3>4.6 The regulator</h3>
+  <p class="note"><i>Retired board's footprint detail.</i> Confirm the AMS1117‑3.3 is TO‑252 (SOT‑223): the
+  board’s pads are TO‑252, and a SOT‑223 is the same 6.5 mm body with a longer lead stub that will not sit down on
+  them. If only a TO‑220 turns up, L1 B1 also holds BA033ST (TO‑220 3.3 V, 4 pcs) — a deliberate all‑THT option,
+  at the cost of a TO‑220 footprint on a board that is trying to be small.</p>
+  <h3>4.7 The transistors</h3>
+  <p class="note"><i>Still live, and this is the one that breaks hardware silently.</i> TO‑92 leads come flat
+  (one row) or staggered (middle lead offset); the design uses <code>TO-92_Inline_Wide</code>. Report which the
+  BC547s are and confirm the marking reads BC547<b>B</b>. Then check the <b>pin order</b>: these footprints assume
+  the NXP/Philips <b>E‑B‑C</b> order facing the flat face (1 = E, 2 = B, 3 = C), and an onsemi part in
+  <b>C‑B‑E</b> looks identical and works not at all. Meter both before they go in.</p>
+  <h3>4.8 The Pro Mini</h3>
+  <p class="note"><i>Still live.</i> Confirm 3.3 V / 8 MHz (crystal marked 8.000): the 3.3 V rail and the firmware
+  expect it, and a 5 V / 16 MHz board back‑feeds 5 V into every pin. Then measure <b>where its pins actually
+  are</b>. The retired board plugged it into one 1×05 header, which is only right if GND, VCC, A0, D11 and D9 are
+  reachable on one row of the Pro Mini's own headers. Photograph both rows with the pin names legible: if they are
+  split, J5 becomes two headers and the bottom edge of the layout moves.</p>
 </div>
 
-<h2>4. Not in the cabinet</h2>
+<h2>5. Not in the cabinet</h2>
 <p class="sub">M3 mounting hardware for the board corners (four holes, if they stay) plus four nuts, and hookup
 wire. The 19 V lead, its fuse, and the NUC's 5 V tap are bench items, not board items.</p>
 
