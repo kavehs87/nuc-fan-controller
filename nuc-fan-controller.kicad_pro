@@ -510,8 +510,7 @@
         "tuning_profile": "",
         "via_diameter": 0.8,
         "via_drill": 0.3,
-        "wire_width": 6,
-        "micro_via_diameter": 0.8
+        "wire_width": 6
       },
       {
         "bus_width": 12,
@@ -530,8 +529,7 @@
         "tuning_profile": "",
         "via_diameter": 0.8,
         "via_drill": 0.35,
-        "wire_width": 6,
-        "micro_via_diameter": 0.8
+        "wire_width": 6
       }
     ],
     "meta": {
