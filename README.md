@@ -221,10 +221,14 @@ A few of those deserve a comment:
   every cycle. The *average* is 54 mA. The fan always sees either a full 12 V or 0 V — that is
   how PWM speed control works. At Klipper's default 100 Hz the effect is the same but with
   5 ms pulses.
-- **Turn-off is slower than turn-on.** `/BOOT` has to charge the IRF7416's 1.7 nF back up to
-  12 V through R3 10 kΩ: τ = 17 µs, and the fan stays on for ~55 µs after the pin goes low. At
-  100 Hz that is irrelevant. If you drive the fan at several kHz, drop R3 to 1 kΩ (τ = 1.7 µs);
-  the 2N7002 then sinks 12 mA, which is well inside its 115 mA rating.
+- **Turn-off is slower than turn-on, and the model understates it.** `/BOOT` has to charge back up
+  to 12 V through R3 10 kΩ. With the netlist's `C2 = 1.7n` — only the IRF7416's own `Ciss` — that
+  is τ = 17 µs and the fan stays on ~55 µs after the pin goes low. The perfboard measured
+  **~170 µs**, because that node also carries its wiring: about 8 nF rather than 1.7 nF, see
+  "Why the carrier is 100 Hz". At 100 Hz the difference is 3 % of the off half-period, which is
+  why the board runs there. If you want several kHz, drop `R3` to 1 kΩ *and* fit the `Q5` gate
+  helper described under that heading; `R3 = 1k` then sinks 12 mA, well inside the 2N7002's
+  115 mA rating, but has to dissipate about 145 mW.
 
 ---
 
@@ -693,6 +697,262 @@ footprint.
 - The bins hold 16/18/28-pin **DIP** sockets, and they do not fit: a DIP socket's rows are
   7.62 mm apart. What the module wants is a 2.54 mm **female** strip snapped to 12 + 12 + 6,
   and the drawers do not have one.
+
+---
+
+## Firmware, and why 0 % was humming
+
+```
+firmware/fan-switch-debug/     drive + tach blink, the first one that ran on the bench
+firmware/fan-switch-ladder/    100 % -> 50 %, one step per minute, no serial needed
+firmware/fan-switch-serial/    duty commanded over the UART: 0..100, ?, h
+firmware/fan-switch-freq/      duty AND carrier over the UART: 0..100, f <Hz>, ?, h
+firmware/bench/                the scripts that drive the bench: flash, set, sequence, verify
+```
+
+All four drive `/PWM` on **D9 = OC1A**, fast PWM with `TOP` from `ICR1`. Timer 1 is the only
+16-bit timer on the module and D9 is the only pin carrying OC1A, which is why the sketches touch
+`TCCR1A/B`, `ICR1` and `OCR1A` directly instead of calling `analogWrite()` — that would have moved
+the whole thing to Timer 2 at 980 Hz.
+
+The two sketches the bench uses now — `ladder` and `freq` — default to **`ICR1 = 9999` with a
+prescaler of 8: 100 Hz**, 5 000 µs high at 50 %. That is not the value they started on: both ran at
+1 kHz until the carrier was measured, and `serial` and `debug` are left at 1 kHz as the record of
+what the bench ran before that measurement. The reason for the change is the next section.
+
+### The hum at 0 % was `OCR1A = 0`, and it is not 0 %
+
+In fast PWM, `OCR1A = 0` does not switch the output off. The datasheet calls it *"a narrow
+spike for each TOP+1 timer clock cycle"*: one timer clock, whatever the carrier is. At 8 MHz that
+is a **125 ns pulse on D9, once every carrier period, forever** — every 1 ms at the 1 kHz these
+sketches originally ran at, every 10 ms at the 100 Hz they run at now.
+
+Through the Q2/Q3 booster that spike is not small. Measured in `sim/out/mosfet-fan-switch.spice`
+with the fan branch attached:
+
+| node | what the spike does |
+|---|---|
+| `/LGATE` | 3.00 V pulled low |
+| `/BOOT` | 12 V → **8.055 V** |
+| `/HIGATE` | held at 12 V |
+| `/GATE` | **10.905 V for 36.66 µs** |
+| `i(L1)` | **31.1 mA** peak, 2.57 mA mean, every cycle |
+
+So the fan was being kicked with 10.9 V on its MOSFET gate a thousand times a second, at the 1 kHz
+carrier this board originally ran, while the sketch believed the output was off. 36.66 µs of a 1 ms
+period is 3.7 % — enough to make the winding and its own capacitance ring audibly. That is the hum.
+
+**The fix is not a smaller number, it is a different mode:** clear `COM1A1:0` to `00` so OC1A
+leaves the pin, then hold D9 low as ordinary GPIO. Timer 1 keeps running, but it is no longer
+connected to anything.
+
+```c
+if (pct == 0) {
+    TCCR1A &= (uint8_t)~(_BV(COM1A1) | _BV(COM1A0));   // OC1A off the pin
+    digitalWrite(PWM_PIN, LOW);                          // held low as GPIO
+    return;
+}
+TCCR1A = _BV(COM1A1) | _BV(WGM11);                       // back to fast PWM
+OCR1A  = (uint16_t)((uint32_t)(PWM_TOP + 1) * pct / 100);
+```
+
+**Confirmed on the bench.** `fan-switch-serial` written through the module's own bootloader
+(`-c arduino -b 57600`, `ATmegaBOOT_168_atmega328_pro_8MHz.hex`) over J5 with DTR connected:
+at `duty 0 %   OCR1A 0/8000` the fan is **silent**, and `50` spins it up on command. Every sketch
+since carries the same fix, so 0 % is silent whatever the carrier is set to.
+
+### Why the carrier is 100 Hz
+
+The sketches started at 1 kHz on the theory that the hum was the chopping, and that putting the
+carrier above hearing — the 4-pin fan PWM standard uses 25 kHz for exactly that reason — would fix
+it. On the bench the opposite happened: 25 kHz is *not quieter*, it is the fan running at full
+speed no matter what duty is commanded. A Hantek DSO2D10 with both channels on the board, CH1 on
+Q1 pin 1 (`/GATE`) and CH2 on Q1's tab (`/DRAIN`), ground clip on the board's input ground, says
+why.
+
+At **1 kHz, 50 % commanded**, `OCR1A 4000/8000`, so 500 µs high:
+
+| measurement | value |
+|---|---|
+| `/GATE` high width | **652 µs** of a 1000 µs period |
+| `/DRAIN` low width | **680 µs** |
+| `/GATE` swing | −0.2 V → 11 V, rise 12 µs |
+| `/DRAIN` swing | −1.2 V → 12 V |
+| `/DRAIN` average | 2.99 V, so the fan's own average supply is 12 − 2.99 = **9.01 V** |
+
+The two channels agree with each other, which is what makes the reading trustworthy: the gate is
+high for exactly as long as the drain is low. **A commanded 500 µs of conduction became
+650–680 µs.** Turn-on is fast, 12 µs. Turn-off takes roughly **170 µs**.
+
+That single number explains everything the bench had already shown, including measurements taken
+before the scope existed. A fixed *time* error adds a fixed *voltage* offset: 12 V × 170 µs ÷
+1000 µs ≈ **2 V**, and a multimeter sweep across the fan at 1 kHz had produced a straight line —
+9.6 V at 60 %, 8.6 V at 50 %, 0.1 V per percent — sitting about 2 V above the ideal line at every
+duty. The scope derived the same 2 V from a time measurement, independently. It also explains why
+the hum appeared at *every* chopped duty from 60 % down to 10 % and at neither extreme: at 100 %
+there is no chopping, and at 0 % the pin is held low as GPIO.
+
+And it explains 25 kHz. The excess is a constant ~170 µs, but at 25 kHz the off half-period is
+20 µs. The gate is told to fall and never gets there, so the output is simply **stuck on** — which
+is exactly what the fan was doing.
+
+### Calibrating the model to the board, and the two ways out
+
+The netlist models `/BOOT` with `C2 = 1.7n`, which is only the IRF7416's own `Ciss`. Re-running the
+transient at 1 kHz / 50 % against the measured 652 µs:
+
+| `C2` in the model | `/GATE` high, 500 µs commanded |
+|---|---|
+| 1.7 nF (what the netlist says) | 538 µs |
+| 4.7 nF | 580 µs |
+| 6.8 nF | 616 µs |
+| 10 nF | 689 µs |
+| **the board** | **652 µs** |
+
+So the perfboard's `/BOOT` node carries roughly **8 nF**, not 1.7 nF — the extra ~6 nF is the
+wiring. That is the difference between a model that reports 53 % duty and a board that delivers
+68 %. It is worth remembering that a hand-built board is three times its own netlist at this node.
+
+Two ways out, and they were both measured:
+
+**Slow the carrier.** The error is a fixed time, so at a long period it stops mattering. At
+**100 Hz, 50 %** the scope reads:
+
+| measurement | value |
+|---|---|
+| period | 10.02 ms |
+| `/GATE` high / low width | **4.82 ms / 5.20 ms** |
+| delivered duty | **48.10 %** for 50 % commanded |
+| `/GATE` average | 4.76 V |
+
+170 µs out of a 5 ms off-half is 3 %, and the delivered duty is honest. The fan is quiet — the
+noise the 1 kHz carrier produced is gone. This is the fix the board is running now, and it cost
+nothing but a constant in the sketch.
+
+**Or make the turn-off fast, which buys the high carriers back.** A BC547 (`Q5`) with its emitter
+to ground, base to `/BOOT` through 4.7 kΩ, and collector to `/GATE` clamps the gate directly
+instead of waiting for `/BOOT` to charge back up. On the calibrated board:
+
+| variant | 1 kHz | 10 kHz | 25 kHz |
+|---|---|---|---|
+| as built, `R3 = 10k` | 580 µs (want 500) | **stuck on** | **stuck on** |
+| `Q5`, `R3 = 10k`, `Rb = 4.7k` | 500 µs | 53 µs | 23 µs, fan 58 mA |
+| **`Q5`, `R3 = 1k`, `Rb = 4.7k`** | **496 µs** | **49 µs** | **19 µs, fan 47.5 mA** |
+
+Wanted values are 500, 50 and 20 µs. The helper with `R3` dropped to 1 kΩ is essentially exact at
+every carrier from 1 kHz to 25 kHz. With `R3 = 1k` the off state also gets cheaper rather than
+more expensive: `/BOOT` settles near 10 V, which is high enough that `Q3` genuinely turns off, so
+`/HIGATE` and `R4` stop carrying anything and the off-state loss collapses to about 25 mW. The
+cost moves to the on state — `R3 = 1k` then carries about 12 mA while the fan runs, so **`R3` has
+to dissipate around 145 mW**, fine for a quarter-watt through-hole part but a part to choose
+knowingly. That variant is modelled and not fitted: 100 Hz already solved the noise, so `Q5` is on
+the shelf until a carrier above hearing is wanted.
+
+One more thing visible in the 1 kHz trace: **`/DRAIN` undershoots to −1.2 V**, which means Q1's
+body diode conducts briefly at turn-on. The freewheel current circulating through D1 and the fan's
+own 10 mH has to collapse, and it does that by pulling the drain below ground. It is not the noise
+source, but it is why the drain edges look ragged.
+
+### The whole duty range at 100 Hz, listened to
+
+With the carrier fixed at 100 Hz the board was run up the entire range, 10 seconds per rung, with
+`OCR1A` read back from the sketch at every step:
+
+| duty | `OCR1A` | `/GATE` high per 10 ms | fan supply | what the bench did |
+|---|---|---|---|---|
+| 0 % | 0 | 0 — pin held low as GPIO | 0 V | silent |
+| 10 % | 1000 | ~1.0 ms | ~1.2 V | **would not spin the fan** |
+| 20 % | 2000 | ~2.0 ms | ~2.4 V | **would not spin the fan** |
+| 30 % … 90 % | 3000 … 9000 | ~3 … 9 ms | ~3.6 … 10.7 V | ran |
+| 100 % | 10000 | always high | ~11.9 V | ran, smooth |
+
+**No humming at any rung.** That is the result the 1 kHz carrier could not produce at any chopped
+duty, and it is the reason 100 Hz is the default.
+
+The dead bottom of the ladder is the fan, not the switch. A 12 V brushless fan needs something like
+4–7 V at its terminals before its own controller will start the rotor, so 10 % and 20 % are being
+delivered correctly and the fan is simply declining to start — expected behaviour on a 2-wire fan,
+and worth knowing before anyone reads "nothing happens at 10 %" as a board fault. The exact rung
+where it starts was not pinned down. The other half of the same fact: once spinning, a fan keeps
+turning at a terminal voltage well below the one it needed to start, so the speed at a given duty
+depends on whether the fan was already running.
+
+### Open item: a start kick, not written yet
+
+A thermostat wants *low duty means low speed*, but a fan that will not start at 1.2 V makes the
+bottom of the range dead. The usual answer is a start kick — 100 % for a second or two to get the
+rotor going, then drop to the commanded duty. That belongs in `fan-switch-freq` as a `k` command
+and in the ladder as a kick before each rung settles. Not implemented; the bench is happy without
+it.
+
+### Do not put a capacitor across the fan terminals
+
+That was the other theory, and the simulation killed it. A capacitor there does not absorb the
+spike, it becomes the other half of an LC tank with the fan's own 10 mH winding:
+
+| `Cfan` | mean fan current at 0 % | ring with `L1 = 10 mH` |
+|---|---|---|
+| none | 2.57 mA | — |
+| 100 nF | 14.9 mA | harmless |
+| 10 µF | **69.6 mA** | 503 Hz, Q 3.8, ~2.4 ms |
+| 100 µF | **96.1 mA** | 159 Hz, Q 12, ~24 ms |
+
+At 10 % duty it is worse still: 74.9 mA with 10 µF, 97.0 mA with 100 µF. A bulk capacitor across
+the terminals makes the fan *hotter and louder*, not quieter. The only capacitor on that side of
+the board worth having is **100 nF film at J3**, and that is for EMI, not for the hum.
+
+### Programming it on the bench
+
+Both routes in `docs` work; the FTDI route is the one that keeps the bench quiet:
+
+```sh
+arduino-cli compile --fqbn arduino:avr:pro:cpu=8MHzatmega328 <sketch>
+avrdude -C <avrdude.conf> -c arduino -P /dev/ttyUSB0 -b 57600 -p m328p \
+        -U flash:w:<sketch>.ino.hex:i
+```
+
+`firmware/bench/` wraps exactly this. `flash-bootloader.sh` compiles and writes, `set.sh` leaves the
+sketch in a commanded state so the board can be probed with the port released, `seq.sh` runs a timed
+sequence so a duty range can be listened to, and `verify-flash.sh` reads all 32 kB back over ISP and
+compares it against the compiled hex.
+
+- **DTR must reach the module's RST.** Without it the bootloader never gets its reset pulse and
+  `avrdude` just times out. The FTDI breakout's DTR to J5-1 is the whole auto-reset circuit.
+- **Cross the data lines.** J5-2 is `TX0`, the module's *output*, so it goes to the breakout's
+  **RX**; J5-3 is `RX1`, the module's *input*, so it goes to the breakout's **TX**. Matching the
+  silkscreen names label-to-label is the wrong way round. If a breakout's labels are ambiguous,
+  jumper its own TX to its RX with nothing else attached and send bytes at it — 20 out, 20 back
+  identifies the pair by function.
+- **57600, not 9600.** The 3.3 V / 8 MHz bootloader runs at 57600; the sketch runs at 9600. They
+  are different baud rates on the same wire, which is why a failed upload looks like a dead link.
+- **Opening the port resets the module, and that is both the feature and the trap.** DTR to J5-1
+  is what gives the bootloader its reset pulse, so flashing needs the port to be opened. But the
+  same pulse resets the sketch, which puts the duty back to 0 %, and `ATmegaBOOT` then sits
+  listening for a sync byte for about a second — any command sent in that window is eaten by the
+  bootloader instead of reaching the sketch. That is how `f 100` once arrived as `unknown: j`. The
+  bench uses a `set.sh` that opens the port, waits 3 s for the bootloader to give up, sends the
+  command list, waits again, sends the list a second time, and then releases the port; the sketch
+  holds whatever it was last commanded, so the bench stays in that state while it is probed with a
+  scope or a meter.
+
+### Known bug, left in place
+
+`firmware/fan-switch-debug` blinks the tach LED with `PORTB ^= _BV(PB6)`, but Arduino **D10 is
+PB2**. The disassembly confirms it (`in r24,0x05; ldi r25,0x40; out 0x05`): it toggles a bit that
+is not the tach pin. It is left as written because that sketch is the record of the first bench
+run. Fix it to `_BV(PB2)` before reusing it on the embedded-Pro-Mini board.
+
+### Where the bench is left
+
+- The chip is running `firmware/fan-switch-freq`, flashed through its own bootloader, and boots on
+  its own at `duty 0 %   OCR1A 0/10000   carrier 100 Hz`. Nothing has to be sent for it to be in the
+  quiet configuration.
+- `Q5` and the 1 kΩ `R3` are **not fitted**. The board is the perfboard build with `R3 = 10k`, and
+  100 Hz is what makes that work.
+- Carriers above roughly 5 kHz stay unusable on this board until `Q5` is fitted: the ~170 µs
+  turn-off is longer than the off half-period there, so the output is stuck on.
+- The fan is quiet at every chopped duty from 30 % to 100 %, silent at 0 %, and does not start below
+  about 20 % because a 12 V brushless fan will not start on 2 V. That is the fan, not the switch.
 
 ---
 
