@@ -5216,10 +5216,6 @@
 		(uuid "3671ad4e-6ab3-4097-aae8-03d5032a652c")
 	)
 	(no_connect
-		(at 80.01 139.7)
-		(uuid "37604d72-7081-4879-acd4-fa88f9cb590c")
-	)
-	(no_connect
 		(at 44.45 138.43)
 		(uuid "40daf2c2-6e05-41dc-902c-85834c893b2a")
 	)
@@ -5853,16 +5849,6 @@
 		)
 		(uuid "fbfc65a5-e1d4-41f3-8a06-069f69c9662f")
 	)
-	(label "SCK"
-		(at 22.86 121.92 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "002408c0-b75c-44ce-8169-710a33aff8af")
-	)
 	(label "GND"
 		(at 400.05 177.8 270)
 		(effects
@@ -6133,16 +6119,6 @@
 		)
 		(uuid "39fdd9f4-e0e3-45a4-b8ac-7a6e93bada65")
 	)
-	(label "GND"
-		(at 35.56 124.46 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "3bb577c9-41b0-426b-9df2-172179b8b37c")
-	)
 	(label "BLK"
 		(at 22.86 166.37 180)
 		(effects
@@ -6213,16 +6189,6 @@
 		)
 		(uuid "4d7a4e17-31c6-4331-9b1c-f3dd3948c855")
 	)
-	(label "MOSI"
-		(at 80.01 162.56 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "4e2b478c-0a4f-4217-9f7c-46c43a8067a5")
-	)
 	(label "DRAIN"
 		(at 246.38 175.26 180)
 		(effects
@@ -6272,6 +6238,16 @@
 			(justify left bottom)
 		)
 		(uuid "6915e09c-cd18-488c-874f-c2e42c7ebf02")
+	)
+	(label "GND"
+		(at 80.01 139.7 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "70ae4499-73f2-42bc-b632-44330855947a")
 	)
 	(label "DRAIN"
 		(at 261.62 175.26 0)
@@ -6332,16 +6308,6 @@
 			(justify right bottom)
 		)
 		(uuid "7f4304f3-a10a-4c84-a673-8a6ef45294b5")
-	)
-	(label "SCK"
-		(at 80.01 157.48 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "8075cb38-a7cb-474f-b426-fe91f657b69d")
 	)
 	(label "GND"
 		(at 44.45 146.05 180)
@@ -6482,26 +6448,6 @@
 			(justify right bottom)
 		)
 		(uuid "a19e0aee-140e-4704-8bf1-f5b80bae7740")
-	)
-	(label "RST"
-		(at 22.86 124.46 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "a78d25b9-4843-43d5-862a-60e293d47cd3")
-	)
-	(label "MOSI"
-		(at 35.56 121.92 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "a9168ce9-0cfc-4c5c-9227-68be853398c8")
 	)
 	(label "GND"
 		(at 307.34 198.12 180)
@@ -6733,16 +6679,6 @@
 		)
 		(uuid "e25e8099-a3e1-4277-a287-15cfad55725d")
 	)
-	(label "MISO"
-		(at 22.86 119.38 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "e2f97ae3-1771-446e-87e3-40dea32ec42c")
-	)
 	(label "GND"
 		(at 330.2 227.33 270)
 		(effects
@@ -6832,16 +6768,6 @@
 			(justify right bottom)
 		)
 		(uuid "f91754e3-cf97-4b74-bd66-f73962417986")
-	)
-	(label "MISO"
-		(at 80.01 160.02 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "fa6a0869-9b08-4f33-9819-6c69a22fb65e")
 	)
 	(symbol
 		(lib_id "Simulation_SPICE:VPULSE")
@@ -10282,107 +10208,17 @@
 			)
 		)
 	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_02x03_Odd_Even")
-		(at 27.94 121.92 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim yes)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "ff8f7988-7f2a-4bc9-8bc5-b3e14f38f74f")
-		(property "Reference" "J6"
-			(at 27.94 127 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "ICSP"
-			(at 27.94 116.84 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical"
-			(at 27.94 121.92 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 27.94 121.92 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Generic connector, double row, 02x03, odd/even numbering"
-			(at 27.94 121.92 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Note" "program the 328 with another Arduino over five wires: pin 2 is the programmer's 5 V and must stay unconnected on a 3.3 V board"
-			(at 27.94 121.92 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "3a4e1cee-6783-4300-8c85-9e1d47a8b10d")
-		)
-		(pin "2"
-			(uuid "2f518eb5-a20a-4b93-a38d-0fb109b53a6f")
-		)
-		(pin "3"
-			(uuid "db7d691a-b8be-48e9-b44f-dfb3920429ca")
-		)
-		(pin "4"
-			(uuid "a0969f4a-c9ba-41ef-8ee0-46a33dc89135")
-		)
-		(pin "5"
-			(uuid "7247e935-086b-490e-8733-d5631e1738bf")
-		)
-		(pin "6"
-			(uuid "82926a25-cba9-49a0-ad52-e94a1209ca3e")
-		)
-		(instances
-			(project "mosfet-fan-switch"
-				(path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
-					(reference "J6")
-					(unit 1)
-				)
-			)
-		)
+	(no_connect
+		(at 80.00999999999999 157.48)
+		(uuid "f8977496-5a23-4a75-9c1d-2ed367b9b315")
+	)
+	(no_connect
+		(at 80.00999999999999 160.02)
+		(uuid "b417bbed-6596-489f-8a92-fc92bb562904")
+	)
+	(no_connect
+		(at 80.00999999999999 162.56)
+		(uuid "64768b71-9caf-419a-b054-e87756ec2525")
 	)
 	(sheet_instances
 		(path "/"
