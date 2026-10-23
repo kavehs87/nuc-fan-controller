@@ -1,7 +1,15 @@
 # nuc-fan-controller — Mode B (19 V → 12 V fan supply, follows the NUC's PWM, simulates the tach)
 
-An 88.9 × 76.2 mm single-copper-layer board — small enough to etch at home — that sits between a 6th-gen
-NUC's processor-fan header and a 12 V fan in a custom enclosure. It does four things:
+> **This build sheet is for a retired board.** The board was never built: the perfboard fan‑switch booster in
+> `fan-switch-booster/` is the reference, and the KiCad project, exports and board generator this file
+> describes were removed from the tree in October 2026 — they are complete at the tag
+> **`nuc-fan-controller-full-2026-10-23`**. What is still live here is the *measurement* half of this file:
+> identifying the four header wires with a meter, the divider and top‑of‑swing procedure, the BC547 pin‑order
+> check, the log pairing and offsets, and the calibration order. Those apply to any build, including the
+> perfboard's.
+
+An 88.9 × 76.2 mm single‑copper‑layer board — small enough to etch at home — that sits between a 6th‑gen
+NUC's processor‑fan header and a 12 V fan in a custom enclosure. It does four things:
 
 1. brings **12 V** to the fan from an **off-board XL4016E1 step-down module** that plugs into
    J6 (19 V in on pin 3, its two returns on pins 1–2, 12 V out on pin 4);
@@ -14,8 +22,8 @@ NUC's processor-fan header and a 12 V fan in a custom enclosure. It does four th
 The fan is an ordinary **two-pin 12 V fan**: no PWM input, no tach wire. All the speed
 control happens on this board, and all the tach the NUC sees is generated here.
 
-The old Mode A board (fixed-RPM tach simulator only) is archived in
-`archive/modeA-2026-10-19/` — nothing on it changed.
+The old Mode A board (fixed‑RPM tach simulator only) was archived in `archive/modeA-2026-10-19/`; that
+directory went with the retirement and is at the tag. Nothing on it changed.
 
 ---
 
@@ -23,26 +31,15 @@ The old Mode A board (fixed-RPM tach simulator only) is archived in
 
 | File | What it is |
 |---|---|
-| `nuc-fan-controller.kicad_pro` / `.kicad_sch` / `.kicad_pcb` | the project |
-| `exports/nuc-fan-controller_schematic.pdf` / `.svg` | schematic, openable without KiCad |
-| `exports/nuc-fan-controller_board.pdf` | the board as KiCad draws it: F.Cu, silk, mask, outline |
-| `exports/nuc-fan-controller_board.svg` | the same, fitted to the board outline |
-| `exports/nuc-fan-controller_etch_copper.pdf` / `.svg` | **F.Cu and Edge.Cuts at 1:1** — print with scaling off and iron it; the black is the copper that stays. The SVG is 88.90 × 76.20 mm exactly |
-| `exports/nuc-fan-controller_etch_negative.pdf` | the same plot inverted, for a process that removes what is black |
-| `exports/nuc-fan-controller_bom.csv` | 30 lines — the mounting holes and the 0 Ω bridge R11 are board-only, so they are correctly not in it, and neither is the buck module or the Pro Mini |
-| `exports/fab/` | 4 Gerbers (F.Cu, F.Silkscreen, F.Mask, Edge.Cuts) + `nuc-fan-controller.drl` + `job.gbrjob` |
-| `firmware/nuc-tach-modeB/nuc-tach-modeB.ino` | the sketch |
-| `firmware/nuc-tach-modeA/` | the previous fixed-RPM sketch, kept for reference |
+| ~~`nuc-fan-controller.kicad_*`~~, ~~`exports/`~~, ~~`fab/`~~ | **not in the tree any more.** The project, its schematic/board/etch prints, its BOM and its Gerbers are at the tag `nuc-fan-controller-full-2026-10-23` |
+| `firmware/nuc-tach-modeB/nuc-tach-modeB.ino` | the sketch, and where the measured ITE constants live |
+| `firmware/nuc-tach-modeA/` | the previous fixed‑RPM sketch, kept for reference |
 | `firmware/probe-uno/`, `probe-gain/`, `probe-loop/`, `probe-temp/`, `probe-divider/` | the breadboard sketches the measurements below were made with |
-| `bench/analyze-ladder.py`, `bench/analyze-temp.py`, `bench/analyze-cold.py`, `bench/analyze-heat.py` | the analysers, run against `bench/data/` |
-| `bench/plot-curve.py` | draws `docs/bench/06-ite-fan-response.svg`, the two-panel graph of the ITE's demand, from the same logs |
+| `bench/analyze-ladder.py`, `bench/analyze-temp.py`, `bench/analyze-cold.py`, `bench/analyze-heat.py` | the analysers, run against `bench/data/` — they take log paths and an offset, not defaults |
+| `bench/plot-curve.py` | draws `docs/bench/06-ite-fan-response.svg`, the two‑panel graph of the ITE's demand, from the same logs |
 | `bench/data/` | the raw logs behind every number in this file: 1 Hz traces of the divider reading, and of the NUC's temperatures — which pair is which run is the table below |
 | `docs/bench/` | the bench photos and the fan-response graph the README shows |
-| `logs/erc.txt`, `logs/drc.txt` | the last ERC and DRC runs, as KiCad's JSON reports (`.txt` so they sit in the repo; the `.json` copies the commands write are scratch and gitignored, along with `logs/netlist.net` and `logs/wires.inc`) |
-| `logs/pour.png` | what `logs/pourcheck.py` sees: the pour, the copper that walls it, and every pad |
-| `logs/build1l.py`, `logs/getfp.py`, `logs/fp-templates.inc`, `logs/setrules.py` | the board is *generated*: its parts, drawn bars, holes and router live in `build1l.py`; `getfp.py` clones the footprint artwork out of the KiCad 10 libraries into `fp-templates.inc`; `setrules.py` writes the home-etch rules into the project file |
-| `logs/pourcheck.py`, `logs/verify.py` | the two checks KiCad cannot do: whether the pour is one island that reaches every GND pad, and whether every net is one piece of copper and matches the schematic pin by pin |
-| `logs/genwires.py`, `logs/applywires.py`, `logs/export.sh` | the schematic wire generator, the splice that puts its output into the schematic, and the script that rebuilds every file in `exports/` |
+| ~~`logs/`~~ | **not in the tree any more.** The board's ERC and DRC reports, `pour.png`, and the whole generator — `build1l.py`, `getfp.py`, `fp-templates.inc`, `setrules.py`, `pourcheck.py`, `verify.py`, `genwires.py`, `applywires.py`, `export.sh` — are at the same tag. The board is *generated*, not drawn by hand: its parts, bars, holes and router live in `build1l.py`, and `verify.py` was the check KiCad cannot do — whether the pour is one island that reaches every GND pad, and whether every net is one piece of copper matching the schematic pin by pin |
 
 **Which log is which run.** The Uno's logs print one line per second and carry no timestamps; the NUC's
 logs are epoch-stamped with `PHASE` markers, so a pair is aligned by the offset the capture scripts were

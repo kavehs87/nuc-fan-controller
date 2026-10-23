@@ -118,11 +118,11 @@ NUC fan header J4                Pro Mini (on the board, U1)
   5.5 V a header supply would suggest. Nothing here depends on that pin, which is the point of
   leaving it unconnected.
 
-### Measured on a real NUC — see the sibling project
+### Measured on a real NUC — recorded at the root of this repo
 
-The ITE side of this design was assumed here and **measured** in `../nuc-tach-sim`
-(`nuc-fan-controller`), on a 6th-generation i3 NUC: 4 577 paired samples at 1 Hz. Those numbers
-govern, not the assumptions below.
+The ITE side of this design was assumed here and **measured** one directory up: 4 577 paired samples at
+1 Hz on a 6th-generation i3 NUC, logged in `../bench/data/`, analysed by `../bench/analyze-*.py`, and
+written up in `../README.md` and `../BUILD.md`. Those numbers govern, not the assumptions below.
 
 | measured | value |
 |---|---|
@@ -140,9 +140,14 @@ credible claim is enough, because the ITE does not close its loop through report
 if you ever want the fan actually stopped, that has to be a threshold in the sketch, not something
 the ITE will do.
 
-One trap when carrying those constants across: the counts logged in `nuc-tach-sim` are on an **Uno's
+One trap when carrying those constants across: the counts logged in `../bench/data/` are on an **Uno's
 5 V ADC reference**, where 512 counts is full duty. On this board's **3.3 V / 8 MHz Pro Mini** the same
 2.50 V tap is **775 counts**. Port the calibration as volts, or multiply the counts by 5 / 3.3.
+
+The enclosure board those measurements were designed for — `nuc-fan-controller`, with its 19 V → 12 V
+module, its BC547 gate stage and its 31.25 kHz drive on D11 — is **retired**: the perfboard here is the
+reference. That design is intact in git at the tag `nuc-fan-controller-full-2026-10-23`, and the sketch
+that carries the measured ITE constants, `../firmware/nuc-tach-modeB/nuc-tach-modeB.ino`, is still here.
 
 `sim/nuc_link.py` (run by `./sim/run.sh`) is the check: duty-by-duty tap voltage, ripple,
 ADC counts, the divider's load, the tach levels and the carrier window. Numbers and

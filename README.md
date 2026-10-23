@@ -6,8 +6,8 @@ and `checkpoint-pro-mini-v2` tags — parked under one directory, so nothing col
 
 | half | what it holds | state |
 |---|---|---|
-| **`fan-switch-booster/`** | the gate booster that lets a 3.3 V logic pin switch a 12 V fan: its schematic, an ngspice model with hand‑written FET models, four sketches, the bench scripts, and a retired PCB design | **built on perfboard, scoped, and listened to.** It is the electrical reference |
-| **root** | the `nuc-fan-controller` board for the NUC enclosure: 19 V → 12 V module, 3.3 V regulator, the duty‑read divider, the BC547 gate stage, the tach stage, three fan outputs | designed, ERC and DRC clean, **not built** |
+| **`fan-switch-booster/`** | the gate booster that lets a 3.3 V logic pin switch a 12 V fan: its schematic, an ngspice model with hand‑written FET models, four sketches, the bench scripts | **built on perfboard, scoped, and listened to.** It is the electrical reference |
+| **root** | the record of the NUC's own fan control: 4 577 paired 1 Hz samples in `bench/data/`, the analysers and graphs that read them, `BUILD.md`, and the sketches that carry the measured ITE constants | **measured.** The enclosure board that was designed around those numbers is retired to git at the tag `nuc-fan-controller-full-2026-10-23` |
 
 **The perfboard is the reference.** Every claim about how a 12 V two‑pin fan behaves under a chopped
 supply — carrier frequency, delivered duty, the fan's start threshold, what the noise actually was — comes
@@ -16,6 +16,12 @@ behaves — its PWM frequency and amplitude, where its demand bottoms out, what 
 breadboard runs recorded below and in `BUILD.md`. The two were measured on the same machine, and they
 complement each other; they do not agree on everything, and where they differ is written down rather than
 smoothed over.
+
+In October 2026 the repo was reduced to that: one KiCad project, the one that was simulated and
+perfboard‑tested. The enclosure board's drawings, its exports, its board generator, the archived
+tach‑simulator board and the two abandoned routings were removed, along with every KiCad cache and scratch
+copy. They are complete at the tag named above, and no measurement went with them — the ITE runs were done
+on a breadboard with an Uno.
 
 ## The facts both halves rest on
 
@@ -40,9 +46,12 @@ less than ~47 %, and 47 % at 100 Hz is about 6.4 V at the fan terminals — abov
 to start. So a fan driven by the ITE's demand is never asked to start from a dead stop, and the "start
 kick" left open in `fan-switch-booster/README.md` only matters for manual control below about 30 %.
 
-## Four ways the two halves disagree, and how to not mix them
+## Four ways the two designs disagree, and how to not mix them
 
-| | the perfboard, `fan-switch-booster/` | the enclosure board, at the root |
+The second column is retired hardware, but its sketch `firmware/nuc-tach-modeB` is still in this repo and
+still carries the measured ITE constants — so these differences are live whenever a sketch crosses over.
+
+| | the perfboard, `fan-switch-booster/` | the retired enclosure board |
 |---|---|---|
 | fan drive pin | **D9** (`OC1A`), Timer 1 | **D11** (`OC2A`), Timer 2 |
 | tach pin | **D10**, and unused on the bench — that board has no tach path | **D9** (`OC1A`), sinking `Q1`'s open collector |
@@ -51,17 +60,17 @@ kick" left open in `fan-switch-booster/README.md` only matters for manual contro
 | gate stage | `Q2` 2N7002 + `Q3` IRF7416 booster. Turn‑off costs a fixed **~170 µs**, because `/BOOT` charges back through `R3` 10 kΩ into a node that measures **~8 nF** | `Q2` BC547 with **`R8` 1 kΩ pulling the gate node to +12 V**, `R9` 120 Ω in series with `Q3`'s gate, `R10` 10 kΩ across gate‑to‑source. Turn‑off dumps through 120 Ω: τ ≈ 0.2 µs |
 | ADC scale at the divider tap | **775 counts** — a 3.3 V reference | the logs are on an **Uno's 5 V** reference, where the same 2.50 V is **512 counts** |
 
-**Both carriers are correct, for their own board.** 31.25 kHz is safe on the enclosure board because its
+**Both carriers are correct, for their own gate stage.** 31.25 kHz is safe on the BC547 board because its
 gate dumps through 120 Ω in well under a microsecond; it is *unusable* on the perfboard, where the off
 half‑period (16 µs) is far shorter than the 170 µs the booster needs to turn off, so the output is simply
-stuck on. That is not a contradiction, it is two different circuits. Neither board has to copy the other's
-carrier: the ITE's 23 kHz is only *read* — the divider turns it into a DC level — and the fan drive
-frequency is a free choice. Do not feed the ITE's clock into either board's output stage.
+stuck on. That is not a contradiction, it is two different circuits. Neither has to copy the other's carrier:
+the ITE's 23 kHz is only *read* — the divider turns it into a DC level — and the fan drive frequency is a
+free choice. Do not feed the ITE's clock into either output stage.
 
-**One thing the CAD has not caught up with.** The bench settled on a **10 kΩ / 10 kΩ** divider — 2.50 V on
-the tap, 0.8 V of headroom on a 3.3 V part — but `nuc-fan-controller.kicad_sch` still carries the old
-chain: `R3` 4.7 k → `R4` 2.2 k in series from `NUC_PWM`, over `R5` 10 kΩ to ground, which taps **2.96 V**
-at full request and leaves 0.34 V. The schematic and `exports/` need that change before the board is built.
+**And one thing that CAD never caught up with.** The bench settled on a **10 kΩ / 10 kΩ** divider — 2.50 V on
+the tap, 0.8 V of headroom on a 3.3 V part — while the retired schematic still carried `R3` 4.7 k → `R4`
+2.2 k in series from `NUC_PWM`, over `R5` 10 kΩ to ground: a **2.96 V** tap with 0.34 V of headroom. If that
+board is ever rebuilt from the tag, it starts at two 10 kΩ, not at what the drawing says.
 
 ## Where the fan‑switch half lives
 
@@ -74,53 +83,44 @@ at full request and leaves 0.34 V. The schematic and `exports/` need that change
 | `sim/` | the ngspice model. `./sim/run.sh` regenerates netlist, deck, plots and the variant tables |
 | `firmware/fan-switch-freq/` | the sketch on the chip right now: boots itself at `duty 0 % OCR1A 0/10000 carrier 100 Hz` |
 | `firmware/bench/` | `set.sh`, `seq.sh`, `flash-bootloader.sh`, `verify-flash.sh`, and how to run them on the remote bench |
-| `archive/` | the 5 V low‑side first attempt, and two abandoned board routings |
+| `archive/` | the 5 V low‑side first attempt — its schematic, its placeholder models and its plots |
 
 ---
 
-# The enclosure board: `nuc-fan-controller`
+# What the NUC does on its own — measured
 
-A board that lets three 12 V two‑pin fans be used in place of a NUC's stock 5 V fan, and that
-answers the NUC's tach input so the BIOS believes the fan it is asking for.
+Everything below this line is the record of the **ITE side**: how the NUC asks for fan speed, what its
+demand follows, where it bottoms out, and how it reads a tach signal. It was measured on a breadboard with an
+Uno standing in for the Pro Mini, and none of it depends on any board in this repo.
 
-It does four things:
+## The enclosure board that used to be here
 
-1. **brings 12 V to the fans from a ready‑made module** — an XL4016E1 step‑down (8 A, ~180 kHz) bolted
-   to the enclosure wall and wired to this board through **J6**: 19 V in on pin 3, its two returns on
-   pins 1–2, 12 V out on pin 4. The board's own 12 V parts are only C3 470 µF/25 V and C4 100 n;
-2. **12 V → 3.3 V** for a 3.3 V / 8 MHz Arduino Pro Mini (AMS1117‑3.3 in a TO‑252, the board's only
-   SMD part, into the Pro Mini's **VCC**; RAW unused) — there is no 5 V rail anywhere on this board;
-3. **follows the duty the NUC's ITE asks for** — the ITE's PWM wire is divided to 2.96 V, read
-   on A0, and re‑made as 31.25 kHz on D11 driving Q2 → IRFZ44N → the fans;
-4. **simulates the tach signal** — Timer1 hardware square wave on D9 sinks Q1's open collector;
-   the pull‑up lives in the NUC. `RPM = 30 × f_tach` (the ITE IT8607E counts 2 pulses per turn).
+`nuc-fan-controller` was a board meant to sit inside the NUC enclosure — last drawn as 88.90 × 76.20 mm on a
+single copper layer, small enough to etch at home, after an earlier life as 124 × 85 mm on two. It did four
+things: brought 19 V down to 12 V with an XL4016E1 module for three 12 V two‑pin fans; made 3.3 V for a Pro
+Mini with an AMS1117‑3.3, with no 5 V rail anywhere on it; read the ITE's PWM request on A0 and re‑made it at
+31.25 kHz on D11 through a BC547 stage into an IRFZ44N; and answered the tach with a Timer 1 square wave on
+D9 sinking `Q1`'s open collector, the pull‑up living in the NUC. ERC clean, DRC clean, 0 unconnected items,
+one deliberate no‑connect on its fan‑header connector's supply pin — the header's own fan supply, which it
+never touched.
 
-Board: 124 × 85 mm, 2 layers, GND poured both sides with 322 stitching vias, `Power` net class
-1.5 mm on 19V / +12V / FAN_SW / +3V3 / GND. **ERC 0 violations. DRC 0 violations,
-0 unconnected items**, one schematic‑parity warning: `J2` pin 4 carries a deliberate no‑connect
-(it is the NUC header's own fan supply, which this board never touches).
+**It is retired, and it was never built.** The perfboard in `fan-switch-booster/` is the reference, so that
+board's KiCad project, its `exports/` (schematic, board, the 1:1 copper etch prints, BOM, Gerbers), its board
+generator in `logs/`, the archived tach‑simulator board and the two abandoned routings of the booster were
+removed from the working tree in October 2026. All of it is intact in git at the tag
+**`nuc-fan-controller-full-2026-10-23`** — every drawing, every export, and `10bc262`, the version that built
+its 19 V → 12 V converter out of discrete parts instead of the module.
 
-**A reversal worth stating.** The first version of this board built its 19 V → 12 V converter out of
-discrete parts — LM2596T‑ADJ, a 100 µH / 6 A toroid, a 1N5822 catch diode and a 10 kΩ trimmer — because
-the XL4016E1 module in the cabinet had been ruled out. That ruling is now lifted: the converter is that
-module, and U1, L1, D1, C1, C2, R1 and RV1 came off the board in exchange for one 4‑pin header. The
-discrete design is in git at `10bc262` and every part of it is still in the cabinet, so the swap goes
-both ways. *BUILD.md* carries the arithmetic that makes the module the better choice at 12 V / 0.3 A.
+What stayed is measurement rather than board: `bench/data/` and the analysers that read it, the photographs
+and graphs in `docs/bench/`, `BUILD.md`, `docs/parts-collection.md`, and the sketches that produced the
+numbers.
 
-## Open it without KiCad
-
-[`exports/index.html`](exports/index.html) — schematic, the board, the 1:1 copper print for etching, BOM, links.
+## What is here for the NUC side
 
 | File | What it is |
 |---|---|
-| `nuc-fan-controller.kicad_sch` / `.kicad_pcb` / `.kicad_pro` | KiCad 10 design |
-| `exports/nuc-fan-controller_schematic.pdf` / `.svg` | schematic, wires not net labels, name tags on every signal net |
-| `exports/nuc-fan-controller_board.pdf`, `…_board.svg` | the board as KiCad draws it: F.Cu, silk, mask, outline |
-| `exports/nuc-fan-controller_etch_copper.pdf`, `…_etch_copper.svg` | **F.Cu + Edge.Cuts at 1:1** — print with scaling off and iron it onto copper-clad; the black is the copper that stays |
-| `exports/nuc-fan-controller_etch_negative.pdf` | the same plot inverted, for a process that removes what is black |
-| `exports/nuc-fan-controller_bom.csv` | 30 lines — the buck module and the Pro Mini are purchased parts, and R11 and the mounting holes are board-only, so none of them are in it |
-| `exports/fab/` | 4 Gerbers (one copper layer) + `.drl` + `job.gbrjob` |
-| `firmware/nuc-tach-modeB/nuc-tach-modeB.ino` | the sketch; calibration constants at the top |
+| `fan-switch-booster/` | **the built reference** — the perfboard booster, its schematic, its simulation, its sketches, its bench scripts. Table near the top of this file |
+| `firmware/nuc-tach-modeB/nuc-tach-modeB.ino` | the sketch written for the retired board, and where the measured ITE constants live: `ITE_READ_GAIN`, the demand follower, the duty clamp |
 | `firmware/probe-uno/probe-uno.ino` | breadboard probe sketch for an Uno (5 V / 16 MHz): tach wave on D9 with the measured `ITE_READ_GAIN` applied, 31.25 kHz fan drive on D11 — for scope-checking the BC547 stages before the board exists |
 | `firmware/probe-gain/probe-gain.ino` | sweep sketch: an exact ladder of tach claims (900–3000 RPM, 20 s each) with the fan following the ITE's demand, printing the divider's own count — measures the ITE's read gain and logs its fan curve |
 | `firmware/probe-loop/probe-loop.ino` | test sketch: fan drive pinned, tach claims stepped 800 / 2000 / 4500 RPM — measures whether the ITE's demand answers the tach at all |
@@ -130,15 +130,15 @@ both ways. *BUILD.md* carries the arithmetic that makes the module the better ch
 | `bench/analyze-hold.py` | the analyser for the "does it integrate time?" test: flat-window trend, same-temperature early against late, and a two-variable fit |
 | `bench/plot-curve.py`, `bench/plot-hold.py` | draw `docs/bench/06-ite-fan-response.svg` and `docs/bench/07-ite-hold-test.svg`, the two graphs below, from the same logs |
 | `bench/data/` | the raw logs: 1 Hz traces of the divider reading, and of the NUC's temperatures |
-| `BUILD.md` | the build sheet: header identification with a meter, setting the module to 12.0 V, calibration, bench order |
+| `BUILD.md` | the bench sheet: identifying the four header wires with a meter, setting a buck module to 12.0 V, the divider / top‑of‑swing procedure, the BC547 pin‑order check, calibration order. Its assembly steps name parts of the retired board |
 | `docs/parts-collection.html` | the collection sheet: every BOM line with the exact cabinet drawer it comes from, in drawer‑walk order, plus the eight measurements that decide the footprints (also `docs/parts-collection.md`) |
-| `archive/modeA-2026-10-19/` | the fixed‑RPM tach simulator this board replaced |
+| `fan-switch-booster/archive/` | the booster's first version — a single logic‑level IRLZ44N driven directly at 5 V, with its plots. Kept because the reason it worked is the reason 3.3 V needs a booster |
 
 ## On the bench
 
-The board itself is not built yet. Its two control signals have been measured on a breadboard, with
-an Uno standing in for the Pro Mini and the ITE's own behaviour logged at 1 Hz. Full numbers and the
-raw logs are in `BUILD.md` and `bench/`; these are the measurements that changed the design.
+These measurements stand on their own. They were taken on a breadboard, with an Uno standing in for the Pro
+Mini and the ITE's own behaviour logged at 1 Hz — no board in this repo was needed for any of them. Full
+numbers and the raw logs are in `BUILD.md` and `bench/data/`; these are the readings that changed the design.
 
 **The whole result in one picture** — 4 577 paired samples from five runs. Top: the ITE's requested duty
 against the temperature of the *board* (`pch_thermal`), every sample as a dot, the heavy line being the
@@ -155,7 +155,8 @@ minutes — the duty sits on 378 counts for all of it. `bench/plot-curve.py` dra
 
 **The harness into the NUC's fan header.** Four wires, no published pinout — `BUILD.md` identifies
 them with a meter before anything is spliced. The tach and PWM wires go to the breadboard; the
-header's own fan supply is left unconnected, which is the deliberate no‑connect on `J2` pin 4.
+header's own fan supply is left unconnected, which is the same pin the retired board marked as a deliberate
+no‑connect.
 
 ![the fan header with the harness in it](docs/bench/02-fan-header.jpg)
 
@@ -291,72 +292,100 @@ suggest, and 100 % lands within 2 % of 512 counts rather than at 1009. Two thing
 a meter settles both in one sitting: why the ladder has a 15‑count offset at zero (the ITE's output, or the
 reading), and whether the top is flat or droops under load at the top dwell. The procedure is in `BUILD.md`.
 
-## Build order, short version
+## Bench order that carries over to any build
 
 1. Identify the four NUC fan‑header wires with a meter — Intel publishes no pinout.
-2. Fit J1, J6, C3, C4, U3. Set the module to 12.0 V with a meter before it is wired in, confirm its
-   current limit is released, then confirm 3.3 V at U3's output.
-3. Find the fan's stall duty and measure its RPM at two duties; those four numbers are the
-   constants at the top of the sketch.
-4. Read TP1 with a frequency counter — it must equal `rpm / 30` Hz exactly, it is a hardware timer.
-5. Tach side first (J2.1 + J2.2), then the PWM wire (J2.3), then the fans on J7/J3/J4.
+2. Set a buck module to 12.0 V with a meter before it is wired in and confirm its current limit is
+   released; confirm 3.3 V at the regulator before it ever reaches a Pro Mini.
+3. Find the fan's stall duty and measure its RPM at two duties. On the perfboard the stall is already
+   bracketed: 20 % delivers ~2.4 V and will not start the fan, 30 % does.
+4. Read the tach output with a frequency counter — it must equal `rpm / 30` Hz exactly, it is a hardware
+   timer.
+5. Wire the tach side first, then the PWM wire, then the fans.
 
 **Three things that break hardware:** a 12 V fan's tach or PWM wire spliced into the NUC header
 (that fan pulls those lines to its own 12 V internally), a 5 V FTDI on a 3.3 V Pro Mini
 (ATmega328P absolute maximum on any pin is VCC + 0.5 V), and a BC547 fitted in the onsemi
-**C-B-E** order when this board is drawn and routed for the NXP/Philips **E-B-C** order — meter
+**C‑B‑E** order when the footprint you are using is drawn for the NXP/Philips **E‑B‑C** order — meter
 the two of them before they go in, `BUILD.md` says how. Flash with Board → *Arduino Pro or Pro
 Mini*, Processor → **ATmega328 (3.3V, 8MHz)**.
 
-## Reproducing the design work
+## Reproducing the measurements
 
+From the repo root, against the raw 1 Hz logs in `bench/data/`. Each Uno log is paired with its temperature
+capture by a fixed offset in seconds — the Uno log has no timestamps — and these are the offsets the recorded
+numbers were produced with:
+
+```sh
+# which temperature the ITE's demand follows: the table in *On the bench*
+python3 bench/analyze-heat.py \
+    bench/data/temp.log    bench/data/stress.log         -4 \
+    bench/data/cold.log    bench/data/coldtemp.log        0 \
+    bench/data/stress2.log bench/data/stress2-temps.log -15 \
+    bench/data/warm.log    bench/data/warm-temps.log    -20 \
+    bench/data/hold.log    bench/data/hold-temps.log    -20
+
+# does the ITE integrate the time the board spends hot?
+python3 bench/analyze-hold.py bench/data/hold.log bench/data/hold-temps.log -20
+
+# the dwell rungs and the duty quantum
+python3 bench/analyze-ladder.py bench/data/loop.log
+
+# the two graphs
+python3 bench/plot-curve.py
+python3 bench/plot-hold.py bench/data/hold.log bench/data/hold-temps.log -20
 ```
-cd ..
-sh logs/export.sh                       # rebuilds exports/: PDF, SVG, BOM, Gerbers, drill
-kicad-cli sch erc nuc-fan-controller.kicad_sch --output logs/erc.json --format json --severity-all
-python3 logs/build1l.py                 # the board is generated: parts, drawn bars, holes, router
-kicad-cli pcb drc nuc-fan-controller.kicad_pcb --output logs/drc.json --format json \
-    --severity-all --refill-zones --save-board
-python3 logs/pourcheck.py               # models KiCad's pour fill; writes logs/pour.png
-python3 logs/verify.py                  # nets, pour island, shorts, netlist parity
+
+Re‑run 2026‑10‑23, so this is verified rather than remembered: the five runs pair to 260 + 717 + 660 + 1 140
++ 1 800 = **4 577 samples**, `analyze-heat.py` reproduces the 2 131 / 306 / 251 / 169 / 365 / 1 352 board bins
+and both discriminating subsets — 247 samples with the cores at 68.7 °C and the board at 51.0 °C at 243
+counts, and 134 samples the other way round at 243 counts — and `analyze-ladder.py` reproduces the −1.1 %
+answer to a 5.6× tach claim.
+
+The plotters need matplotlib. The two shipped SVGs were drawn with **3.11.2**, which is not installed on this
+machine; the venv that has matplotlib here has 3.10.3. Re‑running a plotter rewrites the tracked SVG with that
+version's layout, so revert the change unless redrawing is what you wanted.
+
+The booster's simulation, from `fan-switch-booster/`:
+
+```sh
+./sim/run.sh                                    # netlist -> ngspice -> variants -> plots
+V=/Users/kaveh/Documents/Projects/schemdraw-mcp-server/.venv/bin/python3
+$V sim/variants.py && $V sim/plot.py            # if the default python3 has no matplotlib
 ```
 
-**`layout.py`, `genwires.py` and `applywires.py` are parked, and running them now would undo work.**
-Their `NETS` / `POWER` / `LABELS` tables still describe the schematic as it was before it was edited by
-hand — 52 wires against the 55 the file now carries, and none of the label placements the drawing pass
-moved. They were kept because they are the only record of how the wire set was derived, and they re-point
-at the current geometry as soon as `layout.py` is updated to match it. Until then the schematic and the
-board are the source of truth, and `logs/fixq.py`, `logs/fixboard.py`, `logs/fixboard2.py`,
-`logs/fixboard3.py` are the record of what changed by hand this pass.
+The board machinery that used to live in `logs/` — `build1l.py`, `layout.py`, `genwires.py`,
+`applywires.py`, `verify.py`, `pourcheck.py`, `export.sh` — went with the retired board, and it was already
+partly parked: `layout.py` and the wire generators still described the schematic as it was before it was
+edited by hand, so running them would have undone work. All of it is at the tag.
 
-The layout in `logs/layout.py` is the source of the schematic's geometry; `logs/genwires.py`
-checks cross‑net crossings, wires through symbol bodies, pins on two nets and shorted parts
-before it emits anything. One rule it enforces the hard way: **a symbol pin or a name tag only
-connects to a wire *end***, so a net whose wire carries a flag or a tag mid‑span is written as the
-chain of segments it really is — `19V` is `J1.1 → (43.18, 44.45) → (48.26, 44.45) → J6.3`, the first
-vertex being where the 19 V `PWR_FLAG` hangs off it and the second where the name tag does. Written
-as one straight wire, the flag and the tag are orphaned and ERC reports them.
+One rule `genwires.py` enforced the hard way is worth keeping, because it is true of any KiCad sheet: **a
+symbol pin or a name tag only connects to a wire *end***. A net whose wire carries a flag or a tag mid‑span
+has to be written as the chain of segments it really is. Written as one straight wire, the flag and the tag
+are orphaned and ERC reports them.
 
 ## Status
 
-Design verified on paper and in the CAD; **the board is not built yet.** The control side has been
-measured on a breadboard — the ITE's PWM frequency and amplitude, how it reads the tach, what drives
-its demand, where that demand bottoms out and where it tops out, and that it does not integrate the time
-the board spends hot — see *On the bench*. `BUILD.md` is the bench sequence.
-The fan-side constants (`FAN_RPM_MIN`, `FAN_RPM_FULL`, `ADC_AT_100PCT`) are still placeholders until a
-real fan is fitted and measured; `ITE_READ_GAIN` has a measured value for the Uno driving this NUC and
-needs the same measurement on the finished board.
+**Built, scoped and listened to:** the perfboard fan‑switch booster in `fan-switch-booster/`. Running at a
+100 Hz carrier, quiet across the duty range, with the whole ladder heard.
 
-**Across the merged repo, these are the open items:**
+**Measured and recorded:** the NUC's own fan control — its PWM frequency and amplitude, how it reads the
+tach, what drives its demand, where that demand bottoms out and where it tops out, and that it does not
+integrate the time the board spends hot. See *On the bench*; `BUILD.md` is the bench sequence.
 
-1. swap this board's divider to 10 kΩ / 10 kΩ in the schematic and re‑export — the bench settled on it,
-   the CAD has not (see *Four ways the two halves disagree*);
-2. fit the perfboard's fan to this board's drive and measure its stall duty and RPM at two duties, which
-   turns those placeholder constants into measured ones;
-3. the start kick in `fan-switch-booster/firmware/fan-switch-freq` — only needed if the fan is ever asked
-   to start below ~30 % duty, which the ITE never asks for;
-4. a sketch that reads `/DEMAND` on A0 and re‑makes it at the perfboard's own 100 Hz — the two halves
-   joined, but that wire between them is not written yet.
+**Retired:** the `nuc-fan-controller` enclosure board, and the archived boards before it. See *The enclosure
+board that used to be here*.
+
+**Open items:**
+
+1. a sketch that reads `/DEMAND` on A0 and re‑makes it at the perfboard's own 100 Hz — the two halves
+   joined, but the wire between them is not written yet;
+2. the fan's exact start threshold, still only bracketed between 20 % and 30 % at 100 Hz, and the start kick
+   that would make the bottom of the range usable;
+3. `FAN_RPM_MIN`, `FAN_RPM_FULL` and `ADC_AT_100PCT` in `firmware/nuc-tach-modeB` are placeholders, and
+   `ITE_READ_GAIN` was measured with an Uno — all four need the same measurement on a 3.3 V Pro Mini;
+4. if the enclosure board is ever rebuilt, its divider starts at 10 kΩ / 10 kΩ, not the 4.7 k + 2.2 k over
+   10 k the retired schematic still carries.
 
 No license is granted — all rights reserved. It is published so the drawings and the reasoning
 behind them are readable.
