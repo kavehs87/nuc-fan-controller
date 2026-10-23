@@ -219,6 +219,11 @@ def main() -> None:
     print(f"  peak fan current during a PWM on-time           : {fan_on*1e3:5.1f} mA")
     print(f"  average fan current at 1 kHz / 50 % duty        : {fan_avg*1e3:5.1f} mA")
     print()
+    print("  the same four, measured on the perfboard at 1 kHz / 50 %:")
+    print(f"  /GATE high when told to be high for 500 us        : 652.0 us")
+    print(f"  /DRAIN low                                        : 680.0 us")
+    print(f"  /BOOT rise 5 tau (R3=10k, C2=8n, the real board)  : {5*10e3*8e-9*1e6:5.1f} µs")
+    print()
 
 
 if __name__ == "__main__":
