@@ -240,7 +240,7 @@
       "internal_id": "",
       "mfg": "",
       "mpn": "",
-      "sch_revision": ""
+      "sch_revision": "2"
     },
     "layer_pairs": [],
     "layer_presets": [],
@@ -658,7 +658,7 @@
       {
         "filename": "mosfet-fan-switch.kicad_sch",
         "name": "mosfet-fan-switch",
-        "uuid": "00000000-0000-0000-0000-000000000000"
+        "uuid": "70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
       }
     ],
     "used_designators": "",
@@ -666,8 +666,8 @@
   },
   "sheets": [
     [
-      "df6da939-3279-4dfc-b29c-bbb03e3d26f1",
-      "Arduino 12 V fan, MOSFET low-side switch"
+      "70af4f7e-8b7a-484f-96e0-6ca2b9e2231e",
+      "mosfet-fan-switch"
     ]
   ],
   "text_variables": {
