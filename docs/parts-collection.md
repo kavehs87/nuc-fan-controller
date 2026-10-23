@@ -18,7 +18,7 @@ Every part below came from the parts cabinets. Nothing here needs buying except 
 | Q1 | IRFZ44N N‑channel power MOSFET | TO‑220 | **R1 B4** | **fitted.** `/GATE` is Q1 pin 1, `/DRAIN` is its tab and J3 pin 2 — the two probe points |
 | Q2 | 2N7002 N‑channel MOSFET | SOT‑23 | **R1 A4** | **fitted.** Sinks `/BOOT` when the Arduino pin goes high |
 | Q3 | IRF7416 P‑channel MOSFET | SO‑8 | **R1 A4** | **fitted.** The booster: it is what puts 10.9 V on `/GATE` from a 3.3 V pin. One of the six in the bin is already mounted on a breakout board |
-| D1 | 1N5819 Schottky, 40 V / 1 A | DO‑41 | **L1 E1** | **fitted**, from `/DRAIN` to +12 V. Its freewheel collapsing is what pulls `/DRAIN` to −1.2 V at turn‑on |
+| D1 | 1N5819 Schottky, 40 V / 1 A | DO‑41 | **L1 E1** | **fitted**, from `/DRAIN` to +12 V. The freewheel current it carries, collapsing through the fan's own ~10 mH, is what pulls `/DRAIN` to **−1.2 V** at turn‑on — briefly forward‑biasing Q1's body diode. Measured in the 1 kHz trace |
 | R1 | 1 kΩ | axial | **R1 A2** | **fitted.** Arduino pin → Q2 base |
 | R2 | 10 kΩ | axial | **R1 B2** | **fitted.** Q2 base pull‑down |
 | R3 | 10 kΩ | axial | **R1 B2** | **fitted, and it is the part that decides the carrier.** `/BOOT` charges back through it into a node that measures **~8 nF**, which is the fixed ~170 µs turn‑off |
