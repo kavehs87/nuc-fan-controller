@@ -46,6 +46,10 @@ not the netlist's 1.7 nF. Any perfboard prediction that uses 1.7 nF is optimisti
   write `TCCR1A/B`, `ICR1`, `OCR1A` directly — `analogWrite()` would silently move the drive to Timer 2
   at 980 Hz. On the perfboard bench **D10 (tach) and A0 (`/DEMAND`) are unused**: that board has no
   tach path and no `/DEMAND` tap.
+- **Timer 1 has one period.** `/PWM` (OC1A) and `/TACH_PWM` (OC1B) share `ICR1`, so they share the
+  frequency and can only differ in duty. 100 Hz happens to be correct for both — the fan drive and the
+  tach carrier. Change the fan carrier and the tach carrier moves with it, which the NUC's tachometer
+  input rejects; then the tach belongs on Timer 2 (D11 = OC2B) or in software.
 - The sketch on the chip is `firmware/fan-switch-freq`. It boots by itself at
   `duty 0 %  OCR1A 0/10000  carrier 100 Hz`. Console at 9600: `0..100` duty, `f <16..25000>` carrier in
   hertz, `?` report, `h` help.

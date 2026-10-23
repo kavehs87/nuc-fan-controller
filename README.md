@@ -678,11 +678,17 @@ footprint.
   (775 counts), so `duty = min(1.0, counts / 775)` is the whole control law. The 5.5 ms
   time constant at the tap means the ADC reading is already the average, so a plain
   `analogRead` per 100 ms is enough — no oversampling needed.
-- `/PWM` and `/TACH_PWM` are Timer 1's two channels (OC1A and OC1B), so one `TCCR1A` /
-  `TCCR1B` setup drives the fans and answers the NUC at two different frequencies. The Uno
-  stays usable as the programmer, and it would also run the same four signals at 5 V logic,
-  in which case R7/R8 should become a 10 k / 20 k divider (or simply go, if you feed
-  `/DEMAND` from a 3.3 V reference instead of the NUC's 5 V).
+- `/PWM` and `/TACH_PWM` are Timer 1's two channels (OC1A and OC1B), so **one `TCCR1A` /
+  `TCCR1B` / `ICR1` setup gives them the same frequency and two different duties** — a 16-bit timer
+  has one counter, not two. That works here, and only because of the numbers: the fan drive is
+  100 Hz and the tach carrier wants 100 Hz too, so a single period serves both. If the fan carrier
+  ever moves — fitting `Q5` and going to 25 kHz, say — the tach moves with it, and 25 kHz reads
+  750 000 RPM on the NUC's tach line and is rejected outright. Then the tach has to be generated
+  somewhere else: Timer 2 (D11 = OC2B, fast PWM with prescaler 512 and `OCR2A = 155` gives
+  100.16 Hz), or a software toggle from the Timer 1 overflow interrupt, which is what
+  `fan-switch-debug` actually does. The Uno stays usable as the programmer, and it would also run
+  the same four signals at 5 V logic, in which case R7/R8 should become a 10 k / 20 k divider (or
+  simply go, if you feed `/DEMAND` from a 3.3 V reference instead of the NUC's 5 V).
 
 ### Programming the module
 
