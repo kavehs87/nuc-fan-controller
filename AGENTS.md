@@ -5,12 +5,15 @@ charge-pump-ish gate booster (Q2 2N7002 + Q3 IRF7416 P‑FET) that switches an I
 fan. `README.md` is the full record with the evidence behind every number. This file is the short
 list of things that have already been settled, so they are not re-litigated.
 
-## Two hardware artifacts — never conflate them
+## The circuit is the perfboard build — the PCB is retired
 
-| | what it is | source of measurements |
-|---|---|---|
-| `mosfet-fan-switch.kicad_pcb` | the **designed** board, 56 × 92 mm, 30 footprints placed, **unrouted skeleton** | none yet — it has never been built |
-| the **perfboard bench build** | old hand-wired prototype, Pro Mini in sockets, `R1`–`R5` at schematic values (1 k / 10 k) | **every scope and multimeter number in the README** |
+| | status |
+|---|---|
+| the **perfboard build** | **the circuit itself.** Built, running, quiet across the duty range. Every scope and multimeter number in the README came from it. Pro Mini in sockets, `R1`–`R5` at schematic values (1 k / 10 k), no fitted `C1` or `C2` |
+| `mosfet-fan-switch.kicad_pcb`, `pcb/`, `docs/pcb-*` | **retired design record.** Never built, never routed. Keep it as the reason the layout looks like it does; do not route, fab, extend or "clean up" it |
+
+If a task looks like *finish the board layout*, stop and ask — that work is closed on purpose. The
+schematic, the simulation and the firmware are still live; only the board is retired.
 
 `C1` and `C2` in the netlist are **not fitted parts** — they model `Ciss` of the IRFZ44N and the
 IRF7416. On the perfboard the `/BOOT` node also carries its wiring, and it measures about **8 nF**,
@@ -115,6 +118,4 @@ as a power-rated part, not a random 1 kΩ from a drawer.
 - **`Q5` helper + `R3 = 1k` is modelled, not fitted.** Emitter to ground, base to `/BOOT` through
   4.7 kΩ, collector to `/GATE`. It restores exact duty from 1 kHz to 25 kHz. Only worth building if a
   carrier above hearing is actually wanted; 100 Hz already solved the noise.
-- **README "The board" still describes one copper layer**, while `pcb/build_board.py` now pours `/GND`
-  on `B.Cu` **and** `/P12V` on `F.Cu`. That contradiction needs a decision before the board is routed.
 - **The fan's exact start threshold was never pinned down** — somewhere between 20 % and 30 % at 100 Hz.

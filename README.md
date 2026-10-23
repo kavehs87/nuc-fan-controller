@@ -1,9 +1,15 @@
 # 12 V fan switched by 3.3 V logic — a gate booster built from my own parts
 
-A KiCad schematic, a real ngspice simulation, and a single-copper-layer PCB you can
-etch at home — of the thing every 3D printer needs: **an Arduino pin turning 12 V fans
-on and off with a MOSFET.**  And since the board grew a NUC fan-header socket, the same
-Arduino now reads the NUC's own fan request and answers on its tachometer line.
+A KiCad schematic, a real ngspice simulation, and the same circuit **actually built and running on
+perfboard** — of the thing every 3D printer needs: **an Arduino pin turning 12 V fans on and off
+with a MOSFET.**  And since the design grew a NUC fan-header socket, the same Arduino can read the
+NUC's own fan request and answer on its tachometer line.
+
+**What is finished.** The perfboard build *is* the circuit: it runs, it is quiet across the duty
+range, and it needs no replacement board. The KiCad board and `pcb/` are kept as the design record
+— retired, not waiting to be routed or fabbed. The part of this project that actually changed
+something is the measurement work under *Firmware, and why 0 % was humming*: why 0 % hummed, and why
+the carrier is 100 Hz.
 
 Every real component on this sheet is a part that actually sits in my parts cabinets
 (`L1` and `R1`). Nothing here is a catalogue placeholder. The fan model is sized to the
@@ -356,8 +362,8 @@ mosfet-fan-switch.kicad_sch     the sheet (A3, ERC clean: 0 errors / 0 warnings)
 mosfet-fan-switch.kicad_sym     five local symbols: four package-accurate transistors, and
                                 the Pro Mini itself - 35 pins, one per module hole
 sym-lib-table                   registers that library for this project
-mosfet-fan-switch.kicad_pcb     the board (56 x 92 mm, one copper layer, placed but unrouted:
-                                a routing skeleton - see "The board")
+mosfet-fan-switch.kicad_pcb     the board (56 x 92 mm, placed but unrouted: a routing skeleton,
+                                and **retired** - the circuit was built on perfboard instead)
 pcb/build_board.py              the board generator: part table, track list, design rules
 pcb/pro_mini.py                 the module's hole map -> socket footprint AND schematic symbol
 tools/embed_pro_mini_schematic.py  the one-shot migration that replaced the Nano with U1
@@ -502,6 +508,12 @@ Kept here so the next schematic is faster:
 ---
 
 ## The board
+
+> **Retired.** The circuit was built on perfboard instead, and that build works — see *Where the
+> bench is left*. Everything in this chapter is the design record: why the layout is shaped the way
+> it is, and the routing defects that stopped it. It is not waiting to be finished. Route, fab or
+> extend this board only for a reason the perfboard build cannot answer — for example a permanent
+> install, or fitting the `Q5` gate helper and moving to a carrier above hearing.
 
 `pcb/build_board.py` writes the layout. It is a generator rather than a hand-drawn board:
 the part table, the track list and the design rules are the source, and the `.kicad_pcb`
