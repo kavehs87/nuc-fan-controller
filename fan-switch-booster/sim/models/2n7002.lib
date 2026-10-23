@@ -1,0 +1,55 @@
+* ============================================================================
+*  2N7002  -  N-channel small-signal MOSFET, SOT-23     (cabinet R1, drawer A4)
+* ============================================================================
+*  Role in this circuit: the level shifter.  It sees 3.3 V on its gate and has
+*  to pull the booster node (/BOOT) down to ~0 V, sink about
+*
+*      I = 12 V / R3 = 12 V / 10 kOhm = 1.2 mA
+*
+*  which is far below its 200 mA limit, so it is a comfortable fit.
+*
+*  Fit to the cabinet record:
+*
+*      Vgs(th)   2.0 V typ, 2.5 V max        -> vto = 2.0
+*      Rds(on)   1.2 Ohm max at Vgs = 10 V   -> kp = 1 / (1.2 * (10 - 2)) = 0.104
+*
+*  Level-1 model, ohmic region:
+*
+*      Vgs = 10 V  ->  1/(0.104*8)    = 1.2 Ohm     (matches the spec)
+*      Vgs =  4.5 V->  1/(0.104*2.5)  = 3.85 Ohm    (datasheet shows ~2.5 Ohm;
+*                                                     level-1 is pessimistic at
+*                                                     low Vgs, see note below)
+*      Vgs =  3.0 V->  1/(0.104*1.0)  = 9.6 Ohm  -> 1.2 mA * 9.6 Ohm = 12 mV
+*                                                     of drain-source, deep in
+*                                                     the ohmic region
+*
+*  Id(max) in the cabinet record is 115 mA.  The fan on this sheet wants ~100 mA,
+*  and at Vgs = 3 V this device can only deliver 52 mA, so the 2N7002 is used here
+*  only as a level shifter - it is NOT the pass element.
+*
+*  Note: a level-1 model has no subthreshold region and a straight-line
+*  transconductance, so its Rds(on) at low Vgs is a rough guess.  What it gets
+*  right, and what this circuit depends on, is that at Vgs = 3.0 V the 2N7002 is
+*  clearly ON while the IRFZ44N at the same Vgs is not.
+*
+*  KiCad reads this file through Q2's "Sim.Library" / "Sim.Name" fields.
+* ============================================================================
+.model 2n7002 nmos(level=1 vto=2.0 kp=0.104)
+
+
+* ---------------------------------------------------------------------------
+*  Sub-circuit wrapper - why this exists
+*
+*  The schematic symbol numbers its pins the way the package's legs are
+*  numbered, because KiCad connects symbol pin N to footprint pad N.  KiCad
+*  then writes the SPICE line in symbol pin order, so the wrapper's .subckt
+*  signature is written in that same package order and re-orders the terminals
+*  here for ngspice (which wants MOSFET as D G S [B] and BJT as C B E).
+* ---------------------------------------------------------------------------
+.subckt mos_2n7002 G S D
+M_int D G S S 2n7002
+*  ngspice wants MOSFETs as four nodes (M d g s b model), so the bulk is
+*  spelled out and tied to the source here; a three-node card is rejected with
+*  "not enough nodes".
+*  SOT-23 legs: 1 gate, 2 source, 3 drain.
+.ends

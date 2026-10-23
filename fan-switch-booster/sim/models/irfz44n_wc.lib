@@ -1,0 +1,33 @@
+* ============================================================================
+*  IRFZ44N  -  worst case unit from the same bin (cabinet R1, drawer B4)
+* ============================================================================
+*  Same fit philosophy as irfz44n.lib - land on the datasheet limit
+*  Rds(on) <= 17.5 mOhm at Vgs = 10 V - but with the threshold at the *maximum*
+*  the datasheet allows: Vgs(th) = 4.0 V.  Because the threshold is higher, kp
+*  has to be larger for the same 10 V figure: 1/(13.33*6) + 0.005 = 17.5 mOhm.
+*
+*      Vgs =  3.3 V  ->  below threshold: the fan never turns on.
+*      Vgs = 10.9 V  ->  1/(13.33*6.9) + 0.005 = 16 mOhm  (the booster still
+*                        drives it properly, which is the point)
+*
+*  This model is what "it worked on my bench" hides: two units out of the same
+*  drawer can differ by more than a volt of gate threshold.
+* ============================================================================
+.model irfz44n_wc nmos(level=1 vto=4.0 kp=13.33 rd=5m)
+
+
+* ---------------------------------------------------------------------------
+*  Sub-circuit wrapper - why this exists
+*
+*  The schematic symbol numbers its pins the way the package's legs are
+*  numbered, because KiCad connects symbol pin N to footprint pad N.  KiCad
+*  then writes the SPICE line in symbol pin order, so the wrapper's .subckt
+*  signature is written in that same package order and re-orders the terminals
+*  here for ngspice (which wants MOSFET as D G S [B] and BJT as C B E).
+* ---------------------------------------------------------------------------
+.subckt mos_irfz44n_wc G D S
+M_int D G S S irfz44n_wc
+*  ngspice wants MOSFETs as four nodes (M d g s b model), so the bulk is
+*  spelled out and tied to the source here; a three-node card is rejected with
+*  "not enough nodes".
+.ends

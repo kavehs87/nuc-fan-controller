@@ -1,0 +1,16 @@
+* ============================================================================
+*  Flyback / free-wheeling diode  (1N4148-class small signal, or a Schottky)
+* ============================================================================
+*  Written as a sub-circuit so the terminal order is spelled out explicitly:
+*  KiCad's diode symbol pin 1 is the cathode (K) and pin 2 is the anode (A),
+*  and this sub-circuit keeps that mapping unambiguous for ngspice.
+*
+*      anode  -> current flows A -> K inside the model
+*      cathode (K) sits on the +12 V rail, anode on the switching node
+*
+*  KiCad reads this file through the D1 "Sim.Library" / "Sim.Name" fields.
+* ============================================================================
+.subckt diode_fast K A
+Dint A K diode_fast_model
+.model diode_fast_model d(is=2.2p rs=0.6 cjo=4p tt=11.5n bv=75 ibv=100u)
+.ends

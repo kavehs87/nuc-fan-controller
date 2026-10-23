@@ -1,0 +1,4 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "mosfet-fan-switch") (type "KiCad") (uri "${KIPRJMOD}/mosfet-fan-switch.kicad_sym") (options "") (descr "Package-accurate transistor symbols for the fan driver"))
+)
