@@ -1,4 +1,84 @@
-# nuc-fan-controller
+# NUC fan control — one project, two halves
+
+This repo is what `nuc-fan-controller` and the perfboard fan‑switch build became when they were merged in
+October 2026. The fan‑switch history came across with it — 22 commits and the `checkpoint-fan-driver-v1`
+and `checkpoint-pro-mini-v2` tags — parked under one directory, so nothing collided.
+
+| half | what it holds | state |
+|---|---|---|
+| **`fan-switch-booster/`** | the gate booster that lets a 3.3 V logic pin switch a 12 V fan: its schematic, an ngspice model with hand‑written FET models, four sketches, the bench scripts, and a retired PCB design | **built on perfboard, scoped, and listened to.** It is the electrical reference |
+| **root** | the `nuc-fan-controller` board for the NUC enclosure: 19 V → 12 V module, 3.3 V regulator, the duty‑read divider, the BC547 gate stage, the tach stage, three fan outputs | designed, ERC and DRC clean, **not built** |
+
+**The perfboard is the reference.** Every claim about how a 12 V two‑pin fan behaves under a chopped
+supply — carrier frequency, delivered duty, the fan's start threshold, what the noise actually was — comes
+from that board and is recorded in `fan-switch-booster/README.md`. Every claim about how the NUC's ITE
+behaves — its PWM frequency and amplitude, where its demand bottoms out, what it follows — comes from the
+breadboard runs recorded below and in `BUILD.md`. The two were measured on the same machine, and they
+complement each other; they do not agree on everything, and where they differ is written down rather than
+smoothed over.
+
+## The facts both halves rest on
+
+| fact | value | evidence |
+|---|---|---|
+| the machine | 6th‑generation i3 NUC, whose stock blower is a **5 V** fan | measured |
+| the ITE's PWM request | **23 kHz** square, inside Intel's 25 kHz ±10 % | measured, scope |
+| top of that swing | **≈ 4.90 V** on the wire, ≈ 2.45 V at a 10 k / 10 k tap | measured, extrapolated from the dwell ladder |
+| the header's own fan supply | **5 V**, and a deliberate no‑connect on both boards | measured |
+| the ITE's duty **floor** | **46–48 %** — 1 946 samples, none below 100 counts of 717. Under ITE control the fan never stops | measured |
+| the duty is stepped | dwell rungs 198 / 257 / 320 / 380 counts, an 11.9‑point quantum | measured |
+| what the demand follows | the **board / PCH temperature**, not the cores | measured, 4 577 paired samples |
+| what a tach claim does to the demand | **1.1 %** for a 5.6× claim — reported speed is not in the loop | measured |
+| tach read gain | 1 186 RPM against a 1 200 RPM claim, factor **0.990** | measured |
+| tach ↔ RPM | `RPM = 30 × f_tach` (ITE IT8607E counts 2 pulses per turn) | measured |
+| a 12 V two‑wire fan's start threshold | **4–7 V at its terminals**; 10 % and 20 % at 100 Hz deliver 1.2 V and 2.4 V and will not start it | measured on the perfboard |
+| ATmega328P absolute maximum, any pin | **VCC + 0.5 V** = 3.8 V on a 3.3 V part | datasheet |
+| Intel's published pinout for these headers | **there is none** — meter the four wires before splicing | `BUILD.md` |
+
+The floor and the start threshold fit together, which is worth saying out loud: the ITE never asks for
+less than ~47 %, and 47 % at 100 Hz is about 6.4 V at the fan terminals — above the voltage the fan needs
+to start. So a fan driven by the ITE's demand is never asked to start from a dead stop, and the "start
+kick" left open in `fan-switch-booster/README.md` only matters for manual control below about 30 %.
+
+## Four ways the two halves disagree, and how to not mix them
+
+| | the perfboard, `fan-switch-booster/` | the enclosure board, at the root |
+|---|---|---|
+| fan drive pin | **D9** (`OC1A`), Timer 1 | **D11** (`OC2A`), Timer 2 |
+| tach pin | **D10**, and unused on the bench — that board has no tach path | **D9** (`OC1A`), sinking `Q1`'s open collector |
+| polarity | non‑inverting: pin high → fan on | `Q2` inverts once — pin high → gate low → fan off — and `nuc-tach-modeB` asks for the complement to undo it |
+| carrier | **100 Hz**, measured quiet | **31.25 kHz**, exactly 8 MHz / 256 |
+| gate stage | `Q2` 2N7002 + `Q3` IRF7416 booster. Turn‑off costs a fixed **~170 µs**, because `/BOOT` charges back through `R3` 10 kΩ into a node that measures **~8 nF** | `Q2` BC547 with **`R8` 1 kΩ pulling the gate node to +12 V**, `R9` 120 Ω in series with `Q3`'s gate, `R10` 10 kΩ across gate‑to‑source. Turn‑off dumps through 120 Ω: τ ≈ 0.2 µs |
+| ADC scale at the divider tap | **775 counts** — a 3.3 V reference | the logs are on an **Uno's 5 V** reference, where the same 2.50 V is **512 counts** |
+
+**Both carriers are correct, for their own board.** 31.25 kHz is safe on the enclosure board because its
+gate dumps through 120 Ω in well under a microsecond; it is *unusable* on the perfboard, where the off
+half‑period (16 µs) is far shorter than the 170 µs the booster needs to turn off, so the output is simply
+stuck on. That is not a contradiction, it is two different circuits. Neither board has to copy the other's
+carrier: the ITE's 23 kHz is only *read* — the divider turns it into a DC level — and the fan drive
+frequency is a free choice. Do not feed the ITE's clock into either board's output stage.
+
+**One thing the CAD has not caught up with.** The bench settled on a **10 kΩ / 10 kΩ** divider — 2.50 V on
+the tap, 0.8 V of headroom on a 3.3 V part — but `nuc-fan-controller.kicad_sch` still carries the old
+chain: `R3` 4.7 k → `R4` 2.2 k in series from `NUC_PWM`, over `R5` 10 kΩ to ground, which taps **2.96 V**
+at full request and leaves 0.34 V. The schematic and `exports/` need that change before the board is built.
+
+## Where the fan‑switch half lives
+
+| in `fan-switch-booster/` | what it is |
+|---|---|
+| `README.md` | the whole record of that half: the stages, every part from the cabinets, the simulation, the perfboard findings, why the carrier is 100 Hz, the firmware and the flashing route |
+| `AGENTS.md` | the settled list for that half — read it before touching that subtree |
+| `mosfet-fan-switch.kicad_sch` | the schematic the perfboard was built from. **Live** |
+| `mosfet-fan-switch.kicad_pcb`, `pcb/`, `docs/pcb-*` | **retired** board design — never built, never routed. Kept as the reason the layout looks like it does |
+| `sim/` | the ngspice model. `./sim/run.sh` regenerates netlist, deck, plots and the variant tables |
+| `firmware/fan-switch-freq/` | the sketch on the chip right now: boots itself at `duty 0 % OCR1A 0/10000 carrier 100 Hz` |
+| `firmware/bench/` | `set.sh`, `seq.sh`, `flash-bootloader.sh`, `verify-flash.sh`, and how to run them on the remote bench |
+| `archive/` | the 5 V low‑side first attempt, and two abandoned board routings |
+
+---
+
+# The enclosure board: `nuc-fan-controller`
 
 A board that lets three 12 V two‑pin fans be used in place of a NUC's stock 5 V fan, and that
 answers the NUC's tach input so the BIOS believes the fan it is asking for.
@@ -266,6 +346,17 @@ the board spends hot — see *On the bench*. `BUILD.md` is the bench sequence.
 The fan-side constants (`FAN_RPM_MIN`, `FAN_RPM_FULL`, `ADC_AT_100PCT`) are still placeholders until a
 real fan is fitted and measured; `ITE_READ_GAIN` has a measured value for the Uno driving this NUC and
 needs the same measurement on the finished board.
+
+**Across the merged repo, these are the open items:**
+
+1. swap this board's divider to 10 kΩ / 10 kΩ in the schematic and re‑export — the bench settled on it,
+   the CAD has not (see *Four ways the two halves disagree*);
+2. fit the perfboard's fan to this board's drive and measure its stall duty and RPM at two duties, which
+   turns those placeholder constants into measured ones;
+3. the start kick in `fan-switch-booster/firmware/fan-switch-freq` — only needed if the fan is ever asked
+   to start below ~30 % duty, which the ITE never asks for;
+4. a sketch that reads `/DEMAND` on A0 and re‑makes it at the perfboard's own 100 Hz — the two halves
+   joined, but that wire between them is not written yet.
 
 No license is granted — all rights reserved. It is published so the drawings and the reasoning
 behind them are readable.
