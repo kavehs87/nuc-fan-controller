@@ -40,6 +40,26 @@ not the netlist's 1.7 nF. Any perfboard prediction that uses 1.7 nF is optimisti
 - **`/DRAIN` undershoots to about −1.2 V at turn-on** (Q1's body diode conducts as D1's freewheel
   current collapses). Known, not the noise source, not worth chasing.
 
+## The NUC side — measured in `../nuc-tach-sim`, do not re-derive it here
+
+`nuc-fan-controller` in the sibling repo has 4 577 paired 1 Hz samples from a **6th-generation i3 NUC**.
+Those numbers govern: the ITE's request is **23 kHz** and tops out near **4.90 V**; the header's own fan
+supply is **5 V on that machine** and is a deliberate no-connect here; the ITE's duty has a **46–48 %
+floor** (under ITE control the fan never stops) and moves in ~12-point rungs; the demand follows the
+**board / PCH temperature**, not the cores; and a 5.6× tach claim changes the demand by 1.1 %, so the
+tach answer exists only to keep the BIOS happy. The tach is read 1 % low (`ITE_READ_GAIN` 0.990).
+
+- **Counts are not portable between boards.** Those logs are on an Uno's 5 V ADC reference, where 512
+  counts is full duty. On this project's 3.3 V Pro Mini the same 2.50 V tap is 775 counts. Carry the
+  calibration as volts, or multiply counts by 5 / 3.3.
+- **Never feed the ITE's 23 kHz into this board's booster.** The `/BOOT` turn-off is ~170 µs, so above
+  ~5 kHz the output is stuck on. Read the request and re-make it at this board's own 100 Hz. The sibling
+  project drives at 31.25 kHz because its gate stage is *different* — a BC547 with a 1 kΩ pull-up to
+  12 V and a 120 Ω dump, which turns off in well under a microsecond — not the Q2/Q3 booster used here.
+- **Pin assignments differ between the two projects.** `nuc-fan-controller` uses D9 for the tach and D11
+  for the fan drive; this project's sketches use D9 for the drive and D10 for the tach. Do not mix
+  sketches across the two boards.
+
 ## Firmware
 
 - Drive pin is **D9 = OC1A, and only D9**. Timer 1 is the module's only 16-bit timer, so the sketches

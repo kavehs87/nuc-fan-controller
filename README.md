@@ -92,7 +92,7 @@ supplies the fan on the third. This board refuses both jobs and does them anyway
 NUC fan header J4                Pro Mini (on the board, U1)
   1  PWM request, 5 V ──R7 10k──┐
   2  tach answer   <──Q4 BC547──┼── D10 (OC1B)  /TACH_PWM  100 Hz carrier out
-  3  +12 V         not connected│
+  3  fan supply    not connected│   (5 V on a 6th-gen NUC, 12 V on newer ones)
   4  GND ───────────────────────┴── GND (shared with the 12 V brick)
                                  A0  /DEMAND   2.50 V at full request, read as 775 counts
                                  D9  /PWM      the fan drive, unchanged
@@ -113,7 +113,36 @@ NUC fan header J4                Pro Mini (on the board, U1)
   generates its own 100 Hz carrier (which reads 3 000 RPM). "Same PWM being sent to the
   fans" is the right *idea* — the frequency is what has to differ.
 - J4 pin 3 (the NUC's own fan supply) is **not connected**: the fans are powered by this
-  board's 12 V brick.
+  board's 12 V brick. Note that this supply is **not 12 V on every NUC** — a 6th-generation NUC
+  drives its stock blower at **5 V**, and the ITE's PWM wire tops out near **4.9 V**, not the
+  5.5 V a header supply would suggest. Nothing here depends on that pin, which is the point of
+  leaving it unconnected.
+
+### Measured on a real NUC — see the sibling project
+
+The ITE side of this design was assumed here and **measured** in `../nuc-tach-sim`
+(`nuc-fan-controller`), on a 6th-generation i3 NUC: 4 577 paired samples at 1 Hz. Those numbers
+govern, not the assumptions below.
+
+| measured | value |
+|---|---|
+| the ITE's PWM request frequency | **23 kHz** (inside Intel's 25 kHz ±10 %) |
+| top of the request swing | **~4.90 V** on the wire, ~2.45 V at the 10 k / 10 k tap |
+| the ITE's duty **floor** | **46–48 %** — 1 946 samples, and no sample below 100 counts. Under ITE control the fan **never stops** |
+| the duty is stepped | dwell levels 198 / 257 / 320 / 380 counts (Uno scale), a 11.9-point quantum |
+| what the demand follows | the **board / PCH temperature**, not the cores — cores at 73 °C moved the demand by nothing |
+| what the reported RPM does to the demand | **nothing measurable** — a 5.6× tach claim moved the duty 1.1 % |
+| tach read gain | 1 186 RPM against a 1 200 RPM claim, factor **0.990** |
+
+Two things that follow directly. First, the tach answer only has to keep the BIOS happy — a fixed
+credible claim is enough, because the ITE does not close its loop through reported speed. Second,
+"the NUC controls the speed" means a range of roughly **47 % to 85 %** and a fan that always turns;
+if you ever want the fan actually stopped, that has to be a threshold in the sketch, not something
+the ITE will do.
+
+One trap when carrying those constants across: the counts logged in `nuc-tach-sim` are on an **Uno's
+5 V ADC reference**, where 512 counts is full duty. On this board's **3.3 V / 8 MHz Pro Mini** the same
+2.50 V tap is **775 counts**. Port the calibration as volts, or multiply the counts by 5 / 3.3.
 
 `sim/nuc_link.py` (run by `./sim/run.sh`) is the check: duty-by-duty tap voltage, ripple,
 ADC counts, the divider's load, the tach levels and the carrier window. Numbers and
@@ -664,10 +693,13 @@ footprint.
   pads 16 and 28 are the module's 3.3 V **output**, and that rail is what the `/DEMAND`
   divider is referenced to. The board carries no regulator of its own, and the module's
   ground must be the same ground as J1's 12 V brick and J4's pin 4.
-- **J4 is where the NUC's fan cable plugs in** — but check your own header with a meter
-  first. Pin 1 is the ground-side PWM request, pin 2 the tach input, pin 3 the NUC's own fan
-  supply (left unconnected here), pin 4 ground. A mis-mapped header puts 12 V on a 3.3 V
-  input, so meter it before you plug it in.
+- **J4 is where the NUC's fan cable plugs in** — and **Intel publishes no pinout for these
+  headers**, so the numbering below is this project's own convention, not a datasheet. Identify the
+  four wires with a meter before anything is spliced: which one is ground, which one the ITE drives at
+  23 kHz, which one is the header's own fan supply (**5 V on a 6th-gen NUC, 12 V on newer ones**).
+  A mis-mapped header puts 5 V or 12 V on a 3.3 V input — the ATmega328P's absolute maximum on any pin
+  is **VCC + 0.5 V**, so 5 V straight onto A0 is out of spec even though nothing burns while a 10 kΩ
+  sits in front of it.
 - **JP1 is a real part.** A 0 Ω axial with its leads spread to the 7.62 mm pitch, or a piece
   of tinned wire, between the two pads at (2.00, 14) and (9.62, 14). Without it the PWM line
   is open-circuited and the fans never switch.
