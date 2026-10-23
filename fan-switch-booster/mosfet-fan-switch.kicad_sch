@@ -5039,7 +5039,7 @@
 		)
 		(uuid "6472c335-a475-486d-b68f-3b565f5b5b61")
 	)
-	(text "PHYSICAL PINOUTS - symbols use package pin order: sheet numbers = board legs\nQ2  2N7002  SOT-23    1 gate /LGATE    2 source /GND     3 drain /BOOT\nQ3  IRF7416 SO-8      1,2,3 source /P12V   4 gate /BOOT   5..8 drain /HIGATE\nQ1  IRFZ44N TO-220    1 gate /GATE     2 drain /DRAIN    3 source /GND\nQ4  BC547   TO-92     1 emitter /GND   2 base /TBASE     3 collector /NUC_TACH\nD1  1N5819  DO-41     banded end (cathode) to +12 V, other end to /DRAIN\nJ3  3 fans            odd pins = +12 V, even pins = the switched /DRAIN side\nngspice's own order (D-G-S-B, C-B-E) lives in the sim/models/ subckt wrappers\nJ5  FTDI    1 DTR  2 TX0  3 RX1  4 P3V3  5 GND  6 BLK\nJ6  ICSP    1 MISO 3 SCK  4 MOSI 5 RST  6 GND   (pin 2 stays dead)\nU1  35 module holes: symbol pin number = socket pad number\ndocs/pcb-notes.md carries the full pad-to-net table for the board."
+	(text "PHYSICAL PINOUTS - symbols use package pin order: sheet numbers = board legs\nQ2  2N7002  SOT-23    1 gate /LGATE    2 source /GND     3 drain /BOOT\nQ3  IRF7416 SO-8      1,2,3 source /P12V   4 gate /BOOT   5..8 drain /HIGATE\nQ1  IRFZ44N TO-220    1 gate /GATE     2 drain /DRAIN    3 source /GND\nQ4  BC547   TO-92     1 emitter /GND   2 base /TBASE     3 collector /NUC_TACH\nD1  1N5819  DO-41     banded end (cathode) to +12 V, other end to /DRAIN\nJ3  3 fans            odd pins = +12 V, even pins = the switched /DRAIN side\nngspice's own order (D-G-S-B, C-B-E) lives in the sim/models/ subckt wrappers\nJ5  FTDI    1 DTR  2 TX0  3 RX1  4 P3V3  5 GND  6 BLK   (no ICSP header on this board)\nU1  35 module holes: symbol pin number = socket pad number\ndocs/pcb-notes.md carries the full pad-to-net table for the board."
 		(exclude_from_sim no)
 		(at 155 250 0)
 		(effects
@@ -5270,10 +5270,6 @@
 	(no_connect
 		(at 44.45 151.13)
 		(uuid "e9ff8d0b-658a-4cc0-a40c-4acc612e624b")
-	)
-	(no_connect
-		(at 35.56 119.38)
-		(uuid "ed462368-2887-4f2b-991a-b6960a6bfc5f")
 	)
 	(no_connect
 		(at 44.45 156.21)
