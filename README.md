@@ -6,7 +6,7 @@ and `checkpoint-pro-mini-v2` tags — parked under one directory, so nothing col
 
 | half | what it holds | state |
 |---|---|---|
-| **`fan-switch-booster/`** | the gate booster that lets a 3.3 V logic pin switch a 12 V fan: its schematic, an ngspice model with hand‑written FET models, four sketches, the bench scripts | **built on perfboard, scoped, and listened to.** It is the electrical reference |
+| **`fan-switch-booster/`** | the gate booster that lets a 3.3 V logic pin switch a 12 V fan: its schematic, an ngspice model with hand‑written FET models, five sketches, the bench scripts | **built on perfboard, scoped, and listened to.** It is the electrical reference |
 | **root** | the record of the NUC's own fan control: 4 577 paired 1 Hz samples in `bench/data/`, the analysers and graphs that read them, `BUILD.md`, and the sketches that carry the measured ITE constants | **measured.** The enclosure board that was designed around those numbers is retired to git at the tag `nuc-fan-controller-full-2026-10-23` |
 
 **The perfboard is the reference.** Every claim about how a 12 V two‑pin fan behaves under a chopped
@@ -22,6 +22,44 @@ perfboard‑tested. The enclosure board's drawings, its exports, its board gener
 tach‑simulator board and the two abandoned routings were removed, along with every KiCad cache and scratch
 copy. They are complete at the tag named above, and no measurement went with them — the ITE runs were done
 on a breadboard with an Uno.
+
+## The tree
+
+```
+README.md                  this file — the merged record, and the measured facts both halves rest on
+AGENTS.md                  what is settled, so it is not re-litigated
+BUILD.md                   the NUC-side bench procedures: meter the header, the divider, the BC547 check,
+                           the log pairs and offsets, calibration order  (its board sections are a
+                           retired record; the commands in them no longer run)
+
+bench/                     the ITE measurements
+  data/                      12 raw 1 Hz logs — every number in this file comes from these
+  analyze-*.py               the five analysers
+  plot-curve.py plot-hold.py draw the two graphs in docs/bench/
+  prepare-photos.py          the tool that cropped docs/bench/ from the phone originals; its input
+                             directory was purged, so it no longer runs
+
+docs/
+  bench/                     five bench photographs, two graphs
+  parts-collection.*         the cabinet walk for the retired board's BOM
+
+firmware/                  the sketches that made those measurements
+  nuc-tach-modeB/            the ITE constants live here
+  nuc-tach-modeA/            the archived tach simulator's sketch
+  probe-*/                   the five breadboard probes
+
+fan-switch-booster/        the built reference — its own README.md and AGENTS.md
+  mosfet-fan-switch.kicad_sch   the schematic the perfboard was built from
+  sim/                       ngspice model, hand-written FET models, ./sim/run.sh
+  firmware/                  the sketch on the chip, three earlier variants, an Arduino-as-ISP programmer,
+                             and the bench scripts (set.sh, seq.sh, flash-bootloader.sh, verify-flash.sh)
+  pcb/  docs/pcb-*           the retired PCB record
+  archive/                   the 5 V low-side first attempt
+```
+
+Three tags mark the states this repo has been through: `checkpoint-fan-driver-v1` and
+`checkpoint-pro-mini-v2` from the fan‑switch work, and `nuc-fan-controller-full-2026-10-23`, which holds
+everything the October 2026 cleanup removed.
 
 ## The facts both halves rest on
 
@@ -130,6 +168,9 @@ numbers.
 | `bench/analyze-hold.py` | the analyser for the "does it integrate time?" test: flat-window trend, same-temperature early against late, and a two-variable fit |
 | `bench/plot-curve.py`, `bench/plot-hold.py` | draw `docs/bench/06-ite-fan-response.svg` and `docs/bench/07-ite-hold-test.svg`, the two graphs below, from the same logs |
 | `bench/data/` | the raw logs: 1 Hz traces of the divider reading, and of the NUC's temperatures |
+| `firmware/nuc-tach-modeA/nuc-tach-modeA.ino` | the archived tach simulator's sketch — the fixed‑RPM answer this project replaced |
+| `bench/prepare-photos.py` | the tool that cropped `docs/bench/` out of the phone originals. Its input directory was purged in the cleanup, so it no longer runs; the recipe is in the file |
+| `docs/parts-collection.md`, `.html` | the cabinet walk for the **retired board's** BOM — every line with the drawer it came from, and the measurements each part has to give up before its footprint can be drawn |
 | `BUILD.md` | the bench sheet: identifying the four header wires with a meter, setting a buck module to 12.0 V, the divider / top‑of‑swing procedure, the BC547 pin‑order check, calibration order. Its assembly steps name parts of the retired board |
 | `docs/parts-collection.html` | the collection sheet: every BOM line with the exact cabinet drawer it comes from, in drawer‑walk order, plus the eight measurements that decide the footprints (also `docs/parts-collection.md`) |
 | `fan-switch-booster/archive/` | the booster's first version — a single logic‑level IRLZ44N driven directly at 5 V, with its plots. Kept because the reason it worked is the reason 3.3 V needs a booster |

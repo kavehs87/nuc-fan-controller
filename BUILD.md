@@ -56,6 +56,9 @@ starts logging). `analyze-heat.py` takes that offset as an argument.
 | `hold.log` | `hold-temps.log` | claim frozen, fans off, a 300 s four-core ramp then **1200 s at a two-core load** so the board sits at 68.5–69 °C for sixteen flat minutes — the time-at-temperature test. Its `baseline` loop was left out of the capture script, so the log starts mid-ramp at 41 °C |
 | `nucmon-idle.log` | — | the NUC's own sensors at idle, for the record |
 
+*The next three paragraphs are the retired board's CAD record, as of 2026‑10‑20. They are kept because the
+findings in them are transferable; the commands cannot be re‑run from this tree.*
+
 **ERC: 0 violations.** **DRC: 0 errors** after `kicad-cli pcb drc nuc-fan-controller.kicad_pcb
 --refill-zones --save-board` (2026-10-20), with 26 `lib_footprint_mismatch` warnings and 1
 `unconnected_items` warning, both explained under *Board*: every footprint on this board is a modified
@@ -78,6 +81,9 @@ Delete a tag and KiCad renames that net to `Net-(…)` everywhere downstream.
 ---
 
 ## The circuit, in five blocks
+
+*The circuit as the retired board drew it, in the designators that board used. The built version of the same
+idea — the gate booster, its nets and its measured behaviour — is `fan-switch-booster/README.md`.*
 
 ```
 A. 19 V in, the module, 12 V out            B. 12 V → 3.3 V, for the Pro Mini only
@@ -139,6 +145,9 @@ leaves the edges alone.
 ---
 
 ## BOM, and where the parts came from
+
+*This is the retired board's BOM. The perfboard's parts, all from the same drawers, are listed in
+`fan-switch-booster/README.md`, *Parts — all from my cabinets*.*
 
 All through-hole except one SMD part — U3, a TO-252 — which is hand-solderable without a stencil.  All
 already in the cabinet.  `docs/parts-collection.html` is the same list cut as a walk-the-cabinet checklist,
@@ -241,6 +250,8 @@ so keep the SOT-223.
 
 ## Power budget, and what the board actually carries
 
+*Retired board's budget — the numbers are still the right ones for any 12 V build of this idea.*
+
 | Rail | What hangs off it | Worst case |
 |---|---|---|
 | 19 V in | J1 → J6 → the module's input | 0.4 A at 12 V / 0.3 A out, ~90 % efficiency |
@@ -318,6 +329,11 @@ The tach line sinks 1–5 mA into the ITE's pull-up and the PWM divider draws 5 
 
 ## Board
 
+> **Retired record — the commands in this section cannot run any more.** The board file, its generator and
+> its exports are at the tag `nuc-fan-controller-full-2026-10-23`. What is worth keeping from this section is
+> the *reasoning*: the rules a home-etched single-layer board actually needs, why every footprint here is a
+> deliberately modified copy, and why the ratsnest complains about a net that a 0 Ω resistor joins.
+
 **88.90 × 76.20 mm, one copper layer, made at home.** The single layer is F.Cu, and F.Cu is the
 component side: pads, traces, the pour and every part are on the same side, so the copper you etch is
 the copper you solder to and nothing about the board is mirrored.  (The two-layer board this replaced was
@@ -362,6 +378,9 @@ the copper you solder to and nothing about the board is mirrored.  (The two-laye
   runs along the bottom edge, with the 3.3 V rail 5.08 mm above it so a trace can still come down onto
   every pin but the one its own stub lands on.
 - How it is made, and the loop that keeps it honest:
+
+  The loop that kept it honest — none of these files is in the tree now, so run it from a worktree of the
+  tag if the board is ever rebuilt:
 
   ```
   python3 logs/build1l.py            # writes the board from PARTS / BARS / HOLES in the script
@@ -512,8 +531,8 @@ first, and the fix is a bootloader without the timeout, not a different circuit.
 
 ## Bench test, in order
 
-Each step answers a question the next one depends on. Do them before the board goes into the
-enclosure.
+Each step answers a question the next one depends on. These are live procedures — they apply to the
+perfboard build as much as they applied to the board this file was written for.
 
 1. **Identify the four NUC wires with a meter** (section above). Write down which is which.
 2. **Set the module to 12.0 V with a meter** before it is wired to anything, and check its current

@@ -118,31 +118,23 @@ NUC fan header J4                Pro Mini (on the board, U1)
   5.5 V a header supply would suggest. Nothing here depends on that pin, which is the point of
   leaving it unconnected.
 
-### Measured on a real NUC — recorded at the root of this repo
+### Measured on a real NUC — the record is at the root, not here
 
 The ITE side of this design was assumed here and **measured** one directory up: 4 577 paired samples at
-1 Hz on a 6th-generation i3 NUC, logged in `../bench/data/`, analysed by `../bench/analyze-*.py`, and
-written up in `../README.md` and `../BUILD.md`. Those numbers govern, not the assumptions below.
+1 Hz on a 6th‑generation i3 NUC, logged in `../bench/data/`, analysed by `../bench/analyze-*.py`, and
+tabulated with their evidence in **`../README.md`**, *The facts both halves rest on*. Read them there — they
+are deliberately not repeated here. Those numbers govern, not the assumptions below.
 
-| measured | value |
-|---|---|
-| the ITE's PWM request frequency | **23 kHz** (inside Intel's 25 kHz ±10 %) |
-| top of the request swing | **~4.90 V** on the wire, ~2.45 V at the 10 k / 10 k tap |
-| the ITE's duty **floor** | **46–48 %** — 1 946 samples, and no sample below 100 counts. Under ITE control the fan **never stops** |
-| the duty is stepped | dwell levels 198 / 257 / 320 / 380 counts (Uno scale), a 11.9-point quantum |
-| what the demand follows | the **board / PCH temperature**, not the cores — cores at 73 °C moved the demand by nothing |
-| what the reported RPM does to the demand | **nothing measurable** — a 5.6× tach claim moved the duty 1.1 % |
-| tach read gain | 1 186 RPM against a 1 200 RPM claim, factor **0.990** |
+Three of them decide how this board is used:
 
-Two things that follow directly. First, the tach answer only has to keep the BIOS happy — a fixed
-credible claim is enough, because the ITE does not close its loop through reported speed. Second,
-"the NUC controls the speed" means a range of roughly **47 % to 85 %** and a fan that always turns;
-if you ever want the fan actually stopped, that has to be a threshold in the sketch, not something
-the ITE will do.
-
-One trap when carrying those constants across: the counts logged in `../bench/data/` are on an **Uno's
-5 V ADC reference**, where 512 counts is full duty. On this board's **3.3 V / 8 MHz Pro Mini** the same
-2.50 V tap is **775 counts**. Port the calibration as volts, or multiply the counts by 5 / 3.3.
+- the ITE's duty has a **46–48 % floor**, so under ITE control the fan never stops, and "the NUC controls
+  the speed" means a ladder of roughly **47 % → 85 %**, not a knob. An actually stopped fan has to be a
+  threshold in the sketch;
+- a 5.6× tach claim moved the demand **1.1 %** — the tach answer exists to keep the BIOS happy, not to
+  close a loop;
+- the counts in `../bench/data/` are on an **Uno's 5 V** ADC reference, where 512 counts is full duty. On
+  this board's **3.3 V / 8 MHz Pro Mini** the same 2.50 V tap is **775 counts**. Carry the calibration as
+  volts, or multiply counts by 5 / 3.3.
 
 The enclosure board those measurements were designed for — `nuc-fan-controller`, with its 19 V → 12 V
 module, its BC547 gate stage and its 31.25 kHz drive on D11 — is **retired**: the perfboard here is the
@@ -691,6 +683,10 @@ footprint.
 
 ### Wiring the NUC side
 
+> Some bullets below name `J4`, `J5`, `J6`, `JP1` and U1's pad numbers — those are the **retired PCB's**
+> designators, kept because the reasoning transfers. The perfboard build uses the same Pro Mini in sockets
+> and the same four signals; it just has no silk to point at.
+
 - **U1 is the Pro Mini, and it is on the board** — three female socket strips, 35 holes,
   with the four signals this circuit needs already assigned: pad 12 `/PWM` (**D9 = OC1A**),
   pad 24 `/TACH_PWM` (**D10 = OC1B**), pad 20 `/DEMAND` (read it on **A0**), and `/GND` on
@@ -709,8 +705,11 @@ footprint.
   of tinned wire, between the two pads at (2.00, 14) and (9.62, 14). Without it the PWM line
   is open-circuited and the fans never switch.
 - **The tach carrier is firmware's job.** Drive D10 between 23 and 350 Hz — 100 Hz reads
-  3 000 RPM on an ITE that counts two pulses per revolution. At the fan drive's 1 kHz the NUC
-  sees 30 000 RPM and reports a fan that is not there. Nothing on the board enforces this.
+  3 000 RPM on an ITE that counts two pulses per revolution. Above that window the tach stops being a
+  faster reading and becomes a claim the NUC rejects: the 1 kHz this board ran at while the carrier was
+  being investigated would read 30 000 RPM, and 25 kHz would read 750 000. Nothing on the board enforces
+  the limit — the sketch does, which is why the carrier is a constant in the sketch rather than a
+  coincidence.
 - Read `/DEMAND` on A0 and map it straight onto the fan duty: 2.50 V is a full request
   (775 counts), so `duty = min(1.0, counts / 775)` is the whole control law. The 5.5 ms
   time constant at the tap means the ADC reading is already the average, so a plain
