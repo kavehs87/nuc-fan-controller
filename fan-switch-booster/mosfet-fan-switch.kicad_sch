@@ -4917,7 +4917,107 @@
 			)
 			(embedded_fonts no)
 		)
-	)
+	
+        	(symbol "Mechanical:MountingHole"
+    		(pin_names
+    			(offset 1.016)
+    		)
+    		(exclude_from_sim no)
+    		(in_bom no)
+    		(on_board yes)
+    		(in_pos_files yes)
+    		(duplicate_pin_numbers_are_jumpers no)
+    		(property "Reference" "H"
+    			(at 0 5.08 0)
+    			(show_name no)
+    			(do_not_autoplace no)
+    			(effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    		)
+    		(property "Value" "MountingHole"
+    			(at 0 3.175 0)
+    			(show_name no)
+    			(do_not_autoplace no)
+    			(effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    		)
+    		(property "Footprint" ""
+    			(at 0 0 0)
+    			(show_name no)
+    			(do_not_autoplace no)
+    			(hide yes)
+    			(effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    		)
+    		(property "Datasheet" ""
+    			(at 0 0 0)
+    			(show_name no)
+    			(do_not_autoplace no)
+    			(hide yes)
+    			(effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    		)
+    		(property "Description" "Mounting Hole without connection"
+    			(at 0 0 0)
+    			(show_name no)
+    			(do_not_autoplace no)
+    			(hide yes)
+    			(effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    		)
+    		(property "ki_keywords" "mounting hole"
+    			(at 0 0 0)
+    			(show_name no)
+    			(do_not_autoplace no)
+    			(hide yes)
+    			(effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    		)
+    		(property "ki_fp_filters" "MountingHole*"
+    			(at 0 0 0)
+    			(show_name no)
+    			(do_not_autoplace no)
+    			(hide yes)
+    			(effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    		)
+    		(symbol "MountingHole_0_1"
+    			(circle
+    				(center 0 0)
+    				(radius 1.27)
+    				(stroke
+    					(width 1.27)
+    					(type default)
+    				)
+    				(fill
+    					(type none)
+    				)
+    			)
+    		)
+    		(embedded_fonts no)
+    	)
+  )
 	(text "PARTS - all from my cabinets\nU1  Arduino Pro Mini 3V3       L1 - C5   x1  (on three female sockets)\nQ1  IRFZ44N   TO-220           R1 - B4   x12\nQ2  2N7002    SOT-23           R1 - A4   x11\nQ3  IRF7416   SO-8             R1 - A4   x6  (a breakout board in the same drawer)\nD1  1N5819    40 V 1 A Schottky L1 - E1  x30\nD2  1N5822    40 V 3 A DO-27   L1 - E1   x9   spare, not soldered\nD3  MBR10100CT 10 A dual       L1 - E1   x3   spare, not soldered\nQ4  BC547     TO-92            R1 - D3   x20\nR1, R4    1 k                 R1 - A2   x20\nR2, R3, R5   10 k             R1 - B2   x20\nV1  12 V supply module         L1 - B7   x2\nC1, C2, L1, R6 are model artefacts, not bin parts"
 		(exclude_from_sim no)
 		(at 155 222 0)
@@ -10216,7 +10316,267 @@
 		(at 80.00999999999999 162.56)
 		(uuid "64768b71-9caf-419a-b054-e87756ec2525")
 	)
-	(sheet_instances
+	  (symbol (lib_id "Mechanical:MountingHole") (at 299.72 250.19 0) (unit 1)
+    (body_style 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (in_pos_files yes) (dnp no)
+    (uuid "4ad18cd6-1e9c-41e9-88ba-af34f4416de0")
+    (property "Reference" "MK1"
+      (at 299.72 255.27 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Value" "M3 mounting hole"
+      (at 299.72 253.365 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
+      (at 299.72 250.19 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Datasheet" ""
+      (at 299.72 250.19 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Description" "Mounting Hole without connection"
+      (at 299.72 250.19 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (instances
+      (project "mosfet-fan-switch"
+        (path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+          (reference "MK1")
+          (unit 1)
+        )
+      )
+    )
+  )
+    (symbol (lib_id "Mechanical:MountingHole") (at 320.04 250.19 0) (unit 1)
+    (body_style 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (in_pos_files yes) (dnp no)
+    (uuid "df75f78b-f179-4c92-b608-5103432fb5b5")
+    (property "Reference" "MK2"
+      (at 320.04 255.27 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Value" "M3 mounting hole"
+      (at 320.04 253.365 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
+      (at 320.04 250.19 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Datasheet" ""
+      (at 320.04 250.19 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Description" "Mounting Hole without connection"
+      (at 320.04 250.19 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (instances
+      (project "mosfet-fan-switch"
+        (path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+          (reference "MK2")
+          (unit 1)
+        )
+      )
+    )
+  )
+    (symbol (lib_id "Mechanical:MountingHole") (at 340.36 250.19 0) (unit 1)
+    (body_style 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (in_pos_files yes) (dnp no)
+    (uuid "a582f093-cccd-41b4-bdd7-7312151cd139")
+    (property "Reference" "MK3"
+      (at 340.36 255.27 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Value" "M3 mounting hole"
+      (at 340.36 253.365 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
+      (at 340.36 250.19 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Datasheet" ""
+      (at 340.36 250.19 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Description" "Mounting Hole without connection"
+      (at 340.36 250.19 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (instances
+      (project "mosfet-fan-switch"
+        (path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+          (reference "MK3")
+          (unit 1)
+        )
+      )
+    )
+  )
+    (symbol (lib_id "Mechanical:MountingHole") (at 359.41 250.19 0) (unit 1)
+    (body_style 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (in_pos_files yes) (dnp no)
+    (uuid "4227aff4-84f7-4e0f-a7db-c8ecf25534e3")
+    (property "Reference" "MK4"
+      (at 359.41 255.27 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Value" "M3 mounting hole"
+      (at 359.41 253.365 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
+      (at 359.41 250.19 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Datasheet" ""
+      (at 359.41 250.19 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (property "Description" "Mounting Hole without connection"
+      (at 359.41 250.19 0)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects
+    				(font
+    					(size 1.27 1.27)
+    				)
+    			)
+    )
+    (instances
+      (project "mosfet-fan-switch"
+        (path "/70af4f7e-8b7a-484f-96e0-6ca2b9e2231e"
+          (reference "MK4")
+          (unit 1)
+        )
+      )
+    )
+  )
+  (sheet_instances
 		(path "/"
 			(page "1")
 		)
