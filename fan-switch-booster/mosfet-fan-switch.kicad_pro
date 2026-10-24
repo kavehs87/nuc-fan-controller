@@ -526,7 +526,7 @@
       "netlist": "",
       "plot": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "fab/mosfet-fan-switch.stl",
       "vrml": ""
     },
     "page_layout_descr_file": ""

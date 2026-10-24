@@ -102,6 +102,7 @@
 		(property "Reference" "MK4"
 			(at 0 -4.15 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "1329520c-4cda-4dca-9df0-eef47a7c15c5")
 			(effects
 				(font
@@ -113,6 +114,7 @@
 		(property "Value" "M3 mounting hole"
 			(at 0 4.15 0)
 			(layer "F.Fab")
+			(hide yes)
 			(uuid "3b74799e-3782-45f1-bfa7-76b7def25abe")
 			(effects
 				(font
@@ -4678,6 +4680,7 @@
 		(property "Reference" "MK3"
 			(at 0 -4.15 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "0e6631ca-6505-40c0-b39b-612fa32e724a")
 			(effects
 				(font
@@ -4689,6 +4692,7 @@
 		(property "Value" "M3 mounting hole"
 			(at 0 4.15 0)
 			(layer "F.Fab")
+			(hide yes)
 			(uuid "586541fe-0a74-426f-a438-26af0b2145d1")
 			(effects
 				(font
@@ -5200,6 +5204,7 @@
 		(property "Reference" "MK1"
 			(at 0 -4.15 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "f6c72d61-790d-4037-8661-7786731e2350")
 			(effects
 				(font
@@ -5211,6 +5216,7 @@
 		(property "Value" "M3 mounting hole"
 			(at 0 4.15 0)
 			(layer "F.Fab")
+			(hide yes)
 			(uuid "1bbb99f3-86d7-42c1-97c6-b677965bc839")
 			(effects
 				(font
@@ -9976,6 +9982,7 @@
 		(property "Reference" "MK2"
 			(at 0 -4.15 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "7dc2c44d-445b-460e-b2f6-479c9477eb6a")
 			(effects
 				(font
@@ -9987,6 +9994,7 @@
 		(property "Value" "M3 mounting hole"
 			(at 0 4.15 0)
 			(layer "F.Fab")
+			(hide yes)
 			(uuid "b07577ed-d5df-41ed-a4f1-cc5e83291ba5")
 			(effects
 				(font
